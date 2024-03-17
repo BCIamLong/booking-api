@@ -2,7 +2,7 @@
   "name": "the-wild-oasis-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -12,7 +12,8 @@
     "test:watch": "npx jest --watchAll",
     "test:coverage": "npx jest --collect-coverage",
     "test:integration": "npx jest",
-    "test:unit": "npx jest --detectOpenHandles"
+    "test:unit": "npx jest --detectOpenHandles",
+    "dev:import": "npx ts-node src/data/importData.ts"
   },
   "author": "",
   "license": "ISC",

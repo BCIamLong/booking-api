@@ -1,5 +1,6 @@
 import { ObjectSchema, ValidationResult } from 'joi'
 import cabinSchema from './cabin.schema'
+import guestSchema from './guest.schema'
 import { NextFunction, Request, Response } from 'express'
 import { AppError } from '../utils'
 
@@ -11,4 +12,4 @@ export const validator = (schema: ObjectSchema) => (req: Request, res: Response,
   next()
 }
 
-export { cabinSchema }
+export { cabinSchema, guestSchema }

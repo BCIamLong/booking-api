@@ -35,7 +35,13 @@ const swaggerOptions: SwaggerOptions = {
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions)
 
-swagger.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+const options = {
+  // customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Booking API'
+  // customfavIcon: '/assets/favicon.ico'
+}
+
+swagger.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, options))
 
 swagger.get('/docs.json', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'application/json')

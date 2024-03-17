@@ -1,8 +1,8 @@
-jest.mock('../../database/models/cabin.model.ts')
-import Cabin from '../../database/models/cabin.model'
-import cabinsController from '../cabins.controller'
+jest.mock('../../database/models/guest.model.ts')
+import Guest from '../../database/models/guest.model'
+import guestsController from '../guests.controller'
 
-const { getCabins, getCabin, postCabin, deleteCabin, updateCabin } = cabinsController
+const { getGuests, getGuest, postGuest, deleteGuest, updateGuest } = guestsController
 
 const req = {
   params: {
@@ -22,26 +22,25 @@ const res = {
 }
 // const res = jest
 
-const cabinItem = {
-  _id: '1',
-  name: 'Cozy Cabin',
-  maxCapacity: 4,
-  regularPrice: 100,
-  discount: 10,
-  description: 'A cozy cabin nestled in the woods.',
-  image: 'cozy_cabin.jpg',
+const guestItem = {
+  _id: 'f10e695b-14df-4fe0-a944-fcf8e473e614',
+  fullName: 'Alice Johnson',
+  email: 'alice.johnson@example.com',
+  nationalId: '456789123',
+  nationality: 'UK',
+  countryFlag: '🇬🇧',
   createdAt: new Date(),
   updatedAt: new Date()
 }
 
-describe('unit test for user controller', () => {
-  describe('test getCabins function', () => {
-    it('should return a status of 200 and cabins list', async () => {
+describe('unit test for guests controller', () => {
+  describe('test getGuests function', () => {
+    it('should return a status of 200 and guests list', async () => {
       // @ts-ignore
-      Cabin.find.mockImplementationOnce(() => [cabinItem])
+      Guest.find.mockImplementationOnce(() => [guestItem])
 
       // @ts-ignore
-      await getCabins(req, res)
+      await getGuests(req, res)
 
       expect(res.json).toHaveBeenCalledTimes(1)
       expect(res.json).toHaveBeenCalledWith({
@@ -51,15 +50,15 @@ describe('unit test for user controller', () => {
     })
   })
 
-  describe('test getCabin function', () => {
-    describe('given an invalid cabin id ', () => {
+  describe('test getGuest function', () => {
+    describe('given an invalid guest id ', () => {
       it('should return a status of 404', async () => {
         // @ts-ignore
-        Cabin.findById.mockImplementationOnce(() => undefined)
+        Guest.findById.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
-          await getCabin(req, res)
+          await getGuest(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(404)
@@ -67,34 +66,34 @@ describe('unit test for user controller', () => {
       })
     })
 
-    describe('given an valid cabin id ', () => {
-      it('should return a status of 200 and cabin', async () => {
+    describe('given an valid guest id ', () => {
+      it('should return a status of 200 and guest', async () => {
         // @ts-ignore
-        Cabin.findById.mockImplementationOnce(() => cabinItem)
+        Guest.findById.mockImplementationOnce(() => guestItem)
 
         // @ts-ignore
-        await getCabin(req, res)
+        await getGuest(req, res)
 
         expect(res.json).toHaveBeenCalledTimes(1)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           data: {
-            cabin: cabinItem
+            guest: guestItem
           }
         })
       })
     })
   })
 
-  describe('test updateCabin function', () => {
-    describe('given the invalid cabin id', () => {
+  describe('test updateGuest function', () => {
+    describe('given the invalid guest id', () => {
       it('should return a status of 404', async () => {
         // @ts-ignore
-        Cabin.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        Guest.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
-          await updateCabin(req, res)
+          await updateGuest(req, res)
         } catch (err: any) {
           expect(err.statusCode).toBe(404)
           expect(res.json).toHaveBeenCalledTimes(0)
@@ -105,14 +104,14 @@ describe('unit test for user controller', () => {
     describe('given the invalid input', () => {
       it('should return a status of 400', async () => {
         // @ts-ignore
-        Cabin.findByIdAndUpdate.mockRejectedValueOnce({
+        Guest.findByIdAndUpdate.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
 
         try {
           // @ts-ignore
-          await updateCabin(req, res)
+          await updateGuest(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
@@ -121,35 +120,35 @@ describe('unit test for user controller', () => {
     })
 
     describe('given the valid input', () => {
-      it('should return a status of 200 and new updated cabin', async () => {
+      it('should return a status of 200 and new updated guest', async () => {
         // @ts-ignore
-        Cabin.findByIdAndUpdate.mockImplementationOnce(() => cabinItem)
+        Guest.findByIdAndUpdate.mockImplementationOnce(() => guestItem)
         // @ts-ignore
-        await updateCabin(req, res)
+        await updateGuest(req, res)
 
         expect(res.json).toHaveBeenCalledTimes(1)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           data: {
-            cabin: cabinItem
+            guest: guestItem
           }
         })
       })
     })
   })
 
-  describe('test postCabin function', () => {
+  describe('test postGuest function', () => {
     describe('given an invalid input', () => {
       it('should return a status of 400', async () => {
         // @ts-ignore
-        Cabin.create.mockRejectedValueOnce({
+        Guest.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
 
         try {
           // @ts-ignore
-          await postCabin(req, res)
+          await postGuest(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
@@ -158,33 +157,33 @@ describe('unit test for user controller', () => {
     })
 
     describe('given a valid input', () => {
-      it('should return a status of 201 and new cabin', async () => {
+      it('should return a status of 201 and new guest', async () => {
         // @ts-ignore
-        Cabin.create.mockImplementationOnce(() => cabinItem)
+        Guest.create.mockImplementationOnce(() => guestItem)
         // @ts-ignore
-        await postCabin(req, res)
+        await postGuest(req, res)
 
         expect(res.status).toHaveBeenCalledWith(201)
         expect(res.json).toHaveBeenCalledTimes(1)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           data: {
-            // cabin: expect.any(Object)
-            cabin: cabinItem
+            // guest: expect.any(Object)
+            guest: guestItem
           }
         })
       })
     })
   })
 
-  describe('test deleteCabin function', () => {
+  describe('test deleteGuest function', () => {
     describe('given an invalid id', () => {
       it('should return a status of 404', async () => {
         // @ts-ignore
-        Cabin.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        Guest.findByIdAndDelete.mockImplementationOnce(() => undefined)
         try {
           // @ts-ignore
-          await deleteCabin(req, res)
+          await deleteGuest(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(404)
@@ -195,9 +194,9 @@ describe('unit test for user controller', () => {
     describe('given a valid id', () => {
       it('should return a status of 204', async () => {
         // @ts-ignore
-        Cabin.findByIdAndDelete.mockImplementationOnce(() => cabinItem)
+        Guest.findByIdAndDelete.mockImplementationOnce(() => guestItem)
         // @ts-ignore
-        await deleteCabin(req, res)
+        await deleteGuest(req, res)
 
         expect(res.status).toHaveBeenCalledWith(204)
         expect(res.json).toHaveBeenCalledTimes(1)
