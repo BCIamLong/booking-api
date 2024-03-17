@@ -35,7 +35,7 @@ const cabinSchema = new Schema(
     _id: {
       type: String,
       // required: true,
-      default: uuidv4(),
+      default: `cabin-${uuidv4()}`,
       unique: true
     },
     name: {
