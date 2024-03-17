@@ -6,7 +6,7 @@ import { version } from '../../package.json'
 const swagger = Router()
 
 const swaggerDefinition: SwaggerDefinition = {
-  opeanapi: '3.0.0',
+  openapi: '3.0.0',
   info: {
     title: 'Prepare API for application',
     version,
@@ -30,7 +30,7 @@ const swaggerDefinition: SwaggerDefinition = {
 
 const swaggerOptions: SwaggerOptions = {
   definition: swaggerDefinition,
-  apis: ['./src/api/routes/*.ts', './src/api/validators/*.ts']
+  apis: ['./src/api/routes/*.ts', './src/api/validators/*.ts', './src/api/database/models/*.ts']
 }
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions)

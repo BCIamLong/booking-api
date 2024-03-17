@@ -1,11 +1,41 @@
 import mongoose, { Schema } from 'mongoose'
+import { v4 as uuidv4 } from 'uuid'
 import { ICabin } from '~/api/interfaces'
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   CabinResponse:
+ *    type: object
+ *    properties:
+ *     _id:
+ *      type: string
+ *     name:
+ *      type: string
+ *     maxCapacity:
+ *      type: number
+ *     regularPrice:
+ *      type: number
+ *     discount:
+ *      type: number
+ *     description:
+ *      type: string
+ *     image:
+ *      type: string
+ *     createdAt:
+ *      type: string
+ *      format: date
+ *     updatedAt:
+ *      type: string
+ *      format: date
+ */
 const cabinSchema = new Schema(
   {
     _id: {
       type: String,
-      required: true,
+      // required: true,
+      default: uuidv4(),
       unique: true
     },
     name: {

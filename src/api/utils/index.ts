@@ -1,3 +1,5 @@
 import log from './logger'
+import asyncCatch from './asyncCatch'
+import AppError from './AppError'
 
-export { log }
+export { log, asyncCatch, AppError }
