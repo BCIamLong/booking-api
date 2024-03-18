@@ -6,7 +6,7 @@ const fetchAll =
   async () => {
     const data = await Model.find()
 
-    return data
+    return { data, collectionName: Model.collection.collectionName }
   }
 
 const fetchOne =
@@ -15,7 +15,7 @@ const fetchOne =
     const data = await Model.findById(id)
     if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found with this id`)
 
-    return data
+    return { data, collectionName: Model.collection.collectionName }
   }
 
 const createOne =
@@ -23,7 +23,7 @@ const createOne =
   async (data: Omit<T, '_id' | 'createdAt' | 'updatedAt'>) => {
     const newData = await Model.create(data)
 
-    return newData
+    return { data: newData, collectionName: Model.collection.collectionName }
   }
 
 const editOne =
@@ -35,7 +35,7 @@ const editOne =
     })
     if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found with this id`)
 
-    return data
+    return { data, collectionName: Model.collection.collectionName }
   }
 
 const removeOne =
@@ -45,7 +45,7 @@ const removeOne =
     // const isDeleted = await Cabin.findOne({ _id: id })
     if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found with this id`)
 
-    return data
+    return { data, collectionName: Model.collection.collectionName }
   }
 
 export { fetchAll, fetchOne, createOne, editOne, removeOne }
