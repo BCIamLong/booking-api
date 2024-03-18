@@ -31,7 +31,7 @@ describe('unit test for cabins service', () => {
       // @ts-ignore
       Cabin.find.mockImplementationOnce(() => [cabinItem])
 
-      const data = await fetchCabins()
+      const { data } = await fetchCabins()
 
       // @ts-ignore
       expect(data).toEqual([cabinItem])
@@ -56,7 +56,7 @@ describe('unit test for cabins service', () => {
         // @ts-ignore
         Cabin.findById.mockImplementationOnce(() => cabinItem)
 
-        const data = await fetchCabin('valid_id')
+        const { data } = await fetchCabin('valid_id')
         expect(data).toEqual(cabinItem)
       })
     })
@@ -84,7 +84,7 @@ describe('unit test for cabins service', () => {
         // @ts-ignore
         Cabin.create.mockImplementationOnce(() => cabinItem)
 
-        const data = await createCabin(cabinInput)
+        const { data } = await createCabin(cabinInput)
 
         expect(data).toEqual(cabinItem)
       })
@@ -126,7 +126,7 @@ describe('unit test for cabins service', () => {
         // @ts-ignore
         Cabin.create.mockImplementationOnce(() => cabinItem)
 
-        const data = await createCabin(cabinInput)
+        const { data } = await createCabin(cabinInput)
 
         expect(data).toEqual(cabinItem)
       })
@@ -151,8 +151,9 @@ describe('unit test for cabins service', () => {
         // @ts-ignore
         Cabin.findByIdAndDelete.mockImplementationOnce(() => cabinItem)
 
-        const data = await removeCabin('valid_id')
-        expect(data).toEqual(undefined)
+        const { data } = await removeCabin('valid_id')
+        expect(data).toEqual(cabinItem)
+        // expect(data).toEqual(undefined)
       })
     })
   })

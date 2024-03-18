@@ -29,7 +29,7 @@ describe('unit test for guests service', () => {
       // @ts-ignore
       Guest.find.mockImplementationOnce(() => [guestItem])
 
-      const data = await fetchGuests()
+      const { data } = await fetchGuests()
 
       // @ts-ignore
       expect(data).toEqual([guestItem])
@@ -54,7 +54,7 @@ describe('unit test for guests service', () => {
         // @ts-ignore
         Guest.findById.mockImplementationOnce(() => guestItem)
 
-        const data = await fetchGuest('valid_id')
+        const { data } = await fetchGuest('valid_id')
         expect(data).toEqual(guestItem)
       })
     })
@@ -82,7 +82,7 @@ describe('unit test for guests service', () => {
         // @ts-ignore
         Guest.create.mockImplementationOnce(() => guestItem)
 
-        const data = await createGuest(guestInput)
+        const { data } = await createGuest(guestInput)
 
         expect(data).toEqual(guestItem)
       })
@@ -124,7 +124,7 @@ describe('unit test for guests service', () => {
         // @ts-ignore
         Guest.create.mockImplementationOnce(() => guestItem)
 
-        const data = await createGuest(guestInput)
+        const { data } = await createGuest(guestInput)
 
         expect(data).toEqual(guestItem)
       })
@@ -149,8 +149,9 @@ describe('unit test for guests service', () => {
         // @ts-ignore
         Guest.findByIdAndDelete.mockImplementationOnce(() => guestItem)
 
-        const data = await removeGuest('valid_id')
-        expect(data).toEqual(undefined)
+        const { data } = await removeGuest('valid_id')
+        expect(data).toEqual(guestItem)
+        // expect(data).toEqual(undefined)
       })
     })
   })

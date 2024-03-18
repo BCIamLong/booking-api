@@ -1,0 +1,9 @@
+{
+  "_id": "5fd1a5f3b39f560004d15d8a",
+  "minBookingLength": 1,
+  "maxBookingLength": 30,
+  "maxGuestsPersonal": 5,
+  "breakfastPrice": 10,
+  "createdAt": "2021-12-10T12:00:00Z",
+  "updatedAt": "2021-12-15T09:30:00Z"
+}

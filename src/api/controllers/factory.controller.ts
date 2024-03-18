@@ -35,11 +35,13 @@ const getOne = (fn: ControllerFn) =>
 const postOne = (fn: ControllerFn) =>
   async function (req: Request, res: Response) {
     const { data, collectionName } = await fn({ body: req.body })
+    const formatCollectionName = collectionName.slice(0, collectionName.length - 1)
 
-    res.status(201).json({
+    res.status(201)
+    res.json({
       status: 'success',
       data: {
-        [collectionName]: data
+        [formatCollectionName]: data
       }
     })
   }
@@ -64,7 +66,8 @@ const deleteOne = (fn: ControllerFn) =>
 
     const formatCollectionName = collectionName.slice(0, collectionName.length - 1)
 
-    res.status(204).json({
+    res.status(204)
+    res.json({
       status: 'success',
       data: null
     })
