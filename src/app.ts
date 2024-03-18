@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express'
+import cors from 'cors'
 import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import { swagger } from './config'
@@ -8,7 +9,10 @@ import { AppError } from './api/utils'
 
 const app = express()
 
+app.use(cors())
+app.options('*', cors())
 app.use(swagger)
+
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
 app.use(bodyParser.json({ limit: '90kb' }))
 app.use(bodyParser.urlencoded({ extended: true }))

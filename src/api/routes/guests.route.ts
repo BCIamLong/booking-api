@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { guestsController } from '../controllers'
 import { asyncCatch } from '../utils'
+import { guestSchema, validator } from '../validators'
 
+const { createGuestSchema, updateGuestSchema } = guestSchema
 const { getGuests, postGuest, getGuest, updateGuest, deleteGuest } = guestsController
 
 const guestRouter = Router()
@@ -74,7 +76,7 @@ guestRouter
    *
    *
    */
-  .post(asyncCatch(postGuest))
+  .post(validator(createGuestSchema), asyncCatch(postGuest))
 
 guestRouter
   .route('/:id')
@@ -142,7 +144,7 @@ guestRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(asyncCatch(updateGuest))
+  .patch(validator(updateGuestSchema), asyncCatch(updateGuest))
   /**
    * @openapi
    * '/api/v1/guests/{id}':

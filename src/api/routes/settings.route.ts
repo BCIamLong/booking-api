@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { asyncCatch } from '../utils'
 import { settingsController } from '../controllers'
+import { validator, settingSchema } from '../validators'
 
+const { createSettingSchema, updateSettingSchema } = settingSchema
 const { getSettings, getSetting, postSetting, updateSetting, deleteSetting } = settingsController
 
 const settingsRouter = Router()
@@ -74,7 +76,7 @@ settingsRouter
    *
    *
    */
-  .post(asyncCatch(postSetting))
+  .post(validator(createSettingSchema), asyncCatch(postSetting))
 settingsRouter
 
   .route('/:id')
@@ -142,7 +144,7 @@ settingsRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(asyncCatch(updateSetting))
+  .patch(validator(updateSettingSchema), asyncCatch(updateSetting))
   /**
    * @openapi
    * '/api/v1/settings/{id}':

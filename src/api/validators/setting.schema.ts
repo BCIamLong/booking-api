@@ -53,10 +53,10 @@ const createSettingSchema = Joi.object({
  *      default: 20
  */
 const updateSettingSchema = Joi.object({
-  minBookingLength: Joi.number(),
-  maxBookingLength: Joi.number(),
-  maxGuestsPersonal: Joi.number(),
-  breakfastPrice: Joi.number()
+  minBookingLength: Joi.number().strict(true),
+  maxBookingLength: Joi.number().strict(true),
+  maxGuestsPersonal: Joi.number().strict(true),
+  breakfastPrice: Joi.number().strict(true)
 })
 
 export default { createSettingSchema, updateSettingSchema }
