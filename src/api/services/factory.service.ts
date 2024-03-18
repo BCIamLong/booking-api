@@ -29,7 +29,7 @@ const createOne =
 const editOne =
   <T>(Model: Model<T>) =>
   async (id: string, editData: Partial<T>) => {
-    const data = Model.findByIdAndUpdate(id, editData, {
+    const data = await Model.findByIdAndUpdate(id, editData, {
       new: true,
       runValidators: true
     })

@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 
 interface Options {
   id?: string
-  body?: Omit<any, '_id' | 'createdAt' | 'updatedAt'>
+  body?: any
 }
 
 type ControllerFn = ({ id, body }: Options) => Promise<{ data: any; collectionName: string }>
