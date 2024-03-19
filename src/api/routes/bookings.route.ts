@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { asyncCatch } from '../utils'
 import { bookingsController } from '../controllers'
+import { validator, bookingSchema } from '../validators'
 
+const { createBookingSchema, updateBookingSchema } = bookingSchema
 const { getBookings, getBooking, updateBooking, postBooking, deleteBooking } = bookingsController
 
 const bookingRouter = Router()
@@ -74,7 +76,7 @@ bookingRouter
    *
    *
    */
-  .post(asyncCatch(postBooking))
+  .post(validator(createBookingSchema), asyncCatch(postBooking))
 
 bookingRouter
   .route('/:id')
@@ -142,7 +144,7 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(asyncCatch(updateBooking))
+  .patch(validator(updateBookingSchema), asyncCatch(updateBooking))
   /**
    * @openapi
    * '/api/v1/bookings/{id}':
