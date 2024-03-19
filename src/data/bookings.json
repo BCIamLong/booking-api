@@ -1,0 +1,47 @@
+[
+  {
+    "cabinId": "cabin1",
+    "guestId": "bca4b1cf-5572-4b12-8642-1456e38c4479",
+    "startDate": "2024-04-01T00:00:00.000Z",
+    "endDate": "2024-04-05T00:00:00.000Z",
+    "numNights": 4,
+    "numGuests": 2,
+    "cabinPrice": 200,
+    "extrasPrice": 50,
+    "totalPrice": 250,
+    "status": "confirmed",
+    "hasBreakfast": true,
+    "isPaid": true,
+    "observation": "Guests prefer a quiet cabin."
+  },
+  {
+    "cabinId": "cabin2",
+    "guestId": "40e8973b-5a9b-45dc-b17c-61b4472e0f5e",
+    "startDate": "2024-05-10T00:00:00.000Z",
+    "endDate": "2024-05-15T00:00:00.000Z",
+    "numNights": 5,
+    "numGuests": 3,
+    "cabinPrice": 250,
+    "extrasPrice": 70,
+    "totalPrice": 320,
+    "status": "unconfirmed",
+    "hasBreakfast": true,
+    "isPaid": false,
+    "observation": "Guests requested a lakeside view."
+  },
+  {
+    "cabinId": "cabin3",
+    "guestId": "f10e695b-14df-4fe0-a944-fcf8e473e614",
+    "startDate": "2024-06-20T00:00:00.000Z",
+    "endDate": "2024-06-25T00:00:00.000Z",
+    "numNights": 5,
+    "numGuests": 4,
+    "cabinPrice": 300,
+    "extrasPrice": 80,
+    "totalPrice": 380,
+    "status": "cancelled",
+    "hasBreakfast": false,
+    "isPaid": false,
+    "observation": "Guests changed their travel plans."
+  }
+]

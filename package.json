@@ -13,7 +13,7 @@
     "test:coverage": "npx jest --collect-coverage",
     "test:integration": "npx jest",
     "test:unit": "npx jest --detectOpenHandles",
-    "dev:import": "npx ts-node src/data/importData.ts"
+    "dev:import": "npx ts-node src/data/importData.ts --bookings"
   },
   "author": "",
   "license": "ISC",

@@ -1,12 +1,58 @@
+import { v4 as uuidv4 } from 'uuid'
 import mongoose, { Schema } from 'mongoose'
 import { IBooking } from '~/api/interfaces'
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   BookingResponse:
+ *    type: object
+ *    properties:
+ *     _id:
+ *      type: string
+ *     cabinId:
+ *      type: string
+ *     guestId:
+ *      type: string
+ *     startDate:
+ *      type: string
+ *      format: date
+ *     endDate:
+ *      type: string
+ *      format: date
+ *     numNights:
+ *      type: number
+ *     numGuests:
+ *      type: number
+ *     cabinPrice:
+ *      type: number
+ *     extrasPrice:
+ *      type: number
+ *     totalPrice:
+ *      type: number
+ *     status:
+ *      type: string
+ *     hasBreakfast:
+ *      type: boolean
+ *     isPaid:
+ *      type: boolean
+ *     observation:
+ *      type: string
+ *     createdAt:
+ *      type: string
+ *      format: date
+ *     updatedAt:
+ *      type: string
+ *      format: date
+ */
 const bookingSchema = new Schema(
   {
     _id: {
       type: String,
-      required: true,
+      default: `booking-${uuidv4()}`,
       unique: true
+      // required: true,
     },
     cabinId: {
       type: String,
@@ -48,8 +94,8 @@ const bookingSchema = new Schema(
     },
     status: {
       type: String,
-      default: 'unconfirmed',
-      enum: ['unconfirmed', 'confirmed', 'cancel']
+      default: 'c',
+      enum: ['unconfirmed', 'confirmed', 'cancelled']
     },
     hasBreakfast: {
       type: Boolean,

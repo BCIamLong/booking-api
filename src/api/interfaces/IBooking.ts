@@ -9,9 +9,9 @@ export default interface IBooking {
   cabinPrice: number
   extrasPrice: number
   totalPrice: number
-  status: string
-  hasBreakfast: boolean
-  isPaid: boolean
+  status?: string
+  hasBreakfast?: boolean
+  isPaid?: boolean
   observation: string
   createdAt: Date
   updatedAt: Date
