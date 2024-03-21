@@ -9,9 +9,8 @@ import Joi from 'joi'
  *    required:
  *     - fullName
  *     - email
- *     - nationalId
- *     - nationality
- *     - countryFlag
+ *     - password
+ *     - passwordConfirm
  *    properties:
  *     fullName:
  *      type: string
@@ -19,6 +18,12 @@ import Joi from 'joi'
  *     email:
  *      type: string
  *      default: john.doe@example.com
+ *     password:
+ *      type: string
+ *      default: password123
+ *     passwordConfirm:
+ *      type: string
+ *      default: password123
  *     nationalId:
  *      type: string
  *      default: 123456789
@@ -32,9 +37,11 @@ import Joi from 'joi'
 const createGuestSchema = Joi.object({
   fullName: Joi.string().required(),
   email: Joi.string().email().required(),
-  nationalId: Joi.string().required(),
-  nationality: Joi.string().required(),
-  countryFlag: Joi.string().required()
+  password: Joi.string().min(8).required(),
+  passwordConfirm: Joi.string().min(8).required(),
+  nationalId: Joi.string(),
+  nationality: Joi.string(),
+  countryFlag: Joi.string()
 })
 
 /**

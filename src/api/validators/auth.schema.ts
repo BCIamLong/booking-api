@@ -30,12 +30,12 @@ const loginSchema = Joi.object({
  *   SignupInput:
  *    type: object
  *    required:
- *     - name
+ *     - fullName
  *     - email
  *     - password
  *     - passwordConfirm
  *    properties:
- *     name:
+ *     fullName:
  *      type: string
  *      default: John Doe
  *     email:
@@ -50,7 +50,7 @@ const loginSchema = Joi.object({
  */
 const signupSchema = Joi.object({
   // * for only guest
-  name: Joi.string().required(),
+  fullName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
   passwordConfirm: Joi.string().min(8).required()

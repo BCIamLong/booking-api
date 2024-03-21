@@ -58,6 +58,8 @@ userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  *        $ref: '#components/schemas/UserResponse'
  *    400:
  *     description: Bad request
+ *    409:
+ *     description: Conflict
  *    500:
  *     description: Something went wrong
  */

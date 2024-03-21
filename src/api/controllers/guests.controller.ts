@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
-import { guestsService } from '../services'
+import { guestsService, authService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 
 const { fetchGuests, fetchGuest, editGuest, createGuest, removeGuest } = guestsService
+const { checkEmailExist } = authService
 
 const getGuests = getAll(async () => {
   const { data, collectionName } = await fetchGuests()
@@ -15,6 +16,8 @@ const getGuest = getOne(async (options) => {
 })
 
 const postGuest = postOne(async (options) => {
+  await checkEmailExist('admin', options.body.email)
+
   const { data, collectionName } = await createGuest(options.body || {})
 
   return { data, collectionName }

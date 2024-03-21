@@ -1,7 +1,8 @@
-import { usersService } from '../services'
+import { usersService, authService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 
 const { fetchUsers, fetchUser, editUser, createUser, removeUser } = usersService
+const { checkEmailExist } = authService
 
 const getUsers = getAll(async () => {
   const { data, collectionName } = await fetchUsers()
@@ -14,6 +15,7 @@ const getUser = getOne(async (options) => {
 })
 
 const postUser = postOne(async (options) => {
+  await checkEmailExist('user', options.body.email)
   const { data, collectionName } = await createUser(options.body || {})
 
   return { data, collectionName }

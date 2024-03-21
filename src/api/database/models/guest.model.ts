@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
+import bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 
 import { IGuest } from '~/api/interfaces'
@@ -15,6 +16,8 @@ import { IGuest } from '~/api/interfaces'
  *     fullName:
  *      type: string
  *     email:
+ *      type: string
+ *     password:
  *      type: string
  *     nationalId:
  *      type: string
@@ -42,25 +45,51 @@ const guestSchema = new Schema(
     },
     email: {
       type: String,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: String,
       required: true
+    },
+    passwordConfirm: {
+      type: String,
+      required: true
+    },
+    role: {
+      type: String,
+      default: 'user',
+      enum: ['user']
     },
     nationalId: {
       type: String,
-      required: true
+      default: 'none'
+      // required: true
     },
     nationality: {
       type: String,
-      required: true
+      default: 'none'
+      // required: true
     },
     countryFlag: {
       type: String,
-      required: true
+      default: 'none'
+      // required: true
     }
   },
   {
     timestamps: true
   }
 )
+
+guestSchema.pre('save', async function (next) {
+  if (!this.isNew) return next()
+
+  //@ts-ignore
+  this.passwordConfirm = undefined
+  this.password = await bcrypt.hash(this.password, 10)
+  next()
+})
 
 guestSchema.pre('findOne', function (next) {
   this.select('-__v')
@@ -76,6 +105,10 @@ guestSchema.pre('find', function (next) {
 //   this.select('-__v')
 //   next()
 // })
+
+guestSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
+  return await bcrypt.compare(plainPwd, hashPwd)
+}
 
 const Guest = mongoose.model<IGuest>('Guest', guestSchema)
 

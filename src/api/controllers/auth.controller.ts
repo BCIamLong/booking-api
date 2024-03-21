@@ -2,12 +2,12 @@ import jwt from 'jsonwebtoken'
 import { Request, Response } from 'express'
 import { authService } from '../services'
 import { jwtConfig } from '~/config'
-import { IUser } from '../interfaces'
+import { IGuest, IUser } from '../interfaces'
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
 const { loginService, signupService } = authService
 
-const signToken = function (type: 'access' | 'refresh', user: IUser) {
+const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
   const secret = type === 'access' ? ACCESS_TOKEN_SECRET! : REFRESH_TOKEN_EXPIRES!
   return jwt.sign({ id: user._id }, secret, {
     expiresIn: type === 'access' ? ACCESS_TOKEN_EXPIRES : REFRESH_TOKEN_EXPIRES
@@ -46,8 +46,8 @@ const login = async function (req: Request, res: Response) {
 }
 
 const signup = async function (req: Request, res: Response) {
-  const { name, email, password, passwordConfirm } = req.body
-  const newUser = await signupService({ name, email, password, passwordConfirm })
+  const { fullName, email, password, passwordConfirm } = req.body
+  const newUser = await signupService({ fullName, email, password, passwordConfirm })
   // * hash password and remove password confirm (done in user model)
   // * generate access token and refresh token
   const accessToken = signToken('access', newUser)

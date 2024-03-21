@@ -16,6 +16,8 @@ import { IUser } from '~/api/interfaces'
  *      type: string
  *     email:
  *      type: string
+ *     role:
+ *      type: string
  *     password:
  *      type: string
  *     createdAt:
@@ -41,6 +43,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true
+    },
+    role: {
+      type: String,
+      default: 'user',
+      enum: ['user', 'admin']
     },
     password: {
       type: String,
