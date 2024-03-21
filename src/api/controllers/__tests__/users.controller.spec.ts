@@ -26,7 +26,7 @@ const userItem = {
   _id: 'user1',
   name: 'John Doe',
   email: 'john@example.com',
-  password: 'hashedPwd(hashedpassword1)',
+  password: 'hashedPwd(password123)',
   createdAt: new Date(),
   updatedAt: new Date()
 }

@@ -7,6 +7,7 @@ import guestSchema from './guest.schema'
 import settingSchema from './setting.schema'
 import bookingSchema from './booking.schema'
 import userSchema from './user.schema'
+import authSchema from './auth.schema'
 
 export const validator = (schema: ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
   const { error }: ValidationResult = schema.validate(req.body)
@@ -16,4 +17,4 @@ export const validator = (schema: ObjectSchema) => (req: Request, res: Response,
   next()
 }
 
-export { cabinSchema, guestSchema, settingSchema, bookingSchema, userSchema }
+export { cabinSchema, guestSchema, settingSchema, bookingSchema, userSchema, authSchema }

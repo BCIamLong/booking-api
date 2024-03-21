@@ -39,7 +39,8 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     password: {
       type: String,
@@ -83,6 +84,8 @@ userSchema.pre(/^find/, function (next) {
 userSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
   return await bcrypt.compare(plainPwd, hashPwd)
 }
+
+// export { userSchema }
 
 const User = mongoose.model<IUser>('User', userSchema)
 

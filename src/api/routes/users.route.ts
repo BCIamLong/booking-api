@@ -1,11 +1,67 @@
 import { Router } from 'express'
-import { usersController } from '../controllers'
+import { usersController, authController } from '../controllers'
 import { asyncCatch } from '../utils'
-import { validator, userSchema } from '../validators'
+import { validator, userSchema, authSchema } from '../validators'
 
 const { createUserSchema, updateUserSchema } = userSchema
+const { loginSchema, signupSchema } = authSchema
+const { login, signup } = authController
 const { getUsers, getUser, postUser, updateUser, deleteUser } = usersController
 const userRouter = Router()
+
+/**
+ * @openapi
+ * '/api/v1/users/login':
+ *  post:
+ *   tags:
+ *   - Auth
+ *   summary: login user
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/LoginInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/UserResponse'
+ *    400:
+ *     description: Bad request
+ *    500:
+ *     description: Something went wrong
+ */
+userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
+
+/**
+ * @openapi
+ * '/api/v1/users/signup':
+ *  post:
+ *   tags:
+ *   - Auth
+ *   summary: signup user
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/SignupInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/UserResponse'
+ *    400:
+ *     description: Bad request
+ *    500:
+ *     description: Something went wrong
+ */
+userRouter.post('/login', validator(loginSchema), asyncCatch(login))
 
 userRouter
   .route('/')
