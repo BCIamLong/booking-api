@@ -75,7 +75,9 @@ const guestSchema = new Schema(
       type: String,
       default: 'none'
       // required: true
-    }
+    },
+    passwordChangedAt: Date,
+    passwordResetTokenTimeout: Date
   },
   {
     timestamps: true

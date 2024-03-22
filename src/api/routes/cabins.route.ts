@@ -2,9 +2,11 @@ import { Router } from 'express'
 import { cabinsController } from '../controllers'
 import { asyncCatch } from '../utils'
 import { validator, cabinSchema } from '../validators'
+import { authMiddleware } from '../middlewares'
 
 const { createCabinSchema, updateCabinSchema } = cabinSchema
 const { getCabins, getCabin, postCabin, updateCabin, deleteCabin } = cabinsController
+const { authenticate, authorize } = authMiddleware
 
 const cabinsRouter = Router()
 
@@ -46,6 +48,10 @@ cabinsRouter
    *  post:
    *   tags:
    *   - Cabin
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: create cabin
    *   requestBody:
    *    required: true
@@ -76,7 +82,7 @@ cabinsRouter
    *
    *
    */
-  .post(validator(createCabinSchema), asyncCatch(postCabin))
+  .post(authenticate, authorize('admin'), validator(createCabinSchema), asyncCatch(postCabin))
 
 cabinsRouter
   .route('/:id')
@@ -111,6 +117,10 @@ cabinsRouter
    *  patch:
    *   tags:
    *   - Cabin
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: update an cabin with the cabin id
    *   parameters:
    *   - name: id
@@ -144,13 +154,17 @@ cabinsRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(validator(updateCabinSchema), asyncCatch(updateCabin))
+  .patch(authenticate, authorize('admin'), validator(updateCabinSchema), asyncCatch(updateCabin))
   /**
    * @openapi
    * '/api/v1/cabins/{id}':
    *  delete:
    *   tags:
    *   - Cabin
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: delete a cabin with the cabin id
    *   parameters:
    *   - name: id
@@ -174,6 +188,6 @@ cabinsRouter
    *    500:
    *     description: Something went wrong
    */
-  .delete(asyncCatch(deleteCabin))
+  .delete(authenticate, authorize('admin'), asyncCatch(deleteCabin))
 
 export default cabinsRouter

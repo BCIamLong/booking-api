@@ -7,6 +7,22 @@ const swagger = Router()
 
 const swaggerDefinition: SwaggerDefinition = {
   openapi: '3.0.0',
+  // * in the new version of swagger: the securityDefinitions were renamed to securitySchemes and moved inside components.
+  // * https://swagger.io/docs/specification/authentication/
+  // * so therefore we need to declare securitySchemes in the components instead use securityDefinitions
+  // * i declared it in the index.ts of routes folder
+  // components: {
+  //   bearerAuth: {
+  //     type: 'http',
+  //     scheme: 'bearer',
+  //     bearerFormat: 'JWT'
+  //   },
+  //   security: [
+  //     {
+  //       bearerAuth: []
+  //     }
+  //   ]
+  // },
   info: {
     title: 'Prepare API for application',
     version,

@@ -2,11 +2,15 @@ import { Router } from 'express'
 import { asyncCatch } from '../utils'
 import { settingsController } from '../controllers'
 import { validator, settingSchema } from '../validators'
+import { authMiddleware } from '../middlewares'
 
 const { createSettingSchema, updateSettingSchema } = settingSchema
 const { getSettings, getSetting, postSetting, updateSetting, deleteSetting } = settingsController
+const { authenticate, authorize } = authMiddleware
 
 const settingsRouter = Router()
+
+settingsRouter.use(authenticate, authorize('admin'))
 
 settingsRouter
   .route('/')
@@ -16,6 +20,10 @@ settingsRouter
    *  get:
    *   tags:
    *   - Setting
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get all settings
    *   responses:
    *    200:
@@ -46,6 +54,10 @@ settingsRouter
    *  post:
    *   tags:
    *   - Setting
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: create setting
    *   requestBody:
    *    required: true
@@ -86,6 +98,10 @@ settingsRouter
    *  get:
    *   tags:
    *   - Setting
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get a setting with setting id
    *   parameters:
    *    - name: id
@@ -111,6 +127,10 @@ settingsRouter
    *  patch:
    *   tags:
    *   - Setting
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: update an setting with the setting id
    *   parameters:
    *   - name: id
@@ -151,6 +171,10 @@ settingsRouter
    *  delete:
    *   tags:
    *   - Setting
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: delete a setting with the setting id
    *   parameters:
    *   - name: id

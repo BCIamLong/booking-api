@@ -56,7 +56,9 @@ const userSchema = new Schema(
     passwordConfirm: {
       type: String,
       required: true
-    }
+    },
+    passwordChangedAt: Date,
+    passwordResetTokenTimeout: Date
   },
   {
     timestamps: true

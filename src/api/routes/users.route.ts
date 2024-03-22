@@ -2,10 +2,12 @@ import { Router } from 'express'
 import { usersController, authController } from '../controllers'
 import { asyncCatch } from '../utils'
 import { validator, userSchema, authSchema } from '../validators'
+import { authMiddleware } from '../middlewares'
 
 const { createUserSchema, updateUserSchema } = userSchema
 const { loginSchema, signupSchema } = authSchema
 const { login, signup } = authController
+const { authenticate, authorize } = authMiddleware
 const { getUsers, getUser, postUser, updateUser, deleteUser } = usersController
 const userRouter = Router()
 
@@ -15,6 +17,7 @@ const userRouter = Router()
  *  post:
  *   tags:
  *   - Auth
+ *   security: []
  *   summary: login user
  *   requestBody:
  *    required: true
@@ -42,6 +45,7 @@ userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  *  post:
  *   tags:
  *   - Auth
+ *   security: []
  *   summary: signup user
  *   requestBody:
  *    required: true
@@ -65,6 +69,8 @@ userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  */
 userRouter.post('/login', validator(loginSchema), asyncCatch(login))
 
+userRouter.use(authenticate, authorize('admin'))
+
 userRouter
   .route('/')
   /**
@@ -73,6 +79,10 @@ userRouter
    *  get:
    *   tags:
    *   - User
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get all users
    *   responses:
    *    200:
@@ -103,6 +113,10 @@ userRouter
    *  post:
    *   tags:
    *   - User
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: create user
    *   requestBody:
    *    required: true
@@ -144,6 +158,10 @@ userRouter
    *   tags:
    *   - User
    *   summary: get a user with user id
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   parameters:
    *    - name: id
    *      in: path
@@ -168,6 +186,10 @@ userRouter
    *  patch:
    *   tags:
    *   - User
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: update an user with the user id
    *   parameters:
    *   - name: id
@@ -208,6 +230,10 @@ userRouter
    *  delete:
    *   tags:
    *   - User
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: delete a user with the user id
    *   parameters:
    *   - name: id

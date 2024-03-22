@@ -4,8 +4,36 @@ import guestRouter from './guests.route'
 import settingsRouter from './settings.route'
 import bookingRouter from './bookings.route'
 import userRouter from './users.route'
+import { IGuest, IUser } from '../interfaces'
 
 const router = Router()
+
+// * https://stackoverflow.com/questions/71122741/how-do-i-add-custom-property-to-express-request-in-typescript
+declare module 'express-serve-static-core' {
+  // * for authentication and authorization purposes
+  interface Request {
+    user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
+  }
+}
+
+/**
+ * @openapi
+ * components:
+ *  securitySchemes:
+ *   bearerAuth:
+ *    type: http
+ *    scheme: bearer
+ *    bearerFormat: JWT
+ *   cookieAuth:
+ *    type: apiKey
+ *    in: cookie
+ *    name: access-token
+ *   refreshCookieAuth:
+ *    type: apiKey
+ *    in: cookie
+ *    name: refresh-token
+ *    description: Use this when access token expires
+ */
 
 router.use('/api/v1/cabins', cabinsRouter)
 router.use('/api/v1/guests', guestRouter)

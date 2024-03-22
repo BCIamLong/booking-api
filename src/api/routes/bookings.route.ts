@@ -2,9 +2,11 @@ import { Router } from 'express'
 import { asyncCatch } from '../utils'
 import { bookingsController } from '../controllers'
 import { validator, bookingSchema } from '../validators'
+import { authMiddleware } from '../middlewares'
 
 const { createBookingSchema, updateBookingSchema } = bookingSchema
 const { getBookings, getBooking, updateBooking, postBooking, deleteBooking } = bookingsController
+const { authenticate, authorize } = authMiddleware
 
 const bookingRouter = Router()
 
@@ -16,6 +18,10 @@ bookingRouter
    *  get:
    *   tags:
    *   - Booking
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get all bookings
    *   responses:
    *    200:
@@ -39,13 +45,17 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .get(asyncCatch(getBookings))
+  .get(authenticate, authorize('admin'), asyncCatch(getBookings))
   /**
    * @openapi
    * '/api/v1/bookings':
    *  post:
    *   tags:
    *   - Booking
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: create booking
    *   requestBody:
    *    required: true
@@ -76,7 +86,7 @@ bookingRouter
    *
    *
    */
-  .post(validator(createBookingSchema), asyncCatch(postBooking))
+  .post(authenticate, validator(createBookingSchema), asyncCatch(postBooking))
 
 bookingRouter
   .route('/:id')
@@ -86,6 +96,10 @@ bookingRouter
    *  get:
    *   tags:
    *   - Booking
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get a booking with booking id
    *   parameters:
    *    - name: id
@@ -104,13 +118,17 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .get(asyncCatch(getBooking))
+  .get(authenticate, asyncCatch(getBooking))
   /**
    * @openapi
    * '/api/v1/bookings/{id}':
    *  patch:
    *   tags:
    *   - Booking
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: update an booking with the booking id
    *   parameters:
    *   - name: id
@@ -144,13 +162,17 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(validator(updateBookingSchema), asyncCatch(updateBooking))
+  .patch(authenticate, authorize('admin'), validator(updateBookingSchema), asyncCatch(updateBooking))
   /**
    * @openapi
    * '/api/v1/bookings/{id}':
    *  delete:
    *   tags:
    *   - Booking
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: delete a booking with the booking id
    *   parameters:
    *   - name: id
@@ -174,6 +196,6 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .delete(asyncCatch(deleteBooking))
+  .delete(authenticate, authorize('admin'), asyncCatch(deleteBooking))
 
 export default bookingRouter

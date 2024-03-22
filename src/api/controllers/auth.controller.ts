@@ -8,7 +8,7 @@ const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH
 const { loginService, signupService } = authService
 
 const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
-  const secret = type === 'access' ? ACCESS_TOKEN_SECRET! : REFRESH_TOKEN_EXPIRES!
+  const secret = type === 'access' ? ACCESS_TOKEN_SECRET! : REFRESH_TOKEN_SECRET!
   return jwt.sign({ id: user._id }, secret, {
     expiresIn: type === 'access' ? ACCESS_TOKEN_EXPIRES : REFRESH_TOKEN_EXPIRES
   })

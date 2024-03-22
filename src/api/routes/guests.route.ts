@@ -2,11 +2,15 @@ import { Router } from 'express'
 import { guestsController } from '../controllers'
 import { asyncCatch } from '../utils'
 import { guestSchema, validator } from '../validators'
+import { authMiddleware } from '../middlewares'
 
 const { createGuestSchema, updateGuestSchema } = guestSchema
 const { getGuests, postGuest, getGuest, updateGuest, deleteGuest } = guestsController
+const { authenticate, authorize } = authMiddleware
 
 const guestRouter = Router()
+
+guestRouter.use(authenticate, authorize('admin'))
 
 guestRouter
   .route('/')
@@ -16,6 +20,10 @@ guestRouter
    *  get:
    *   tags:
    *   - Guest
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get all guests
    *   responses:
    *    200:
@@ -46,6 +54,10 @@ guestRouter
    *  post:
    *   tags:
    *   - Guest
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: create guest
    *   requestBody:
    *    required: true
@@ -86,6 +98,10 @@ guestRouter
    *  get:
    *   tags:
    *   - Guest
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: get a guest with guest id
    *   parameters:
    *    - name: id
@@ -111,6 +127,10 @@ guestRouter
    *  patch:
    *   tags:
    *   - Guest
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: update an guest with the guest id
    *   parameters:
    *   - name: id
@@ -151,6 +171,10 @@ guestRouter
    *  delete:
    *   tags:
    *   - Guest
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
    *   summary: delete a guest with the guest id
    *   parameters:
    *   - name: id
