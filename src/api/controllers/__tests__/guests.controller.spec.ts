@@ -1,4 +1,10 @@
+jest.mock('bcrypt')
 jest.mock('../../database/models/guest.model.ts')
+jest.mock('../../services/auth.service')
+// jest.mock('~/api/services')
+// import { authService } from '~/api/services'
+import bcrypt from 'bcrypt'
+import authService from '../../services/auth.service'
 import Guest from '../../database/models/guest.model'
 import guestsController from '../guests.controller'
 
@@ -26,6 +32,7 @@ const guestItem = {
   _id: 'f10e695b-14df-4fe0-a944-fcf8e473e614',
   fullName: 'Alice Johnson',
   email: 'alice.johnson@example.com',
+  password: 'hashedPwd(password123)',
   nationalId: '456789123',
   nationality: 'UK',
   countryFlag: '🇬🇧',
@@ -141,6 +148,12 @@ describe('unit test for guests controller', () => {
     describe('given an invalid input', () => {
       it('should return a status of 400', async () => {
         // @ts-ignore
+        jest.spyOn(authService, 'checkEmailExist').mockImplementationOnce(() => true)
+
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
         Guest.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
@@ -156,8 +169,62 @@ describe('unit test for guests controller', () => {
       })
     })
 
+    describe('given the email is already exist in guests', () => {
+      it('should return an error with 409 status code', async () => {
+        // @ts-ignore
+        jest.spyOn(authService, 'checkEmailExist').mockImplementationOnce(() => true)
+
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
+        Guest.create.mockRejectedValueOnce({
+          name: 'ConflictError',
+          statusCode: 409
+        })
+
+        try {
+          // @ts-ignore
+          await postGuest(req, res)
+        } catch (err: any) {
+          expect(res.json).toHaveBeenCalledTimes(0)
+          expect(err.statusCode).toBe(409)
+        }
+      })
+    })
+
+    describe('given the email is already exist in admins', () => {
+      it('should return an error with 409 status code', async () => {
+        // @ts-ignore
+        jest.spyOn(authService, 'checkEmailExist').mockRejectedValueOnce({
+          name: 'ConflictError',
+          statusCode: 409
+        })
+
+        // @ts-ignore
+        // bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
+        // Guest.create.mockRejectedValueOnce({
+        //   name: 'ConflictError',
+        //   statusCode: 409
+        // })
+
+        try {
+          // @ts-ignore
+          await postGuest(req, res)
+        } catch (err: any) {
+          expect(res.json).toHaveBeenCalledTimes(0)
+          expect(err.statusCode).toBe(409)
+        }
+      })
+    })
+
     describe('given a valid input', () => {
       it('should return a status of 201 and new guest', async () => {
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
         // @ts-ignore
         Guest.create.mockImplementationOnce(() => guestItem)
         // @ts-ignore

@@ -1,4 +1,6 @@
+jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
+import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
 import usersService from '../users.service'
 
@@ -8,7 +10,7 @@ const userItem = {
   _id: 'user1',
   name: 'John Doe',
   email: 'john@example.com',
-  password: 'hashedPwd(hashedpassword1)',
+  password: 'hashedPwd(password123)',
   createdAt: new Date(),
   updatedAt: new Date()
 }
@@ -16,8 +18,8 @@ const userItem = {
 const userInput = {
   name: 'John Doe',
   email: 'john@example.com',
-  password: 'hashedpassword1',
-  passwordConfirm: 'hashedpassword1'
+  password: 'password123',
+  passwordConfirm: 'password123'
 }
 
 const updateUserInput = {
@@ -66,6 +68,9 @@ describe('unit test for users service', () => {
     describe('given an invalid input', () => {
       it('should throw an error with status code of 400', async () => {
         // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
         User.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
@@ -79,8 +84,31 @@ describe('unit test for users service', () => {
       })
     })
 
+    describe('given the email is already exist', () => {
+      it('should return an error with 409 status code', async () => {
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
+        User.create.mockRejectedValueOnce({
+          name: 'ConflictError',
+          statusCode: 409
+        })
+
+        try {
+          // @ts-ignore
+          await createUser(userInput)
+        } catch (err: any) {
+          expect(err.statusCode).toBe(409)
+        }
+      })
+    })
+
     describe('given a valid input', () => {
       it('should return a new user', async () => {
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
         // @ts-ignore
         User.create.mockImplementationOnce(() => userItem)
 

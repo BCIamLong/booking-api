@@ -1,6 +1,11 @@
+jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
+jest.mock('../../services/auth.service')
+
+import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
 import usersController from '../users.controller'
+import authService from '../../services/auth.service'
 
 const { getUsers, getUser, postUser, deleteUser, updateUser } = usersController
 
@@ -139,6 +144,12 @@ describe('unit test for users controller', () => {
     describe('given an invalid input', () => {
       it('should return a status of 400', async () => {
         // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
+        jest.spyOn(authService, 'checkEmailExist').mockImplementationOnce(() => true)
+
+        // @ts-ignore
         User.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
@@ -154,8 +165,61 @@ describe('unit test for users controller', () => {
       })
     })
 
+    describe('given the email is already exist in admins', () => {
+      it('should return an error with 409 status code', async () => {
+        // @ts-ignore
+        jest.spyOn(authService, 'checkEmailExist').mockImplementationOnce(() => true)
+
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
+        User.create.mockRejectedValueOnce({
+          name: 'ConflictError',
+          statusCode: 409
+        })
+
+        try {
+          // @ts-ignore
+          await postUser(req, res)
+        } catch (err: any) {
+          expect(res.json).toHaveBeenCalledTimes(0)
+          expect(err.statusCode).toBe(409)
+        }
+      })
+    })
+
+    describe('given the email is already exist in guests', () => {
+      it('should return an error with 409 status code', async () => {
+        // @ts-ignore
+        jest.spyOn(authService, 'checkEmailExist').mockRejectedValueOnce({
+          name: 'ConflictError',
+          statusCode: 409
+        })
+
+        // @ts-ignore
+        // bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
+        // @ts-ignore
+        // Guest.create.mockRejectedValueOnce({
+        //   name: 'ConflictError',
+        //   statusCode: 409
+        // })
+
+        try {
+          // @ts-ignore
+          await postUser(req, res)
+        } catch (err: any) {
+          expect(res.json).toHaveBeenCalledTimes(0)
+          expect(err.statusCode).toBe(409)
+        }
+      })
+    })
+
     describe('given a valid input', () => {
       it('should return a status of 201 and new user', async () => {
+        // @ts-ignore
+        bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
         // @ts-ignore
         User.create.mockImplementationOnce(() => userItem)
         // @ts-ignore

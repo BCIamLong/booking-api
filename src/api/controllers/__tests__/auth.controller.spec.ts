@@ -1,10 +1,12 @@
 jest.mock('jsonwebtoken')
 jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
+jest.mock('../../database/models/guest.model.ts')
 jest.mock('../../../config/jwt.config.ts')
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
+import Guest from '../../database/models/guest.model'
 import authController from '../auth.controller'
 import jwtConfig from '../../../config/jwt.config'
 
@@ -19,6 +21,19 @@ const userItem = {
   createdAt: new Date(),
   updatedAt: new Date()
 }
+
+const guestItem = {
+  _id: 'f10e695b-14df-4fe0-a944-fcf8e473e614',
+  fullName: 'Alice Johnson',
+  email: 'alice.johnson@example.com',
+  nationalId: '456789123',
+  nationality: 'UK',
+  password: 'hashedPwd(password123)',
+  countryFlag: '🇬🇧',
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
 const accessToken = '123456'
 
 const req = {
@@ -47,6 +62,11 @@ describe('unit test for auth controller', () => {
           name: 'ValidationError',
           statusCode: 400
         })
+        // @ts-ignore
+        Guest.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         try {
           // @ts-ignore
@@ -62,6 +82,8 @@ describe('unit test for auth controller', () => {
       it('should return a 404', async () => {
         // @ts-ignore
         User.findOne.mockImplementationOnce(() => undefined)
+        // @ts-ignore
+        Guest.findOne.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -77,6 +99,11 @@ describe('unit test for auth controller', () => {
       it('should return a 400', async () => {
         // @ts-ignore
         User.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
+        // @ts-ignore
+        Guest.findOne.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
@@ -107,7 +134,11 @@ describe('unit test for auth controller', () => {
         // @ts-ignore
         User.schema.methods.checkPwd.mockImplementationOnce(() => true)
         // @ts-ignore
+        Guest.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        // @ts-ignore
         User.findOne.mockImplementationOnce(() => new User(userItem))
+        // @ts-ignore
+        Guest.findOne.mockImplementationOnce(() => new Guest(guestItem))
 
         // @ts-ignore
         await login(req, res)
@@ -127,7 +158,10 @@ describe('unit test for auth controller', () => {
     describe('given the invalid input', () => {
       it('should return a 400', async () => {
         // @ts-ignore
-        User.create.mockRejectedValueOnce({
+        User.findOne.mockImplementationOnce(() => undefined)
+
+        // @ts-ignore
+        Guest.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
@@ -144,6 +178,8 @@ describe('unit test for auth controller', () => {
 
     describe('given email already exist', () => {
       it('should return a 409', async () => {
+        // @ts-ignore
+        User.findOne.mockImplementationOnce(() => userItem)
         // @ts-ignore
         User.create.mockRejectedValueOnce({
           name: 'ConflictError',
@@ -163,7 +199,10 @@ describe('unit test for auth controller', () => {
     describe('given the invalid password confirm', () => {
       it('should return a 400', async () => {
         // @ts-ignore
-        User.create.mockRejectedValueOnce({
+        User.findOne.mockImplementationOnce(() => undefined)
+
+        // @ts-ignore
+        Guest.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
@@ -189,7 +228,10 @@ describe('unit test for auth controller', () => {
         jest.spyOn(authController, 'signToken').mockImplementationOnce(() => accessToken)
 
         // @ts-ignore
-        User.create.mockImplementationOnce(() => new User(userItem))
+        User.findOne.mockImplementationOnce(() => undefined)
+
+        // @ts-ignore
+        Guest.create.mockImplementationOnce(() => new Guest(guestItem))
 
         // @ts-ignore
         await signup(req, res)

@@ -1,7 +1,9 @@
 jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
+jest.mock('../../database/models/guest.model.ts')
 import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
+import Guest from '../../database/models/guest.model'
 import authService from '../auth.service'
 
 const { loginService, signupService } = authService
@@ -11,6 +13,18 @@ const userItem = {
   name: 'John Doe',
   email: 'john@example.com',
   password: 'hashedPwd(password123)',
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+
+const guestItem = {
+  _id: 'f10e695b-14df-4fe0-a944-fcf8e473e614',
+  fullName: 'Alice Johnson',
+  email: 'alice.johnson@example.com',
+  nationalId: '456789123',
+  nationality: 'UK',
+  password: 'hashedPwd(password123)',
+  countryFlag: '🇬🇧',
   createdAt: new Date(),
   updatedAt: new Date()
 }
@@ -32,6 +46,11 @@ describe('unit test for users service', () => {
     describe('given a false format email', () => {
       it('should return an error with status code of 400', async () => {
         // @ts-ignore
+        Guest.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
+        // @ts-ignore
         User.findOne.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
@@ -48,6 +67,8 @@ describe('unit test for users service', () => {
       it('should return an error with status code of 404', async () => {
         // @ts-ignore
         User.findOne.mockImplementationOnce(() => undefined)
+        // @ts-ignore
+        Guest.findOne.mockImplementationOnce(() => undefined)
 
         try {
           await loginService('user@example.com', 'password')
@@ -61,6 +82,12 @@ describe('unit test for users service', () => {
       it('should return an user', async () => {
         // @ts-ignore
         User.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
+
+        // @ts-ignore
+        Guest.findOne.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
@@ -81,7 +108,11 @@ describe('unit test for users service', () => {
         // @ts-ignore
         User.schema.methods.checkPwd.mockImplementationOnce(() => true)
         // @ts-ignore
+        Guest.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        // @ts-ignore
         User.findOne.mockImplementationOnce(() => new User(userItem))
+        // @ts-ignore
+        Guest.findOne.mockImplementationOnce(() => new Guest(guestItem))
 
         const user = await loginService('john@example.com', 'password123')
 
@@ -97,7 +128,13 @@ describe('unit test for users service', () => {
         bcrypt.hash.mockImplementationOnce(() => '123456789')
 
         // @ts-ignore
-        User.create.mockRejectedValueOnce({
+        User.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
+
+        // @ts-ignore
+        Guest.create.mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
@@ -117,10 +154,7 @@ describe('unit test for users service', () => {
         bcrypt.hash.mockImplementationOnce(() => '123456789')
 
         // @ts-ignore
-        User.create.mockRejectedValueOnce({
-          name: 'ConflictError',
-          statusCode: 409
-        })
+        User.findOne.mockImplementationOnce(() => userItem)
 
         try {
           // @ts-ignore
@@ -136,11 +170,15 @@ describe('unit test for users service', () => {
         // @ts-ignore
         bcrypt.hash.mockImplementationOnce(() => '123456789')
         // @ts-ignore
-        User.create.mockImplementationOnce(() => userItem)
+        User.findOne.mockImplementationOnce(() => undefined)
+        // @ts-ignore
+        Guest.create.mockImplementationOnce(() => guestItem)
 
         // @ts-ignore
         const newUser = await signupService(signupInput)
-        expect(newUser).toEqual(userItem)
+        expect(newUser).toEqual(guestItem)
+
+        // expect([userItem, guestItem]).toContainEqual(newUser)
       })
     })
   })
