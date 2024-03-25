@@ -17,6 +17,10 @@ import { IGuest } from '~/api/interfaces'
  *      type: string
  *     email:
  *      type: string
+ *     role:
+ *      type: string
+ *     avatar:
+ *      type: string
  *     password:
  *      type: string
  *     nationalId:
@@ -47,6 +51,10 @@ const guestSchema = new Schema(
       type: String,
       required: true,
       unique: true
+    },
+    avatar: {
+      type: String,
+      default: 'default-avatar.jpg'
     },
     password: {
       type: String,

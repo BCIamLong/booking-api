@@ -7,6 +7,7 @@ import { swagger } from './config'
 import router from './api/routes'
 import { errorsHandler as globalErrorsHandler } from './api/middlewares'
 import { AppError } from './api/utils'
+// import './config/modules.d'
 
 const app = express()
 

@@ -6,10 +6,12 @@ import { authMiddleware } from '../middlewares'
 
 const { createUserSchema, updateUserSchema } = userSchema
 const { loginSchema, signupSchema } = authSchema
-const { login, signup } = authController
+const { login, signup, loginWithGoogle } = authController
 const { authenticate, authorize } = authMiddleware
 const { getUsers, getUser, postUser, updateUser, deleteUser } = usersController
 const userRouter = Router()
+
+userRouter.get('/login/oauth/google', asyncCatch(loginWithGoogle))
 
 /**
  * @openapi

@@ -1,6 +1,7 @@
 import { Guest } from '../database/models'
 import { createOne, editOne, fetchAll, fetchOne, removeOne } from './factory.service'
 import { IGuest } from '../interfaces'
+import { FilterQuery, QueryOptions, UpdateQuery } from 'mongoose'
 // import { AppError } from '../utils'
 
 const fetchGuests = fetchAll<IGuest>(Guest)
@@ -9,7 +10,17 @@ const createGuest = createOne<IGuest>(Guest)
 const editGuest = editOne<IGuest>(Guest)
 const removeGuest = removeOne<IGuest>(Guest)
 
-export default { fetchGuest, fetchGuests, createGuest, editGuest, removeGuest }
+// ? why we don't create some think like upsertGuest function?
+// * well that's because findOneAndUpdate option is already have the upsert option we just set this upsert option to true
+const findAndUpdateGuest = async function (
+  query: FilterQuery<IGuest>,
+  update: UpdateQuery<IGuest>,
+  options: QueryOptions = {}
+) {
+  return Guest.findOneAndUpdate(query, update, options)
+}
+
+export default { fetchGuest, fetchGuests, createGuest, editGuest, removeGuest, findAndUpdateGuest }
 
 // const fetchGuests = async function () {
 //   const guests = await Guest.find()

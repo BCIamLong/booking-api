@@ -39,6 +39,7 @@ const createGuestSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
   passwordConfirm: Joi.string().min(8).required(),
+  avatar: Joi.string(),
   nationalId: Joi.string(),
   nationality: Joi.string(),
   countryFlag: Joi.string()
@@ -70,6 +71,7 @@ const createGuestSchema = Joi.object({
 const updateGuestSchema = Joi.object({
   fullName: Joi.string(),
   email: Joi.string().email(),
+  avatar: Joi.string(),
   nationalId: Joi.string(),
   nationality: Joi.string(),
   countryFlag: Joi.string()

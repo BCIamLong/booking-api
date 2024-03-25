@@ -35,10 +35,10 @@ declare module 'express-serve-static-core' {
  *    description: Use this when access token expires
  */
 
+router.use('/api/v1/users', userRouter)
 router.use('/api/v1/cabins', cabinsRouter)
 router.use('/api/v1/guests', guestRouter)
 router.use('/api/v1/settings', settingsRouter)
 router.use('/api/v1/bookings', bookingRouter)
-router.use('/api/v1/users', userRouter)
 
 export default router
