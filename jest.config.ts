@@ -18,7 +18,8 @@ const config: Config = {
     // ! https://stackoverflow.com/questions/69319086/jest-not-finding-alias-path
     // !https://chat.openai.com/c/bcf98546-4512-4d3d-a657-21608ced5e12
     '~/config': ['<rootDir>/src/config'],
-    '~/api/services': ['<rootDir>/src/api/services']
+    '~/api/services': ['<rootDir>/src/api/services'],
+    '~/api/database/models': ['<rootDir>/src/api/database/models']
     // '^@components/(.*)': '<rootDir>/src/components/$1'
   })
 }

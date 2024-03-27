@@ -29,46 +29,51 @@ const mongooseConfigWithRedis = async function (redisClient: ReturnType<typeof c
   }
 
   mongoose.Query.prototype.exec = async function () {
-    const hashKey = this.hashKey
+    try {
+      const hashKey = this.hashKey
 
-    // arguments
-    if (!this.isCached) return exec.apply(this, [])
+      // arguments
+      if (!this.isCached) return exec.apply(this, [])
 
-    const key = JSON.stringify({
-      ...this.getQuery(),
-      collection: this.model.collection.name
-    })
-
-    const result = await exec.apply(this, [])
-    if (this.key) {
-      await redisClient.set(this.key, JSON.stringify(result), {
-        // * the expire of the this user session === refresh token time (and it's only delete when the user is logout)
-        EX: Number(REFRESH_TOKEN_EXPIRES)
+      const key = JSON.stringify({
+        ...this.getQuery(),
+        collection: this.model.collection.name
       })
 
+      const result = await exec.apply(this, [])
+      if (this.key) {
+        await redisClient.set(this.key, JSON.stringify(result), {
+          // * the expire of the this user session === refresh token time (and it's only delete when the user is logout)
+          EX: Number(REFRESH_TOKEN_EXPIRES)
+        })
+
+        return result
+      }
+
+      const cacheVal = !hashKey ? await redisClient.get(key) : await redisClient.hGet(hashKey, key)
+      const data = JSON.parse(cacheVal!)
+
+      if (!hashKey) {
+        if (cacheVal) return new this.model(data)
+
+        redisClient.set(key, JSON.stringify(result))
+        return result
+      }
+
+      if (cacheVal)
+        return Array.isArray(data)
+          ? data.map((item) => {
+              return new this.model(item)
+            })
+          : new this.model(data)
+
+      redisClient.hSet(hashKey, key, JSON.stringify(result))
+
       return result
+    } catch (err: any) {
+      console.log(err)
+      throw new Error(err.message)
     }
-
-    const cacheVal = !hashKey ? await redisClient.get(key) : await redisClient.hGet(hashKey, key)
-    const data = JSON.parse(cacheVal!)
-
-    if (!hashKey) {
-      if (cacheVal) return new this.model(data)
-
-      redisClient.set(key, JSON.stringify(result))
-      return result
-    }
-
-    if (cacheVal)
-      return Array.isArray(data)
-        ? data.map((item) => {
-            return new this.model(item)
-          })
-        : new this.model(data)
-
-    redisClient.hSet(hashKey, key, JSON.stringify(result))
-
-    return result
   }
 }
 
