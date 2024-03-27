@@ -1,16 +1,19 @@
 import axios from 'axios'
 import qs from 'qs'
 import { Guest, User } from '../database/models'
-import { IGuest } from '../interfaces'
+import { IGuest, IUser } from '../interfaces'
 import { AppError } from '../utils'
 import { oauthConfig } from '~/config'
+import { Query } from 'mongoose'
+import guestsService from './guests.service'
 
+const { findAndUpdateGuest } = guestsService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
 
 const loginService = async function (email: string, password: string) {
-  let user = await Guest.findOne({ email })
+  let user: IUser | IGuest = (await Guest.findOne({ email }).cache({ type: 'session', key: 'user' })) as IGuest
 
-  if (!user) user = await User.findOne({ email })
+  if (!user) user = (await User.findOne({ email }).cache({ type: 'session', key: 'user' })) as IUser
 
   if (!user) throw new AppError(404, 'User is not exist')
 
@@ -26,7 +29,15 @@ const signupService = async function (data: Omit<IGuest, '_id' | 'createdAt' | '
   const isExist = await User.findOne({ email: data.email })
   if (isExist) throw new AppError(409, 'This email is already exist')
 
-  const newUser = await Guest.create(data)
+  //! in the create this keyword is refer to document no query object so that's why we can't use cache method because we custom it to query object of mongoose right
+  // const query = Guest.create(data)
+  // const newUser = await query
+
+  // * so instead we need to use this findAndUpdateGuest to create our guest user
+  const newUser = await findAndUpdateGuest({ email: data.email }, data, {
+    upsert: true,
+    new: true
+  })
 
   return newUser
 }

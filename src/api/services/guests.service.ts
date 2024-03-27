@@ -17,7 +17,8 @@ const findAndUpdateGuest = async function (
   update: UpdateQuery<IGuest>,
   options: QueryOptions = {}
 ) {
-  return Guest.findOneAndUpdate(query, update, options)
+  return Guest.findOneAndUpdate(query, update, options).cache({ key: 'user', type: 'session' })
+  // return Guest.findOneAndUpdate(query, update, options)
 }
 
 export default { fetchGuest, fetchGuests, createGuest, editGuest, removeGuest, findAndUpdateGuest }

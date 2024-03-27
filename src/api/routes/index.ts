@@ -15,6 +15,19 @@ declare module 'express-serve-static-core' {
     user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
   }
 }
+interface Options {
+  key: string
+  type: 'cache' | 'session'
+}
+
+declare module 'mongoose' {
+  interface Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
+    cache(options: Options): this
+    isCached: boolean
+    hashKey: string
+    key: string
+  }
+}
 
 /**
  * @openapi

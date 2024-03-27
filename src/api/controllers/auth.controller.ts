@@ -4,15 +4,46 @@ import { authService, guestsService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser } from '../interfaces'
 import { AppError } from '../utils'
+// import { Document } from 'mongoose'
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
 const { CLIENT_ORIGIN } = appConfig
 const { loginService, signupService, getGoogleOauthTokens, getGoogleUser } = authService
 const { findAndUpdateGuest } = guestsService
 
+// interface IUserDocument extends Document {
+//   _id: string
+//   name: string
+//   email: string
+//   password: string
+//   passwordConfirm: string
+//   role?: 'user' | 'admin'
+//   passwordChangedAt?: Date
+//   passwordResetTokenTimeout?: Date
+//   createdAt: Date
+//   updatedAt: Date
+// }
+
+// interface IGuestDocument extends Document {
+//   _id: string
+//   fullName: string
+//   email: string
+//   password?: string
+//   passwordConfirm?: string
+//   nationalId?: string
+//   nationality?: string
+//   countryFlag?: string
+//   passwordChangedAt?: Date
+//   passwordResetTokenTimeout?: Date
+//   photo?: string
+//   role?: 'user'
+//   createdAt: Date
+//   updatedAt: Date
+// }
+
 const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
   const secret = type === 'access' ? ACCESS_TOKEN_SECRET! : REFRESH_TOKEN_SECRET!
-  return jwt.sign({ id: user._id }, secret, {
+  return jwt.sign({ id: user?._id }, secret, {
     expiresIn: type === 'access' ? ACCESS_TOKEN_EXPIRES : REFRESH_TOKEN_EXPIRES
   })
 }
@@ -53,8 +84,8 @@ const signup = async function (req: Request, res: Response) {
   const newUser = await signupService({ fullName, email, password, passwordConfirm })
   // * hash password and remove password confirm (done in user model)
   // * generate access token and refresh token
-  const accessToken = signToken('access', newUser)
-  const refreshToken = signToken('refresh', newUser)
+  const accessToken = signToken('access', newUser as IUser | IGuest)
+  const refreshToken = signToken('refresh', newUser as IUser | IGuest)
   // * store user data to session or something like that (protected middleware will do this task)
   // * send back access token if we have no error
   setCookies(res, accessToken, refreshToken)
