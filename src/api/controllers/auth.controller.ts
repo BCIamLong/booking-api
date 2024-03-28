@@ -4,12 +4,13 @@ import { authService, guestsService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser } from '../interfaces'
 import { AppError, Email } from '../utils'
+import { JwtPayload } from 'jsonwebtoken'
 // import { Document } from 'mongoose'
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
 const { CLIENT_ORIGIN, appEmitter } = appConfig
 const { loginService, signupService, getGoogleOauthTokens, getGoogleUser } = authService
-const { findAndUpdateGuest } = guestsService
+const { findAndUpdateGuest, editGuest } = guestsService
 
 // interface IUserDocument extends Document {
 //   _id: string
@@ -95,10 +96,10 @@ const signup = async function (req: Request, res: Response) {
     token: accessToken
   })
 
-  // *send welcome email
-  // const url = `${req.protocol}://${req.get('host')}` //* redirect back to homepage
-
-  appEmitter.signup(newUser as IGuest, CLIENT_ORIGIN)
+  // *send welcome email (use the approach from guest model) so add more business logic as possible to business layers
+  // const url = `${req.protocol}://${req.get('host')}/api/v1/users/verify-email` //* redirect back to homepage
+  // appEmitter.signup(newUser as IGuest, url)
+  // appEmitter.signup(newUser as IGuest, CLIENT_ORIGIN)
   // const url = CLIENT_ORIGIN //* redirect back to homepage
   // const emailHost = new Email(newUser as IGuest, url)
   // emailHost.sendWelcomeMail()
@@ -154,7 +155,7 @@ const loginWithGoogle = async function (req: Request, res: Response) {
     throw new AppError(403, 'Google account is not verified, please verify your google account to continue!')
 
   const newUser = await findAndUpdateGuest(
-    { email },
+    { email, verifyEmail: true },
     {
       email,
       fullName
@@ -181,4 +182,17 @@ const loginWithGoogle = async function (req: Request, res: Response) {
   // ! but with this we can understand how all of these work behind the scenes right, but later if we want we can just use the library if we really work with oauth many times
 }
 
-export default { login, signup, signToken, loginWithGoogle }
+const verifyEmail = async function (req: Request, res: Response) {
+  const token = req.headers.authorization?.split(' ')[1] || req.cookies['access-token'] || req.cookies['refresh-token']
+  if (!token) throw new AppError(400, 'Error is not good')
+
+  const decoded = (
+    req.cookies['access-token'] ? jwt.verify(token, ACCESS_TOKEN_SECRET) : jwt.verify(token, REFRESH_TOKEN_SECRET)
+  ) as JwtPayload
+
+  await editGuest(decoded.id, { verifyEmail: true })
+
+  res.redirect(CLIENT_ORIGIN)
+}
+
+export default { login, signup, signToken, loginWithGoogle, verifyEmail }

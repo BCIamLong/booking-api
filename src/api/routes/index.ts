@@ -29,6 +29,12 @@ declare module 'mongoose' {
   }
 }
 
+declare module 'jsonwebtoken' {
+  interface JwtPayload {
+    id: string
+  }
+}
+
 /**
  * @openapi
  * components:

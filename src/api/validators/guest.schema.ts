@@ -58,6 +58,9 @@ const createGuestSchema = Joi.object({
  *     email:
  *      type: string
  *      default: john.doe@example.com
+ *     verifyEmail:
+ *      type: boolean
+ *      default: true
  *     nationalId:
  *      type: string
  *      default: 123456789
@@ -71,6 +74,7 @@ const createGuestSchema = Joi.object({
 const updateGuestSchema = Joi.object({
   fullName: Joi.string(),
   email: Joi.string().email(),
+  verifyEmail: Joi.boolean(),
   avatar: Joi.string(),
   nationalId: Joi.string(),
   nationality: Joi.string(),

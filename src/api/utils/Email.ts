@@ -24,13 +24,13 @@ export default class Email {
     appointments, reserving tables, or securing tickets for events – all from the comfort of your
     fingertips.
   </p>
-  <p>Let's get start now</p>`
+  <p>Let's click here to verify your account and get start </p>`
     const footer = `<p>
   We're here to make your life easier, so if you have any questions or need assistance at any point,
   don't hesitate to reach out to our friendly support team.
 </p>
 <p>Once again, welcome aboard, and thank you for choosing booking app</p>`
-    const btnCTA = `Booking now`
+    const btnCTA = `Verify to start`
     let html = emailTemplate
     html = emailTemplate.replace('%FIRST_NAME%', this.firstName)
     html = html.replace('%URL_REDIRECT%', this.url)

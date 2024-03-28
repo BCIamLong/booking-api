@@ -6,7 +6,7 @@ import { authMiddleware } from '../middlewares'
 
 const { createUserSchema, updateUserSchema } = userSchema
 const { loginSchema, signupSchema } = authSchema
-const { login, signup, loginWithGoogle } = authController
+const { login, signup, loginWithGoogle, verifyEmail } = authController
 const { authenticate, authorize } = authMiddleware
 const { getUsers, getUser, postUser, updateUser, deleteUser } = usersController
 const userRouter = Router()
@@ -70,6 +70,8 @@ userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  *     description: Something went wrong
  */
 userRouter.post('/login', validator(loginSchema), asyncCatch(login))
+
+userRouter.get('/verify-email', authenticate, asyncCatch(verifyEmail))
 
 userRouter.use(authenticate, authorize('admin'))
 

@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 
 import { IGuest } from '~/api/interfaces'
+import { appConfig } from '~/config'
+
+const { appEmitter } = appConfig
 
 /**
  * @openapi
@@ -17,6 +20,8 @@ import { IGuest } from '~/api/interfaces'
  *      type: string
  *     email:
  *      type: string
+ *     verifyEmail:
+ *      type: boolean
  *     role:
  *      type: string
  *     avatar:
@@ -51,6 +56,10 @@ const guestSchema = new Schema(
       type: String,
       required: true,
       unique: true
+    },
+    verifyEmail: {
+      type: Boolean,
+      default: false
     },
     avatar: {
       type: String,
@@ -115,6 +124,18 @@ guestSchema.pre('find', function (next) {
 //   this.select('-__v')
 //   next()
 // })
+
+guestSchema.post('findOneAndUpdate', async function (doc, next) {
+  // const newDoc = this.getFilter()
+  // console.log(doc)
+  // console.log(newDoc)
+  if (!doc) return
+  if (doc?.verifyEmail) return
+  const url = `http://localhost:3009/api/v1/users/verify-email`
+
+  appEmitter.signup(doc, url)
+  next()
+})
 
 guestSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
   return await bcrypt.compare(plainPwd, hashPwd)
