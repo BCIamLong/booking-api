@@ -71,7 +71,7 @@ userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  */
 userRouter.post('/login', validator(loginSchema), asyncCatch(login))
 
-userRouter.get('/verify-email', authenticate, asyncCatch(verifyEmail))
+userRouter.get('/verify-email', asyncCatch(verifyEmail))
 
 userRouter.use(authenticate, authorize('admin'))
 

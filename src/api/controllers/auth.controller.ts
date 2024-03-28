@@ -5,8 +5,10 @@ import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser } from '../interfaces'
 import { AppError, Email } from '../utils'
 import { JwtPayload } from 'jsonwebtoken'
+import redis from '../database/redis'
 // import { Document } from 'mongoose'
 
+const { redisClient } = redis
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
 const { CLIENT_ORIGIN, appEmitter } = appConfig
 const { loginService, signupService, getGoogleOauthTokens, getGoogleUser } = authService
@@ -184,13 +186,17 @@ const loginWithGoogle = async function (req: Request, res: Response) {
 
 const verifyEmail = async function (req: Request, res: Response) {
   const token = req.headers.authorization?.split(' ')[1] || req.cookies['access-token'] || req.cookies['refresh-token']
-  if (!token) throw new AppError(400, 'Error is not good')
+  let userSession
+  let decoded
+  if (token)
+    decoded = (
+      req.cookies['access-token'] ? jwt.verify(token, ACCESS_TOKEN_SECRET) : jwt.verify(token, REFRESH_TOKEN_SECRET)
+    ) as JwtPayload
+  else userSession = await redisClient.get('user')
 
-  const decoded = (
-    req.cookies['access-token'] ? jwt.verify(token, ACCESS_TOKEN_SECRET) : jwt.verify(token, REFRESH_TOKEN_SECRET)
-  ) as JwtPayload
+  if (!token && !userSession) throw new AppError(400, 'Bad request')
 
-  await editGuest(decoded.id, { verifyEmail: true })
+  await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
 
   res.redirect(CLIENT_ORIGIN)
 }
