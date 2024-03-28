@@ -3,11 +3,11 @@ import { Request, Response } from 'express'
 import { authService, guestsService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser } from '../interfaces'
-import { AppError } from '../utils'
+import { AppError, Email } from '../utils'
 // import { Document } from 'mongoose'
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
-const { CLIENT_ORIGIN } = appConfig
+const { CLIENT_ORIGIN, appEmitter } = appConfig
 const { loginService, signupService, getGoogleOauthTokens, getGoogleUser } = authService
 const { findAndUpdateGuest } = guestsService
 
@@ -88,11 +88,20 @@ const signup = async function (req: Request, res: Response) {
   const refreshToken = signToken('refresh', newUser as IUser | IGuest)
   // * store user data to session or something like that (protected middleware will do this task)
   // * send back access token if we have no error
+
   setCookies(res, accessToken, refreshToken)
   res.json({
     status: 'success',
     token: accessToken
   })
+
+  // *send welcome email
+  // const url = `${req.protocol}://${req.get('host')}` //* redirect back to homepage
+
+  appEmitter.signup(newUser as IGuest, CLIENT_ORIGIN)
+  // const url = CLIENT_ORIGIN //* redirect back to homepage
+  // const emailHost = new Email(newUser as IGuest, url)
+  // emailHost.sendWelcomeMail()
 }
 
 // * so this controller handler will handle for this endpoint: /api/session/oauth/google when the user click to login account of google

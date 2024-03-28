@@ -3,5 +3,6 @@ import dbConfig from './db.config'
 import jwtConfig from './jwt.config'
 import oauthConfig from './oauth.config'
 import appConfig from './app.config'
+import emailConfig from './email.config'
 
-export { swagger, dbConfig, jwtConfig, oauthConfig, appConfig }
+export { swagger, dbConfig, jwtConfig, oauthConfig, appConfig, emailConfig }
