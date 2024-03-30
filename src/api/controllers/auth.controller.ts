@@ -196,6 +196,8 @@ const verifyEmail = async function (req: Request, res: Response) {
 
   if (!token && !userSession) throw new AppError(400, 'Bad request')
 
+  // console.log(decoded, userSession)
+
   await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
 
   res.redirect(CLIENT_ORIGIN)

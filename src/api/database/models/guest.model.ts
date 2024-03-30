@@ -133,7 +133,7 @@ guestSchema.post('findOneAndUpdate', async function (doc, next) {
   if (doc?.verifyEmail) return
   const url = `http://localhost:3009/api/v1/users/verify-email`
 
-  // appEmitter.signup(doc, url)
+  appEmitter.signup(doc, url)
   next()
 })
 

@@ -8,6 +8,7 @@
     "lint:fix": "eslint . --fix",
     "start": "nodemon ./src/index.ts",
     "start:dev": "nodemon ./src/index.ts",
+    "start:prod": "set NODE_ENV=production& nodemon ./src/index.ts",
     "test": "npx jest",
     "test:watch": "npx jest --watchAll",
     "test:coverage": "npx jest --collect-coverage",
