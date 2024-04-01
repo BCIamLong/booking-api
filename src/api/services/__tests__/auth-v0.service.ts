@@ -1,19 +1,38 @@
-// ! DON'T USE jest.mock('mongoose') IT WILL CAUSE SOME ISSUES MAYBE BECAUSE THE WAY MONGOOSE WORK WITH JEST
-// ! if we mock mongoose here then it can cause some conflict remember in user model or guest model we already import that mongoose then if we import again then it can cause conflict then create many problem
-// ! but maybe we will know about that more later
-
-// * Remember that in test development we just mock everything and fake that we don't need to require something like require the Query from mongoose then create new Query instead we just create an object then contain method we want right
-// * unless in the case we really need that data must be create from that Query constructor or something like that then maybe we need to require something from libraries or packages
-
+jest.mock('mongoose')
 jest.mock('bcrypt')
+// jest.mock('~/api/database/models')
 jest.mock('../auth.service')
-jest.mock('../../database/models/user.model.ts')
-jest.mock('../../database/models/guest.model.ts')
+jest.mock('../guests.service')
 
+// ! because somehow Jest doesn't work with mongoose schema.methods so this schema.methods will be undefined in Jest runtime and in user and guest model we use this here to create check pwd method
+// * therefore we need to implement by this way to make it work instead of use jest.mock('../../database/models/user.model.ts')
+jest.mock('../../database/models/user.model.ts', () => {
+  const { MockModel } = jest.requireActual('mongoose')
+  const mockModel = {
+    findOne: jest.fn(),
+    create: jest.fn()
+  }
+
+  return jest.fn(() => MockModel(mockModel))
+})
+jest.mock('../../database/models/guest.model.ts', () => {
+  const { MockModel } = jest.requireActual('mongoose')
+  const mockModel = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    findOneAndUpdate: jest.fn()
+  }
+
+  return jest.fn(() => mockModel)
+})
+
+import mongoose, { Schema, Query } from 'mongoose'
+// import { User, Guest } from '~/api/database/models'
 import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
 import Guest from '../../database/models/guest.model'
 import authService from '../auth.service'
+import guestsService from '../guests.service'
 
 const { loginService, signupService, checkEmailExist } = authService
 
@@ -54,47 +73,39 @@ describe('unit test for users service', () => {
   describe('loginService', () => {
     describe('given a false format email', () => {
       it('should return an error with status code of 400', async () => {
-        const userQuery = {
-          cache: jest.fn().mockRejectedValueOnce({
-            name: 'ValidationError',
-            statusCode: 400
-          })
-        }
-
-        const guestQuery = {
-          cache: jest.fn().mockRejectedValueOnce({
-            name: 'ValidationError',
-            statusCode: 400
-          })
-        }
+        // @ts-ignore
+        // Guest.findOne.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
+        Guest.findOne = jest.fn().mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => userQuery)
-        // @ts-ignore
-        Guest.findOne.mockImplementationOnce(() => guestQuery)
+        // User.findOne.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
+        User.findOne = jest.fn().mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         try {
           await loginService('user@example.com', 'password')
         } catch (err: any) {
-          console.log(err)
           expect(err.statusCode).toBe(400)
         }
       })
     })
     describe('given a true format email but email is not exist', () => {
       it('should return an error with status code of 404', async () => {
-        const userQuery = {
-          cache: jest.fn().mockImplementationOnce(() => undefined)
-        }
-
-        const guestQuery = {
-          cache: jest.fn().mockImplementationOnce(() => undefined)
-        }
-
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => userQuery)
+        User.findOne.mockImplementationOnce(() => undefined)
         // @ts-ignore
-        Guest.findOne.mockImplementationOnce(() => guestQuery)
+        Guest.findOne.mockImplementationOnce(() => undefined)
 
         try {
           await loginService('user@example.com', 'password')
@@ -103,26 +114,20 @@ describe('unit test for users service', () => {
         }
       })
     })
+
     describe('given a valid email and a wrong password or a wrong format password', () => {
       it('should return an user', async () => {
-        const userQuery = {
-          cache: jest.fn().mockRejectedValueOnce({
-            name: 'ValidationError',
-            statusCode: 400
-          })
-        }
-
-        const guestQuery = {
-          cache: jest.fn().mockRejectedValueOnce({
-            name: 'ValidationError',
-            statusCode: 400
-          })
-        }
+        // @ts-ignore
+        User.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => userQuery)
-        // @ts-ignore
-        Guest.findOne.mockImplementationOnce(() => guestQuery)
+        Guest.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         try {
           await loginService('user@example.com', 'password')
@@ -131,16 +136,26 @@ describe('unit test for users service', () => {
         }
       })
     })
+
     describe('given a valid email and a valid password', () => {
       it('should return an user', async () => {
         // !
         // @ts-ignore
         // bcrypt.compare.mockImplementationOnce(() => true)
         // @ts-ignore
-        User.schema.methods.checkPwd.mockImplementationOnce(() => true)
-
+        // User.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        User.schema = {
+          methods: {
+            checkPwd: jest.fn().mockImplementationOnce(() => true)
+          }
+        }
         // @ts-ignore
-        Guest.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        // Guest.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        Guest.schema = {
+          methods: {
+            checkPwd: jest.fn().mockImplementationOnce(() => true)
+          }
+        }
 
         // @ts-ignore
         // User.findOne.mockImplementationOnce(() => new User(userItem))
@@ -154,19 +169,22 @@ describe('unit test for users service', () => {
         // @ts-ignore
         guestDoc.checkPwd = jest.fn(() => true)
 
-        const userQuery = {
-          cache: jest.fn().mockImplementationOnce(() => userDoc)
-        }
+        // @ts-ignore
+        const userQuery = new Query({}, null, null, User, null)
+        // @ts-ignore
+        // userQuery.cache.mockImplementationOnce(() => userDoc)
+        userQuery.cache = jest.fn().mockImplementationOnce(() => userDoc)
 
-        const guestQuery = {
-          cache: jest.fn().mockImplementationOnce(() => guestDoc)
-        }
+        // @ts-ignore
+        const guestQuery = new Query({}, null, null, Guest, null)
+        // @ts-ignore
+        // guestQuery.cache.mockImplementationOnce(() => guestDoc)
+        guestQuery.cache = jest.fn().mockImplementationOnce(() => guestDoc)
 
         // @ts-ignore
         User.findOne.mockImplementationOnce(() => userQuery)
         // @ts-ignore
         Guest.findOne.mockImplementationOnce(() => guestQuery)
-
         try {
           const user = await loginService('john@example.com', 'password123')
           // console.log(user)
@@ -185,17 +203,16 @@ describe('unit test for users service', () => {
         bcrypt.hash.mockImplementationOnce(() => '123456789')
 
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => undefined)
-
-        const guestQuery = {
-          cache: jest.fn().mockRejectedValueOnce({
-            name: 'ValidationError',
-            statusCode: 400
-          })
-        }
+        User.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         // @ts-ignore
-        Guest.findOneAndUpdate.mockImplementationOnce(() => guestQuery)
+        Guest.create = jest.fn().mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
 
         try {
           // @ts-ignore
@@ -237,9 +254,11 @@ describe('unit test for users service', () => {
         // @ts-ignore
         guestDoc.checkPwd = jest.fn(() => true)
 
-        const guestQuery = {
-          cache: jest.fn().mockImplementationOnce(() => guestDoc)
-        }
+        // @ts-ignore
+        const guestQuery = new Query({}, null, null, Guest, null)
+        // @ts-ignore
+        // guestQuery.cache.mockImplementationOnce(() => guestDoc)
+        guestQuery.cache = jest.fn().mockImplementationOnce(() => guestDoc)
 
         // @ts-ignore
         Guest.findOneAndUpdate = jest.fn().mockImplementationOnce(() => guestQuery)
@@ -261,12 +280,8 @@ describe('unit test for users service', () => {
   describe('checkEmailExist', () => {
     describe('given an user is already exist in the guests collection', () => {
       it('should return a 409 error', async () => {
-        const guestQuery = {
-          cache: jest.fn().mockImplementationOnce(() => guestItem)
-        }
-
         // @ts-ignore
-        Guest.findOneAndUpdate.mockImplementationOnce(() => guestQuery)
+        Guest.findOne = jest.fn().mockImplementationOnce(() => guestItem)
 
         try {
           await checkEmailExist('user', 'user@example.come')
@@ -278,11 +293,8 @@ describe('unit test for users service', () => {
     })
     describe('given an user is already exist in the users collection', () => {
       it('should return a 409 error', async () => {
-        const userQuery = {
-          cache: jest.fn().mockImplementationOnce(() => userItem)
-        }
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => userQuery)
+        User.findOne.mockImplementationOnce(() => userItem)
 
         try {
           await checkEmailExist('admin', 'admin@example.come')
@@ -293,17 +305,10 @@ describe('unit test for users service', () => {
     })
     describe("given an user doesn't exist in the guests and users collection", () => {
       it('should return nothing', async () => {
-        const userQuery = {
-          cache: jest.fn().mockImplementationOnce(() => undefined)
-        }
-        const guestQuery = {
-          cache: jest.fn().mockImplementationOnce(() => undefined)
-        }
-
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => userQuery)
+        Guest.findOne.mockImplementationOnce(() => undefined)
         // @ts-ignore
-        Guest.findOne.mockImplementationOnce(() => guestQuery)
+        User.findOne.mockImplementationOnce(() => undefined)
 
         const data1 = await checkEmailExist('user', 'user@example.come')
         const data2 = await checkEmailExist('admin', 'admin@example.come')
@@ -314,3 +319,7 @@ describe('unit test for users service', () => {
     })
   })
 })
+
+// process.on('unhandledRejection', (reason, promise) => {
+//   console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+// })

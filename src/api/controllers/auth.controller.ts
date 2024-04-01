@@ -70,12 +70,14 @@ const setCookies = function (res: Response, accessToken: string, refreshToken: s
 const login = async function (req: Request, res: Response) {
   const { email, password } = req.body
   const user = await loginService(email, password)
+
   // * generate access token and refresh token
   const accessToken = signToken('access', user)
   const refreshToken = signToken('refresh', user)
   // * store user data to session or something like that (protected middleware will do this task)
   // * send back access token if we have no error
   setCookies(res, accessToken, refreshToken)
+
   res.json({
     status: 'success',
     token: accessToken

@@ -1,40 +1,17 @@
-jest.mock('dotenv/config')
-jest.mock('bcrypt')
 jest.mock('jsonwebtoken')
+jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
-jest.mock('../../database/models/guest.model')
-jest.mock('../../services/auth.service')
-
-import 'dotenv/config'
-import bcrypt from 'bcrypt'
+jest.mock('../../database/models/guest.model.ts')
+jest.mock('../../../config/jwt.config.ts')
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
 import Guest from '../../database/models/guest.model'
 import authController from '../auth.controller'
-import authService from '../../services/auth.service'
+import jwtConfig from '../../../config/jwt.config'
 
 const { login, signup } = authController
-
-const req = {
-  params: {
-    id: 123
-  },
-  body: {}
-}
-
-// const res1 = {
-//   json: jest.fn((x) => x)
-// }
-
-const res = {
-  status: jest.fn().mockReturnThis(),
-  // status: jest.fn((status: number) => res1),
-  json: jest.fn((x) => x),
-  cookie: jest.fn((x) => x)
-}
-// const res = jest
-
-const accessToken = '123456'
+const { ACCESS_TOKEN_EXPIRES, ACCESS_TOKEN_SECRET } = jwtConfig
 
 const userItem = {
   _id: 'user1',
@@ -57,6 +34,25 @@ const guestItem = {
   updatedAt: new Date()
 }
 
+const accessToken = '123456'
+
+const req = {
+  params: {
+    id: 123
+  },
+  body: {
+    email: 'john@example.com',
+    password: 'hashedPwd(password123)'
+  }
+}
+
+const res = {
+  status: jest.fn().mockReturnThis(),
+  // status: jest.fn((status: number) => res1),
+  json: jest.fn((x) => x),
+  cookie: jest.fn((x) => x)
+}
+
 describe('unit test for auth controller', () => {
   describe('test login function', () => {
     describe('given a false format email', () => {
@@ -76,7 +72,6 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           await login(req, res)
         } catch (err: any) {
-          // @ts-ignore
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
         }
@@ -94,7 +89,6 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           await login(req, res)
         } catch (err: any) {
-          // @ts-ignore
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(404)
         }
@@ -103,21 +97,14 @@ describe('unit test for auth controller', () => {
 
     describe('given a valid email and a wrong password or a wrong format password', () => {
       it('should return a 400', async () => {
-        const userQuery = {
-          cache: jest.fn().mockImplementationOnce(() => userItem)
-        }
-
-        const guestQuery = {
-          cache: jest.fn().mockImplementationOnce(() => guestItem)
-        }
-
         // @ts-ignore
-        User.findOne.mockImplementationOnce(() => userQuery)
+        User.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 400
+        })
         // @ts-ignore
-        Guest.findOne.mockImplementationOnce(() => guestQuery)
-        // @ts-ignore
-        User.schema.checkPwd = jest.fn().mockRejectedValueOnce({
-          type: 'ValidationError',
+        Guest.findOne.mockRejectedValueOnce({
+          name: 'ValidationError',
           statusCode: 400
         })
 
@@ -125,7 +112,6 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           await login(req, res)
         } catch (err: any) {
-          // @ts-ignore
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
         }
@@ -134,8 +120,11 @@ describe('unit test for auth controller', () => {
 
     describe('given a valid email and a valid password', () => {
       it('should return a 200 and access token', async () => {
+        // const accessToken = jwt.sign({ id: 'user1' }, ACCESS_TOKEN_SECRET!, {
+        //   expiresIn: +ACCESS_TOKEN_EXPIRES!
+        // })
         // @ts-ignore
-        bcrypt.compare.mockImplementationOnce(() => true)
+        // bcrypt.compare.mockImplementationOnce(() => true)
 
         // @ts-ignore
         jwt.sign.mockImplementationOnce(() => accessToken)
@@ -143,14 +132,19 @@ describe('unit test for auth controller', () => {
         jest.spyOn(authController, 'signToken').mockImplementationOnce(() => accessToken)
 
         // @ts-ignore
-        jest.spyOn(authService, 'loginService').mockImplementationOnce(() => new Guest(guestItem))
+        User.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        // @ts-ignore
+        Guest.schema.methods.checkPwd.mockImplementationOnce(() => true)
+        // @ts-ignore
+        User.findOne.mockImplementationOnce(() => new User(userItem))
+        // @ts-ignore
+        Guest.findOne.mockImplementationOnce(() => new Guest(guestItem))
 
         // @ts-ignore
         await login(req, res)
-        // @ts-ignore
+
         expect(res.json).toHaveBeenCalledTimes(1)
-        // // @ts-ignore
-        // @ts-ignore
+        expect(res.cookie).toHaveBeenCalledTimes(2)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           token: accessToken
@@ -159,6 +153,7 @@ describe('unit test for auth controller', () => {
       })
     })
   })
+
   describe('test signup function', () => {
     describe('given the invalid input', () => {
       it('should return a 400', async () => {
@@ -175,7 +170,6 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           await signup(req, res)
         } catch (err: any) {
-          // @ts-ignore
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
         }
@@ -196,7 +190,6 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           await signup(req, res)
         } catch (err: any) {
-          // @ts-ignore
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(409)
         }
@@ -218,7 +211,6 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           await signup(req, res)
         } catch (err: any) {
-          // @ts-ignore
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
         }
@@ -236,23 +228,16 @@ describe('unit test for auth controller', () => {
         jest.spyOn(authController, 'signToken').mockImplementationOnce(() => accessToken)
 
         // @ts-ignore
-        // User.findOne.mockImplementationOnce(() => undefined)
+        User.findOne.mockImplementationOnce(() => undefined)
 
-        // const guestQuery = {
-        //   cache: jest.fn().mockImplementationOnce(() => new Guest(guestItem))
-        // }
-
-        // // @ts-ignore
-        // Guest.findOneAndUpdate.mockImplementationOnce(() => guestQuery)
-        jest.spyOn(authService, 'signupService').mockImplementationOnce(() => new Guest(guestItem))
+        // @ts-ignore
+        Guest.create.mockImplementationOnce(() => new Guest(guestItem))
 
         // @ts-ignore
         await signup(req, res)
-        // @ts-ignore
+
         expect(res.json).toHaveBeenCalledTimes(1)
-        // @ts-ignore
         expect(res.cookie).toHaveBeenCalledTimes(2)
-        // @ts-ignore
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           token: accessToken

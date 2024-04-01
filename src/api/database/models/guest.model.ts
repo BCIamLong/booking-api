@@ -137,6 +137,9 @@ guestSchema.post('findOneAndUpdate', async function (doc, next) {
   next()
 })
 
+// guestSchema.methods = guestSchema.methods || {}
+
+// if (process.env.NODE_ENV !== 'test')
 guestSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
   return await bcrypt.compare(plainPwd, hashPwd)
 }

@@ -90,6 +90,9 @@ userSchema.pre(/^find/, function (next) {
 //   next()
 // })
 
+// userSchema.methods = userSchema.methods || {}
+
+// if (process.env.NODE_ENV !== 'test')
 userSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
   return await bcrypt.compare(plainPwd, hashPwd)
 }

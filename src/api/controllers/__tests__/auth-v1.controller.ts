@@ -1,40 +1,28 @@
-jest.mock('dotenv/config')
-jest.mock('bcrypt')
-jest.mock('jsonwebtoken')
-jest.mock('../../database/models/user.model.ts')
-jest.mock('../../database/models/guest.model')
-jest.mock('../../services/auth.service')
+// ! Remember in jest runtime we can't import modules like import jwt from 'jsonwebtoken'
+// * Instead we need to use jest mock then import
+// jest.mock('jsonwebtoken') //* to mock this module to jest scope
+// import jwt from 'jsonwebtoken' //* import this module from that jest scope
 
+// jest.mock('jsonwebtoken')
+// jest.mock('bcrypt')
+jest.mock('dotenv/config')
+jest.mock('../../database/models/user.model.ts')
+jest.mock('../../database/models/guest.model.ts')
+jest.mock('../../../config/jwt.config.ts')
+jest.mock('../auth.controller.ts')
+jest.mock('../../services/auth.service.ts')
+
+// import jwt from 'jsonwebtoken'
+// import bcrypt from 'bcrypt'
 import 'dotenv/config'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 import User from '../../database/models/user.model'
 import Guest from '../../database/models/guest.model'
 import authController from '../auth.controller'
 import authService from '../../services/auth.service'
+// import jwtConfig from '../../../config/jwt.config'
 
 const { login, signup } = authController
-
-const req = {
-  params: {
-    id: 123
-  },
-  body: {}
-}
-
-// const res1 = {
-//   json: jest.fn((x) => x)
-// }
-
-const res = {
-  status: jest.fn().mockReturnThis(),
-  // status: jest.fn((status: number) => res1),
-  json: jest.fn((x) => x),
-  cookie: jest.fn((x) => x)
-}
-// const res = jest
-
-const accessToken = '123456'
+// const { ACCESS_TOKEN_EXPIRES, ACCESS_TOKEN_SECRET } = jwtConfig
 
 const userItem = {
   _id: 'user1',
@@ -55,6 +43,39 @@ const guestItem = {
   countryFlag: '🇬🇧',
   createdAt: new Date(),
   updatedAt: new Date()
+}
+
+const accessToken = '123456'
+
+const req = {
+  params: {
+    id: 123
+  },
+  body: {
+    email: 'john@example.com',
+    password: 'hashedPwd(password123)'
+  }
+}
+
+// const mockResponse = () => {
+//   const res = {}
+//   // @ts-ignore
+//   res.status = jest.fn().mockReturnValue(res)
+//   // @ts-ignore
+//   res.json = jest.fn().mockReturnValue(res)
+//   // @ts-ignore
+//   res.cookie = jest.fn((x) => x)
+//   return res
+// }
+// const res = mockResponse()
+
+// @ts-ignore
+const res = {
+  // @ts-ignore
+  status: jest.fn().mockReturnThis(),
+  // status: jest.fn((status: number) => res1),
+  json: jest.fn((x) => x),
+  cookie: jest.fn((x) => x)
 }
 
 describe('unit test for auth controller', () => {
@@ -134,14 +155,34 @@ describe('unit test for auth controller', () => {
 
     describe('given a valid email and a valid password', () => {
       it('should return a 200 and access token', async () => {
+        // const accessToken = jwt.sign({ id: 'user1' }, ACCESS_TOKEN_SECRET!, {
+        //   expiresIn: +ACCESS_TOKEN_EXPIRES!
+        // })
         // @ts-ignore
-        bcrypt.compare.mockImplementationOnce(() => true)
+        // bcrypt.compare.mockImplementationOnce(() => true)
 
         // @ts-ignore
-        jwt.sign.mockImplementationOnce(() => accessToken)
+        // jwt.sign.mockImplementationOnce(() => accessToken)
 
         jest.spyOn(authController, 'signToken').mockImplementationOnce(() => accessToken)
 
+        // // @ts-ignore
+        // User.schema.methods.checkPwd = jest.fn().mockImplementationOnce(() => true)
+        // // @ts-ignore
+        // Guest.schema.methods.checkPwd = jest.fn().mockImplementationOnce(() => true)
+
+        // const userQuery = {
+        //   cache: jest.fn().mockImplementationOnce(() => userItem)
+        // }
+
+        // const guestQuery = {
+        //   cache: jest.fn().mockImplementationOnce(() => guestItem)
+        // }
+
+        // // @ts-ignore
+        // User.findOne.mockImplementationOnce(() => userQuery)
+        // // @ts-ignore
+        // Guest.findOne.mockImplementationOnce(() => guestQuery)
         // @ts-ignore
         jest.spyOn(authService, 'loginService').mockImplementationOnce(() => new Guest(guestItem))
 
@@ -150,6 +191,7 @@ describe('unit test for auth controller', () => {
         // @ts-ignore
         expect(res.json).toHaveBeenCalledTimes(1)
         // // @ts-ignore
+        expect(res.cookie).toHaveBeenCalledTimes(2)
         // @ts-ignore
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
@@ -159,6 +201,7 @@ describe('unit test for auth controller', () => {
       })
     })
   })
+
   describe('test signup function', () => {
     describe('given the invalid input', () => {
       it('should return a 400', async () => {
@@ -228,10 +271,10 @@ describe('unit test for auth controller', () => {
     describe('given the valid input', () => {
       it('should return a 200 and access token', async () => {
         // @ts-ignore
-        bcrypt.hash.mockImplementationOnce(() => '12345678')
+        // bcrypt.hash.mockImplementationOnce(() => '12345678')
 
         // @ts-ignore
-        jwt.sign.mockImplementationOnce(() => accessToken)
+        // jwt.sign.mockImplementationOnce(() => accessToken)
 
         jest.spyOn(authController, 'signToken').mockImplementationOnce(() => accessToken)
 
