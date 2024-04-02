@@ -6,16 +6,18 @@
 // * unless in the case we really need that data must be create from that Query constructor or something like that then maybe we need to require something from libraries or packages
 
 jest.mock('bcrypt')
+jest.mock('axios')
 jest.mock('../auth.service')
 jest.mock('../../database/models/user.model.ts')
 jest.mock('../../database/models/guest.model.ts')
 
 import bcrypt from 'bcrypt'
+import axios from 'axios'
 import User from '../../database/models/user.model'
 import Guest from '../../database/models/guest.model'
 import authService from '../auth.service'
 
-const { loginService, signupService, checkEmailExist } = authService
+const { loginService, signupService, checkEmailExist, getGoogleOauthTokens, getGoogleUser } = authService
 
 const userItem = {
   _id: 'user1',
@@ -312,5 +314,44 @@ describe('unit test for users service', () => {
         expect(data2).toBe(undefined)
       })
     })
+  })
+
+  describe('getGoogleOauthTokens', () => {
+    //   describe('given the invalid code', () => {
+    //     it('should return a bad request 400', async () => {
+    //       // @ts-ignore
+    //       axios.post.mockRejectedValueOnce(new Error('Bad Request'))
+    //       expect(await getGoogleOauthTokens({ code: '123' })).rejects.toThrow('Bad Request')
+    //     })
+    //   })
+    //   describe('given the valid code', () => {
+    //     it('should return a token data', async () => {
+    //       const data_tmp = {
+    //         id_token: 'id_token',
+    //         access_token: 'access_token'
+    //       }
+    //       // @ts-ignore
+    //       axios.post = jest.fn().mockResolvedValue({ data: data_tmp })
+    //       const result = await getGoogleOauthTokens({ code: '123' })
+    //       console.log(result)
+    //       expect(result).toEqual(data_tmp)
+    //     })
+    //   })
+  })
+
+  describe('getGoogleUser', () => {
+    //   describe('given the wrong token data', () => {
+    //     it('should return a bad request 400', async () => {
+    //       axios.get = jest.fn().mockRejectedValueOnce({
+    //         error: 'Bad Request',
+    //         statusCode: 400
+    //       })
+    //       try {
+    //         await getGoogleUser({ id_token: 'id_token', access_token: 'access_token' })
+    //       } catch (err: any) {
+    //         expect(err.statusCode).toBe(400)
+    //       }
+    //     })
+    //   })
   })
 })
