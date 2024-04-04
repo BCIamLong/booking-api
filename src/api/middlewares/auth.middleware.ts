@@ -45,6 +45,9 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
     if (new Date(user.passwordChangedAt!) >= new Date())
       return next(new AppError(401, 'This use recently has changed password, please login again'))
 
+    if (!user.verifyEmail)
+      return next(new AppError(401, 'Please check your email inbox and verify your email to start using our web app'))
+
     req.user = user
     next()
   } catch (err) {

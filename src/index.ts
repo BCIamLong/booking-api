@@ -19,6 +19,12 @@ appEmitter.on('signup', (user, url) => {
   emailHost.sendWelcomeMail()
 })
 
+appEmitter.on('reset-password', (user, url) => {
+  // console.log('hello')
+  const emailHost = new Email(user, url)
+  emailHost.sendResetPwdMail()
+})
+
 process.on('unhandledRejection', (err: Error) => {
   log.error(err.name, err.message)
   log.error(err)

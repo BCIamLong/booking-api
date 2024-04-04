@@ -1,3 +1,5 @@
+import crypto from 'crypto'
+import bcrypt from 'bcrypt'
 import axios from 'axios'
 import qs from 'qs'
 import { Guest, User } from '../database/models'
@@ -6,7 +8,9 @@ import { AppError } from '../utils'
 import { oauthConfig } from '~/config'
 import { Query } from 'mongoose'
 import guestsService from './guests.service'
+import { appConfig } from '~/config'
 
+const { appEmitter, SERVER_ORIGIN } = appConfig
 const { findAndUpdateGuest } = guestsService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
 
@@ -26,14 +30,16 @@ const loginService = async function (email: string, password: string) {
 }
 
 const signupService = async function (data: Omit<IGuest, '_id' | 'createdAt' | 'updatedAt'>) {
-  const isExist = await User.findOne({ email: data.email })
-  if (isExist) throw new AppError(409, 'This email is already exist')
+  const user = await isUserExisted({ field: 'email', value: data.email })
+  if (user) throw new AppError(409, 'This email is already exist')
 
   //! in the create this keyword is refer to document no query object so that's why we can't use cache method because we custom it to query object of mongoose right
   // const query = Guest.create(data)
   // const newUser = await query
 
   // * so instead we need to use this findAndUpdateGuest to create our guest user
+  data.passwordConfirm = undefined
+  data.password = await bcrypt.hash(data.password!, 10)
   const newUser = await findAndUpdateGuest({ email: data.email }, data, {
     upsert: true,
     new: true
@@ -49,6 +55,17 @@ const checkEmailExist = async function (role: 'user' | 'admin', email: string) {
   // console.log(isExist)
 
   if (isExist) throw new AppError(409, 'This email is already exist')
+}
+
+const isUserExisted = async function ({ field, value }: { field: string; value: string }) {
+  const guest = await Guest.findOne({ [field]: value })
+  let user
+  if (guest) user = guest
+  else user = await User.findOne({ [field]: value })
+  // console.log(user)
+
+  if (!user) return null
+  return user
 }
 
 interface GoogleOauthTokens {
@@ -105,4 +122,78 @@ const getGoogleUser = async function ({
   return res.data
 }
 
-export default { loginService, signupService, checkEmailExist, getGoogleOauthTokens, getGoogleUser }
+const forgotPwdService = async function ({ email }: { email: string }) {
+  const user = await isUserExisted({ field: 'email', value: email })
+  if (!user) throw new AppError(400, "This user doesn't exist!")
+
+  try {
+    const token = crypto.randomBytes(64).toString('hex')
+    const resetToken = crypto.createHash('sha256').update(token).digest('hex')
+    user.passwordResetToken = resetToken
+    user.passwordResetTokenTimeout = new Date(Date.now() + 10000 * 60 * 60 * 1000)
+    await user.save({ validateBeforeSave: false })
+
+    const emailUrl = `${SERVER_ORIGIN}/api/v1/users/reset-password/${token}/verify`
+
+    appEmitter.resetPassword(user, emailUrl)
+  } catch (err) {
+    user.passwordResetToken = undefined
+    user.passwordResetTokenTimeout = undefined
+    await user.save({ validateBeforeSave: false })
+    throw err
+  }
+}
+
+const checkResetPwdTokenService = async function ({ token }: { token: string }) {
+  const resetToken = crypto.createHash('sha256').update(token).digest('hex')
+
+  const user = await isUserExisted({ field: 'passwordResetToken', value: resetToken })
+  if (!user) throw new AppError(401, 'You reset password process is failed')
+
+  if ((user.passwordResetTokenTimeout as Date) < new Date())
+    throw new AppError(401, 'Your reset password turn is expired')
+
+  return user
+}
+
+const resetPwdService = async function ({ token, password }: { password: string; token: string }) {
+  const user = await checkResetPwdTokenService({ token })
+
+  user.password = password
+  user.updatedAt = new Date()
+  user.passwordChangedAt = new Date()
+  user.passwordResetToken = undefined
+  user.passwordResetTokenTimeout = undefined
+
+  await user.save({ validateBeforeSave: false })
+}
+
+const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
+  const resetToken = crypto.createHash('sha256').update(token).digest('hex')
+
+  const user = await isUserExisted({ field: 'passwordResetToken', value: resetToken })
+  if (!user) throw new AppError(400, 'Bad request')
+
+  if ((user.passwordResetTokenTimeout as Date) < new Date())
+    throw new AppError(401, 'Your reset password turn is expired')
+
+  user.password = password
+  user.updatedAt = new Date()
+  user.passwordChangedAt = new Date()
+  user.passwordResetToken = undefined
+  user.passwordResetTokenTimeout = undefined
+
+  await user.save({ validateBeforeSave: false })
+}
+
+export default {
+  loginService,
+  signupService,
+  checkEmailExist,
+  getGoogleOauthTokens,
+  getGoogleUser,
+  resetPwdService,
+  resetPwdServiceV0,
+  forgotPwdService,
+  checkResetPwdTokenService
+}

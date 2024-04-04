@@ -9,6 +9,7 @@ export default interface IGuest {
   nationality?: string
   countryFlag?: string
   passwordChangedAt?: Date
+  passwordResetToken?: string
   passwordResetTokenTimeout?: Date
   photo?: string
   role?: 'user'

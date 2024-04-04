@@ -94,6 +94,7 @@ const guestSchema = new Schema(
       // required: true
     },
     passwordChangedAt: Date,
+    passwordResetToken: String,
     passwordResetTokenTimeout: Date
   },
   {
@@ -102,6 +103,11 @@ const guestSchema = new Schema(
 )
 
 guestSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10)
+    return next()
+  }
+
   if (!this.isNew) return next()
 
   //@ts-ignore
@@ -142,6 +148,10 @@ guestSchema.post('findOneAndUpdate', async function (doc, next) {
 // if (process.env.NODE_ENV !== 'test')
 guestSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
   return await bcrypt.compare(plainPwd, hashPwd)
+}
+
+guestSchema.methods.hashPwd = async function (pwd: string) {
+  return await bcrypt.hash(pwd, 10)
 }
 
 const Guest = mongoose.model<IGuest>('Guest', guestSchema)

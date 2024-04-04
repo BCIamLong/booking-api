@@ -1,7 +1,7 @@
 import { TransportOptions, createTransport } from 'nodemailer'
 import { convert } from 'html-to-text'
 import { emailConfig } from '~/config'
-import { IGuest } from '../interfaces'
+import { IGuest, IUser } from '../interfaces'
 
 const { EMAIL_FROM, EMAIL_HOST, EMAIL_PORT, EMAIL_USERNAME, EMAIL_PASSWORD, emailTemplate } = emailConfig
 export default class Email {
@@ -9,10 +9,10 @@ export default class Email {
   public htmlEmailTemplate: string
 
   constructor(
-    public user: IGuest,
+    public user: IGuest & IUser,
     public url: string
   ) {
-    this.firstName = this.user.fullName.split(' ')[0]
+    this.firstName = this.user?.fullName?.split(' ')[0] || this.user?.name?.split(' ')[0]
 
     let html = emailTemplate
     html = emailTemplate.replace('%FIRST_NAME%', this.firstName)
@@ -21,7 +21,7 @@ export default class Email {
   }
 
   sendResetPwdMail() {
-    const content = `<p>We've received a request to reset the password associated with your account at [YourWebsiteName]. To complete this process, please follow the instructions below:</p>
+    const content = `<p>We've received a request to reset the password associated with your account at Booking App. To complete this process, please follow the instructions below:</p>
     <p>1. Click the following link as a button bellow to reset your password</p>
     <p>2. Once you're on the password reset page, you'll be prompted to enter a new password. Please choose a strong password that is unique to this account</p>
     <p>3. After setting your new password, you'll be able to log in to your account using your updated credentials</p>`

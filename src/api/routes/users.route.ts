@@ -5,8 +5,9 @@ import { validator, userSchema, authSchema } from '../validators'
 import { authMiddleware } from '../middlewares'
 
 const { createUserSchema, updateUserSchema } = userSchema
-const { loginSchema, signupSchema } = authSchema
-const { login, signup, loginWithGoogle, verifyEmail } = authController
+const { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema } = authSchema
+const { login, signup, loginWithGoogle, verifyEmail, forgotPassword, checkResetPasswordToken, resetPassword } =
+  authController
 const { authenticate, authorize } = authMiddleware
 const { getUsers, getUser, postUser, updateUser, deleteUser } = usersController
 const userRouter = Router()
@@ -71,9 +72,122 @@ userRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  */
 userRouter.post('/login', validator(loginSchema), asyncCatch(login))
 
+/**
+ * @openapi
+ * '/api/v1/users/verify-email':
+ *  get:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: verify the user email
+ *   responses:
+ *    200:
+ *     description: Success
+ *    401:
+ *     description: Unauthorized
+ *    404:
+ *     description: Not found
+ *    500:
+ *     description: Something went wrong
+ */
 userRouter.get('/verify-email', asyncCatch(verifyEmail))
 
-userRouter.use(authenticate, authorize('admin'))
+/**
+ * @openapi
+ * '/api/v1/users/reset-password/{token}':
+ *  patch:
+ *   tags:
+ *   - Auth
+ *   security: []
+ *   summary: help user send request to require reset password
+ *   parameters:
+ *    - name: token
+ *      in: path
+ *      description: the token for reset password
+ *      required: true
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/ResetPasswordInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/ResetPasswordResponse`'
+ *    400:
+ *     description: Bad request
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+userRouter.patch('/reset-password/:token', validator(resetPwdSchema), asyncCatch(resetPassword))
+
+/**
+ * @openapi
+ * '/api/v1/users/reset-password/{token}/verify':
+ *  get:
+ *   tags:
+ *   - Auth
+ *   security: []
+ *   summary: verify the reset password token
+ *   parameters:
+ *    - name: token
+ *      in: path
+ *      description: the token for reset password
+ *      required: true
+ *   responses:
+ *    200:
+ *     description: Success
+ *    401:
+ *     description: unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+userRouter.get('/reset-password/:token/verify', asyncCatch(checkResetPasswordToken))
+
+/**
+ * @openapi
+ * '/api/v1/users/forgot-password':
+ *  post:
+ *   tags:
+ *   - Auth
+ *   security: []
+ *   summary: help user send request to require reset password
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/ForgotPasswordInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/ForgotPasswordResponse'
+ *    400:
+ *     description: Bad request
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+userRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgotPassword))
+
+// ! ONLY USERS LOGGED IN
+userRouter.use(authenticate)
+
+// ! ONLY ADMIN
+userRouter.use(authorize('admin'))
 
 userRouter
   .route('/')

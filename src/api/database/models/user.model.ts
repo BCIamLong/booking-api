@@ -58,6 +58,7 @@ const userSchema = new Schema(
       required: true
     },
     passwordChangedAt: Date,
+    passwordResetToken: String,
     passwordResetTokenTimeout: Date
   },
   {
@@ -66,6 +67,12 @@ const userSchema = new Schema(
 )
 
 userSchema.pre('save', async function (next) {
+  console.log(this.isModified('password'))
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10)
+    return next()
+  }
+
   if (!this.isNew) return next()
 
   //@ts-ignore
@@ -95,6 +102,10 @@ userSchema.pre(/^find/, function (next) {
 // if (process.env.NODE_ENV !== 'test')
 userSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string) {
   return await bcrypt.compare(plainPwd, hashPwd)
+}
+
+userSchema.methods.hashPwd = async function (pwd: string) {
+  return await bcrypt.hash(pwd, 10)
 }
 
 // export { userSchema }

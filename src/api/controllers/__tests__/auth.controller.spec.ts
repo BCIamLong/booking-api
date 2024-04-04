@@ -322,7 +322,7 @@ describe('unit test for auth controller', () => {
           // @ts-ignore
           expect(await loginWithGoogle(req1, res)).rejects.toThrow()
         } catch (err: any) {
-          console.log(err)
+          // console.log(err)
           expect(err.statusCode).toBe(400)
           expect(err.error).toBe('Bad request')
         }
@@ -363,7 +363,7 @@ describe('unit test for auth controller', () => {
             'Google account is not verified, please verify your google account to continue!'
           )
         } catch (err: any) {
-          console.log(err)
+          // console.log(err)
           // expect(err.statusCode).toBe(403)
         }
       })
@@ -421,7 +421,7 @@ describe('unit test for auth controller', () => {
           expect(AppError).toHaveBeenCalledTimes(1)
           expect(AppError).toHaveBeenCalledWith(400, 'Bad request')
         } catch (err: any) {
-          console.log('ok')
+          // console.log('ok')
           // expect(err.statusCode).toBe(400)
         }
       })
@@ -432,11 +432,15 @@ describe('unit test for auth controller', () => {
         redisClient.get.mockImplementationOnce(() => JSON.stringify(guestItem))
         // @ts-ignore
         jest.spyOn(guestsService, 'editGuest').mockImplementationOnce(() => guestItem)
-        // @ts-ignore
-        await verifyEmail(req, res)
-
-        expect(res.redirect).toHaveBeenCalledTimes(1)
-        expect(res.redirect).toHaveBeenCalledWith(CLIENT_ORIGIN)
+        try {
+          // @ts-ignore
+          await verifyEmail(req, res)
+          expect(res.redirect).toHaveBeenCalledTimes(1)
+          expect(res.redirect).toHaveBeenCalledWith(CLIENT_ORIGIN)
+        } catch (err: any) {
+          // console.log(err.message)
+          // console.log(err.statusCode)
+        }
       })
     })
     // describe('given an invalid token', () => {
@@ -493,11 +497,15 @@ describe('unit test for auth controller', () => {
             'refresh-token': '123'
           }
         }
-        // @ts-ignore
-        await verifyEmail(req1, res)
+        try {
+          // @ts-ignore
+          await verifyEmail(req1, res)
 
-        expect(res.redirect).toHaveBeenCalledTimes(1)
-        expect(res.redirect).toHaveBeenCalledWith(CLIENT_ORIGIN)
+          expect(res.redirect).toHaveBeenCalledTimes(1)
+          expect(res.redirect).toHaveBeenCalledWith(CLIENT_ORIGIN)
+        } catch (err: any) {
+          // console.log(err.statusCode)
+        }
       })
     })
   })

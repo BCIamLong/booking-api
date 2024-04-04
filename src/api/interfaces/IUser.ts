@@ -6,6 +6,7 @@ export default interface IUser {
   passwordConfirm: string
   role?: 'user' | 'admin'
   passwordChangedAt?: Date
+  passwordResetToken?: string
   passwordResetTokenTimeout?: Date
   createdAt: Date
   updatedAt: Date

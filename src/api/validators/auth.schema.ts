@@ -56,4 +56,57 @@ const signupSchema = Joi.object({
   passwordConfirm: Joi.string().min(8).required()
 })
 
-export default { loginSchema, signupSchema }
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   ForgotPasswordInput:
+ *    type: object
+ *    required:
+ *     - email
+ *    properties:
+ *     email:
+ *      type: string
+ *      default: john@example.com
+ *   ForgotPasswordResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     message:
+ *      type: string
+ */
+const forgotPwdSchema = Joi.object({
+  email: Joi.string().email().required()
+})
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   ResetPasswordInput:
+ *    type: object
+ *    required:
+ *     - password
+ *     - passwordConfirm
+ *    properties:
+ *     password:
+ *      type: string
+ *      default: password123
+ *     passwordConfirm:
+ *      type: string
+ *      default: password123
+ *   ResetPasswordResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     token:
+ *      type: string
+ */
+const resetPwdSchema = Joi.object({
+  password: Joi.string().min(8).required(),
+  passwordConfirm: Joi.ref('password')
+})
+
+export default { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema }

@@ -13,6 +13,7 @@ declare module 'express-serve-static-core' {
   // * for authentication and authorization purposes
   interface Request {
     user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
+    token: string
   }
 }
 interface Options {

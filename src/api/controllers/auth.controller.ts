@@ -11,7 +11,16 @@ import redis from '../database/redis'
 const { redisClient } = redis
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
 const { CLIENT_ORIGIN, appEmitter } = appConfig
-const { loginService, signupService, getGoogleOauthTokens, getGoogleUser } = authService
+const {
+  loginService,
+  signupService,
+  getGoogleOauthTokens,
+  getGoogleUser,
+  forgotPwdService,
+  resetPwdService,
+  resetPwdServiceV0,
+  checkResetPwdTokenService
+} = authService
 const { findAndUpdateGuest, editGuest } = guestsService
 
 // interface IUserDocument extends Document {
@@ -196,13 +205,98 @@ const verifyEmail = async function (req: Request, res: Response) {
     ) as JwtPayload
   else userSession = await redisClient.get('user')
 
-  if (!token && !userSession) throw new AppError(400, 'Bad request')
+  if (!token && !userSession) throw new AppError(401, 'Verify email process is failed!')
 
   // console.log(decoded, userSession)
 
-  await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
+  const { data } = await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
+  if (!data) throw new AppError(404, 'Verify email process is failed!')
 
   res.redirect(CLIENT_ORIGIN)
 }
 
-export default { login, signup, signToken, loginWithGoogle, verifyEmail }
+const forgotPassword = async function (req: Request, res: Response) {
+  // * user perform the forgot password feature
+  // * they go to the form and enter email
+  const { email } = req.body
+  // * check this email correct format(schema will do that), exist? if false throw error (1)
+  // * create reset token then send the reset email which the link include this token (2)
+  // * set reset token timeout, store the reset token to compare later on in rest password (3)
+  // * if the process has error make sure reset everything like reset token and its timeout cuz we don't want store it to DB when this process fails right (4)
+  // ? (1), (2), (3), (4) are already done in the forgot password service
+  await forgotPwdService({ email })
+
+  // * if success return some response with message allow user know that we sent the reset password email
+
+  res.json({
+    status: 'success',
+    message: 'Sent the mail to your email, please check that and reset your password'
+  })
+}
+
+const checkResetPasswordToken = async function (req: Request, res: Response) {
+  // * user click to the link from email
+  // * get the token from the url
+  const token = req.params.token
+  // * convert this token to reset token (1)
+  // * then query to the user or guest to find the user send this token if we have no users for this token then  just throw error (2)
+  // * if we find user send this token then check the timeout is over 3 minutes or not? if it's over just throw error of token expires (3)
+  // ? (1), (2), (3) done by checkResetPwdTokenService
+  const user = await checkResetPwdTokenService({ token })
+
+  // req.user = user
+  req.token = token
+
+  res.redirect(`${CLIENT_ORIGIN}/reset-password`)
+}
+
+const resetPassword = async function (req: Request, res: Response) {
+  // * user click to the link from email
+  // * get the token from the url
+  const { token } = req.params
+  console.log(token)
+  const { password } = req.body
+  // * convert this token to reset token (1)
+  // * then query to the user or guest to find the user send this token if we have no users for this token then  just throw error (2)
+  // * if we find user send this token then check the timeout is over 3 minutes or not? if it's over just throw error of token expires (3)
+  // * if token timeout valid allow user enter password and password confirm, check identical or not, if not just throw error (done by schema which will validate data(req.body))
+  // * if identical just update new password remove the password confirm, reset token, token timeout because we don't want save these to our DB, update password changed at date and also the updated at date (4)
+  // ?  (4) done by resetPwdService
+  await resetPwdService({ token, password })
+  // * then after success we can redirect the user to the login page to user can login with new password
+
+  // res.redirect(`${CLIENT_ORIGIN}/login`)
+
+  res.json({
+    status: 'success',
+    token
+  })
+}
+
+const resetPasswordV0 = async function (req: Request, res: Response) {
+  // * user click to the link from email
+  // * get the token from the url
+  const token = req.params.token
+  const { password } = req.body
+  // * convert this token to reset token (1)
+  // * then query to the user or guest to find the user send this token if we have no users for this token then  just throw error (2)
+  // * if we find user send this token then check the timeout is over 3 minutes or not? if it's over just throw error of token expires (3)
+  // * if token timeout valid allow user enter password and password confirm, check identical or not, if not just throw error (done by schema which will validate data(req.body))
+  // * if identical just update new password remove the password confirm, reset token, token timeout because we don't want save these to our DB, update password changed at date and also the updated at date (4)
+  // ? (1), (2), (3), (4) done in reset password service
+  await resetPwdServiceV0({ token, password })
+  // * then after success we can redirect the user to the login page to user can login with new password
+
+  res.redirect(`${CLIENT_ORIGIN}/login`)
+}
+
+export default {
+  login,
+  signup,
+  signToken,
+  loginWithGoogle,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  checkResetPasswordToken
+}
