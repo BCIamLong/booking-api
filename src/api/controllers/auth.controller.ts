@@ -14,6 +14,7 @@ const { CLIENT_ORIGIN, appEmitter } = appConfig
 const {
   loginService,
   signupService,
+  logoutService,
   getGoogleOauthTokens,
   getGoogleUser,
   forgotPwdService,
@@ -273,6 +274,17 @@ const resetPassword = async function (req: Request, res: Response) {
   })
 }
 
+const logout = async function (req: Request, res: Response) {
+  await logoutService()
+  res.clearCookie('access-token')
+  res.clearCookie('refresh-token')
+
+  res.json({
+    status: 'success',
+    message: 'Logout successfully'
+  })
+}
+
 const resetPasswordV0 = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
@@ -293,6 +305,7 @@ const resetPasswordV0 = async function (req: Request, res: Response) {
 export default {
   login,
   signup,
+  logout,
   signToken,
   loginWithGoogle,
   verifyEmail,

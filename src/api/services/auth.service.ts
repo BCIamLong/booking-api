@@ -9,7 +9,9 @@ import { oauthConfig } from '~/config'
 import { Query } from 'mongoose'
 import guestsService from './guests.service'
 import { appConfig } from '~/config'
+import redis from '../database/redis'
 
+const { redisClient } = redis
 const { appEmitter, SERVER_ORIGIN } = appConfig
 const { findAndUpdateGuest } = guestsService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
@@ -168,6 +170,10 @@ const resetPwdService = async function ({ token, password }: { password: string;
   await user.save({ validateBeforeSave: false })
 }
 
+const logoutService = async function () {
+  await redisClient.del('user')
+}
+
 const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
   const resetToken = crypto.createHash('sha256').update(token).digest('hex')
 
@@ -195,5 +201,6 @@ export default {
   resetPwdService,
   resetPwdServiceV0,
   forgotPwdService,
-  checkResetPwdTokenService
+  checkResetPwdTokenService,
+  logoutService
 }

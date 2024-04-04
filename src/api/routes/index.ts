@@ -5,6 +5,7 @@ import settingsRouter from './settings.route'
 import bookingRouter from './bookings.route'
 import userRouter from './users.route'
 import { IGuest, IUser } from '../interfaces'
+import authRouter from './auth.route'
 
 const router = Router()
 
@@ -55,6 +56,7 @@ declare module 'jsonwebtoken' {
  *    description: Use this when access token expires
  */
 
+router.use('/api/v1/auth', authRouter)
 router.use('/api/v1/users', userRouter)
 router.use('/api/v1/cabins', cabinsRouter)
 router.use('/api/v1/guests', guestRouter)
