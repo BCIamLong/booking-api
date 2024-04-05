@@ -1,5 +1,6 @@
-export default interface ICabin {
-  _id: string
+import { Document } from 'mongoose'
+
+export interface ICabinInput {
   name: string
   maxCapacity: number
   regularPrice: number
@@ -8,4 +9,8 @@ export default interface ICabin {
   image: string
   createdAt: Date
   updatedAt: Date
+}
+
+export default interface ICabin extends ICabinInput, Document {
+  _id: string
 }

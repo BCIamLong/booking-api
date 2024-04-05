@@ -10,6 +10,7 @@ import { Query } from 'mongoose'
 import guestsService from './guests.service'
 import { appConfig } from '~/config'
 import redis from '../database/redis'
+import { IGuestInput } from '../interfaces/IGuest'
 
 const { redisClient } = redis
 const { appEmitter, SERVER_ORIGIN } = appConfig
@@ -31,7 +32,7 @@ const loginService = async function (email: string, password: string) {
   return user
 }
 
-const signupService = async function (data: Omit<IGuest, '_id' | 'createdAt' | 'updatedAt'>) {
+const signupService = async function (data: Omit<IGuestInput, 'createdAt' | 'updatedAt'>) {
   const user = await isUserExisted({ field: 'email', value: data.email })
   if (user) throw new AppError(409, 'This email is already exist')
   const token = crypto.randomBytes(64).toString('hex')

@@ -1,11 +1,12 @@
 import { Cabin } from '../database/models'
 import { createOne, editOne, fetchAll, fetchOne, removeOne } from './factory.service'
 import { ICabin } from '../interfaces'
+import { ICabinInput } from '../interfaces/ICabin'
 // import { AppError } from '../utils'
 
 const fetchCabins = fetchAll<ICabin>(Cabin)
 const fetchCabin = fetchOne<ICabin>(Cabin)
-const createCabin = createOne<ICabin>(Cabin)
+const createCabin = createOne<ICabin, ICabinInput>(Cabin)
 const editCabin = editOne<ICabin>(Cabin)
 const removeCabin = removeOne<ICabin>(Cabin)
 

@@ -1,5 +1,6 @@
-export default interface IUser {
-  _id: string
+import { Document } from 'mongoose'
+
+export interface IUserInput {
   name: string
   email: string
   verifyEmail: boolean
@@ -11,4 +12,8 @@ export default interface IUser {
   passwordResetTokenTimeout?: Date
   createdAt: Date
   updatedAt: Date
+}
+
+export default interface IUser extends IUserInput, Document {
+  _id: string
 }

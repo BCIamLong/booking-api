@@ -2,11 +2,12 @@ import { Guest } from '../database/models'
 import { createOne, editOne, fetchAll, fetchOne, removeOne } from './factory.service'
 import { IGuest } from '../interfaces'
 import { FilterQuery, QueryOptions, UpdateQuery } from 'mongoose'
+import { IGuestInput } from '../interfaces/IGuest'
 // import { AppError } from '../utils'
 
 const fetchGuests = fetchAll<IGuest>(Guest)
 const fetchGuest = fetchOne<IGuest>(Guest)
-const createGuest = createOne<IGuest>(Guest)
+const createGuest = createOne<IGuest, IGuestInput>(Guest)
 const editGuest = editOne<IGuest>(Guest)
 const removeGuest = removeOne<IGuest>(Guest)
 

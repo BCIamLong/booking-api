@@ -1,5 +1,6 @@
-export default interface IBooking {
-  _id: string
+import { Document } from 'mongoose'
+
+export interface IBookingInput {
   cabinId: string
   guestId: string
   startDate: Date
@@ -15,4 +16,8 @@ export default interface IBooking {
   observation: string
   createdAt: Date
   updatedAt: Date
+}
+
+export default interface IBooking extends IBookingInput, Document {
+  _id: string
 }

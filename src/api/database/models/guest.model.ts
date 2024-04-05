@@ -104,7 +104,7 @@ const guestSchema = new Schema(
 )
 
 guestSchema.pre('save', async function (next) {
-  console.log(this.isModified('password'))
+  // console.log(this.isModified('password'))
   if (this.isModified('password')) {
     //@ts-ignore
     this.passwordConfirm = undefined

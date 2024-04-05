@@ -19,8 +19,8 @@ const fetchOne =
   }
 
 const createOne =
-  <T>(Model: Model<T>) =>
-  async (data: Omit<T, '_id' | 'createdAt' | 'updatedAt'>) => {
+  <T, U>(Model: Model<T>) =>
+  async (data: Omit<U, 'createdAt' | 'updatedAt'>) => {
     const newData = await Model.create(data)
 
     return { data: newData, collectionName: Model.collection.collectionName }

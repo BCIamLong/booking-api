@@ -1,5 +1,6 @@
-export default interface IGuest {
-  _id: string
+import { Document } from 'mongoose'
+
+export interface IGuestInput {
   fullName: string
   email: string
   password?: string
@@ -16,4 +17,8 @@ export default interface IGuest {
   role?: 'user'
   createdAt: Date
   updatedAt: Date
+}
+
+export default interface IGuest extends IGuestInput, Document {
+  _id: string
 }
