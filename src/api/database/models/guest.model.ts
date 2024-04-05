@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { IGuest } from '~/api/interfaces'
 import { appConfig } from '~/config'
 
-const { appEmitter } = appConfig
+const { appEmitter, SERVER_ORIGIN } = appConfig
 
 /**
  * @openapi
@@ -93,6 +93,7 @@ const guestSchema = new Schema(
       default: 'none'
       // required: true
     },
+    verifyEmailToken: String,
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetTokenTimeout: Date
@@ -135,14 +136,31 @@ guestSchema.pre('find', function (next) {
 // })
 
 guestSchema.post('findOneAndUpdate', async function (doc, next) {
+  // *DELETE THE verifyEmailToken after we verify email because we use findAndUpdateGuest to update and cache the user then we need to remove this verifyEmailToken in this post hook of findOneAndUpdate
+  if (doc.verifyEmail && doc.verifyEmailToken) {
+    doc.verifyEmailToken = undefined
+    await doc.save({ validateBeforeSave: false })
+  }
+  // const newDoc = this.getFilter()
+  // console.log(doc)
+  // console.log(newDoc)
+  // if (!doc) return
+  // if (doc?.verifyEmail) return
+  // const url = `${SERVER_ORIGIN}/api/v1/auth/verify-email/${doc.verifyEmailToken}`
+
+  // appEmitter.signup(doc, url)
+  next()
+})
+
+guestSchema.post('save', async function (doc, next) {
   // const newDoc = this.getFilter()
   // console.log(doc)
   // console.log(newDoc)
   if (!doc) return
   if (doc?.verifyEmail) return
-  const url = `http://localhost:3009/api/v1/users/verify-email`
+  const url = `${SERVER_ORIGIN}/api/v1/auth/verify-email/${doc.verifyEmailToken}`
 
-  appEmitter.signup(doc, url)
+  appEmitter.signup(doc as IGuest, url)
   next()
 })
 

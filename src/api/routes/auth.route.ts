@@ -224,7 +224,7 @@ authRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgo
  *    500:
  *     description: Something went wrong
  */
-authRouter.get('/verify-email', asyncCatch(verifyEmail))
+authRouter.get('/verify-email/:token', asyncCatch(verifyEmail))
 
 authRouter.use(authenticate)
 

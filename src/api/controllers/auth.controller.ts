@@ -26,35 +26,9 @@ const {
 const { findAndUpdateGuest, editGuest } = guestsService
 const { editUser } = usersService
 
-// interface IUserDocument extends Document {
-//   _id: string
-//   name: string
-//   email: string
-//   password: string
-//   passwordConfirm: string
-//   role?: 'user' | 'admin'
-//   passwordChangedAt?: Date
-//   passwordResetTokenTimeout?: Date
-//   createdAt: Date
-//   updatedAt: Date
-// }
+interface IUserDocument extends Document, IUser {}
 
-// interface IGuestDocument extends Document {
-//   _id: string
-//   fullName: string
-//   email: string
-//   password?: string
-//   passwordConfirm?: string
-//   nationalId?: string
-//   nationality?: string
-//   countryFlag?: string
-//   passwordChangedAt?: Date
-//   passwordResetTokenTimeout?: Date
-//   photo?: string
-//   role?: 'user'
-//   createdAt: Date
-//   updatedAt: Date
-// }
+interface IGuestDocument extends Document, IGuest {}
 
 const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
   const secret = type === 'access' ? ACCESS_TOKEN_SECRET! : REFRESH_TOKEN_SECRET!
@@ -101,8 +75,8 @@ const signup = async function (req: Request, res: Response) {
   const newUser = await signupService({ fullName, email, password, passwordConfirm })
   // * hash password and remove password confirm (done in user model)
   // * generate access token and refresh token
-  const accessToken = signToken('access', newUser as IUser | IGuest)
-  const refreshToken = signToken('refresh', newUser as IUser | IGuest)
+  const accessToken = signToken('access', newUser)
+  const refreshToken = signToken('refresh', newUser)
   // * store user data to session or something like that (protected middleware will do this task)
   // * send back access token if we have no error
 
@@ -199,21 +173,35 @@ const loginWithGoogle = async function (req: Request, res: Response) {
 }
 
 const verifyEmail = async function (req: Request, res: Response) {
-  const token = req.headers.authorization?.split(' ')[1] || req.cookies['access-token'] || req.cookies['refresh-token']
+  const { token: verifyEmailToken } = req.params
+  const authToken =
+    req.headers.authorization?.split(' ')[1] || req.cookies['access-token'] || req.cookies['refresh-token']
   let userSession
   let decoded
-  if (token)
+  if (authToken)
     decoded = (
-      req.cookies['access-token'] ? jwt.verify(token, ACCESS_TOKEN_SECRET) : jwt.verify(token, REFRESH_TOKEN_SECRET)
+      req.cookies['access-token']
+        ? jwt.verify(authToken, ACCESS_TOKEN_SECRET)
+        : jwt.verify(authToken, REFRESH_TOKEN_SECRET)
     ) as JwtPayload
   else userSession = await redisClient.get('user')
 
-  if (!token && !userSession) throw new AppError(401, 'Verify email process is failed!')
+  if (!authToken && !userSession) throw new AppError(401, 'Verify email process is failed!')
 
   // console.log(decoded, userSession)
+  // * remove verifyEmailToken done in the findOneAndUpdate post hook in guest model
+  const newUser = await findAndUpdateGuest(
+    { verifyEmailToken },
+    { verifyEmail: true },
+    {
+      new: true
+    }
+  )
+  req.user = newUser as IGuest
 
-  const { data } = await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
-  if (!data) throw new AppError(404, 'Verify email process is failed!')
+  if (!newUser) throw new AppError(404, 'Verify email process is failed!')
+  // const { data } = await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
+  // if (!data) throw new AppError(404, 'Verify email process is failed!')
 
   res.redirect(CLIENT_ORIGIN)
 }

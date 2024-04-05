@@ -68,7 +68,7 @@ const createBookingSchema = Joi.object({
   cabinPrice: Joi.number().required().strict(true),
   extrasPrice: Joi.number().required().strict(true),
   totalPrice: Joi.number().required().strict(true),
-  status: Joi.string(),
+  status: Joi.string().valid('unconfirmed', 'checked-in', 'checked-out'),
   hasBreakfast: Joi.boolean(),
   isPaid: Joi.boolean(),
   observation: Joi.string().required()

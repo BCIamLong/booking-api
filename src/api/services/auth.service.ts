@@ -13,7 +13,7 @@ import redis from '../database/redis'
 
 const { redisClient } = redis
 const { appEmitter, SERVER_ORIGIN } = appConfig
-const { findAndUpdateGuest } = guestsService
+const { findAndUpdateGuest, createGuest } = guestsService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
 
 const loginService = async function (email: string, password: string) {
@@ -34,20 +34,21 @@ const loginService = async function (email: string, password: string) {
 const signupService = async function (data: Omit<IGuest, '_id' | 'createdAt' | 'updatedAt'>) {
   const user = await isUserExisted({ field: 'email', value: data.email })
   if (user) throw new AppError(409, 'This email is already exist')
+  const token = crypto.randomBytes(64).toString('hex')
+  const verifyEmailToken = crypto.createHash('sha256').update(token).digest('hex')
 
   //! in the create this keyword is refer to document no query object so that's why we can't use cache method because we custom it to query object of mongoose right
   // const query = Guest.create(data)
   // const newUser = await query
 
   // * so instead we need to use this findAndUpdateGuest to create our guest user
-  data.passwordConfirm = undefined
-  data.password = await bcrypt.hash(data.password!, 10)
-  const newUser = await findAndUpdateGuest({ email: data.email }, data, {
-    upsert: true,
-    new: true
-  })
+  data.verifyEmailToken = verifyEmailToken
+  // ! BECAUSE THE FIRST TIME THE USER SIGNUP WE DON'T NEED TO CACHE THE USER DATA BECAUSE THEY ARE NOT VERIFY EMAIL RIGHT AND ONLY AFTER THEY VERIFY EMAIL WE JUST CACHE THE USER DATA
+  // * THE CACHE PROCESS WILL HAPPEN IN THE VERIFY EMAIL ROUTE HANDLER
 
-  return newUser
+  const { data: newUser } = await createGuest(data)
+
+  return newUser as IGuest
 }
 
 const checkEmailExist = async function (role: 'user' | 'admin', email: string) {

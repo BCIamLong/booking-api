@@ -33,7 +33,7 @@ const createUserSchema = Joi.object({
   email: Joi.string().email().required(),
   role: Joi.string().valid('user', 'admin'),
   password: Joi.string().min(8).required(),
-  passwordConfirm: Joi.string().min(8).required()
+  passwordConfirm: Joi.ref('password')
 })
 
 /**
@@ -58,7 +58,7 @@ const updateUserSchema = Joi.object({
   email: Joi.string().email(),
   role: Joi.string().valid('user', 'admin'),
   password: Joi.string().min(8),
-  passwordConfirm: Joi.string().min(8)
+  passwordConfirm: Joi.ref('password')
 })
 
 // ? consider the admin permission to really allow the admin can change the password of the user

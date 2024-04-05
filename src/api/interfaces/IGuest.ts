@@ -5,6 +5,7 @@ export default interface IGuest {
   password?: string
   passwordConfirm?: string
   verifyEmail?: boolean
+  verifyEmailToken?: string
   nationalId?: string
   nationality?: string
   countryFlag?: string

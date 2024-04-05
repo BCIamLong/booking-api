@@ -38,7 +38,7 @@ const createGuestSchema = Joi.object({
   fullName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
-  passwordConfirm: Joi.string().min(8).required(),
+  passwordConfirm: Joi.ref('password'),
   avatar: Joi.string(),
   nationalId: Joi.string(),
   nationality: Joi.string(),
@@ -74,11 +74,14 @@ const createGuestSchema = Joi.object({
 const updateGuestSchema = Joi.object({
   fullName: Joi.string(),
   email: Joi.string().email(),
+  password: Joi.string().min(8),
+  passwordConfirm: Joi.ref('password'),
   verifyEmail: Joi.boolean(),
   avatar: Joi.string(),
   nationalId: Joi.string(),
   nationality: Joi.string(),
   countryFlag: Joi.string()
 })
+// * in some case admin or some one have permission can change the password of the guest if it's needed
 
 export default { createGuestSchema, updateGuestSchema }

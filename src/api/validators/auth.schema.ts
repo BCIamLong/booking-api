@@ -53,7 +53,7 @@ const signupSchema = Joi.object({
   fullName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
-  passwordConfirm: Joi.string().min(8).required()
+  passwordConfirm: Joi.ref('password')
 })
 
 /**
