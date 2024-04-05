@@ -28,10 +28,10 @@ const createOne =
 
 const editOne =
   <T>(Model: Model<T>) =>
-  async (id: string, editData: Partial<T>) => {
+  async (id: string, editData: Partial<T>, validate: boolean = true) => {
     const data = await Model.findByIdAndUpdate(id, editData, {
       new: true,
-      runValidators: true
+      runValidators: validate
     })
     if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found with this id`)
 

@@ -10,6 +10,10 @@ import userSchema from './user.schema'
 import authSchema from './auth.schema'
 
 export const validator = (schema: ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
+  if (req.file) {
+    const { originalname, size, mimetype } = req.file
+    req.body.avatar = { originalname, size, mimetype }
+  }
   const { error }: ValidationResult = schema.validate(req.body)
 
   if (error) return next(new AppError(400, error.message))

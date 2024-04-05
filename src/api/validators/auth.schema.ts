@@ -109,4 +109,45 @@ const resetPwdSchema = Joi.object({
   passwordConfirm: Joi.ref('password')
 })
 
-export default { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema }
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   UpdateCurrentUserInput:
+ *    type: object
+ *    properties:
+ *     fullName:
+ *      type: string
+ *     email:
+ *      type: string
+ *     avatar:
+ *      type: string
+ *      format: binary
+ *   UpdateCurrentUserResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     data:
+ *      type: object
+ *      properties:
+ *       user:
+ *        oneOf:
+ *         - $ref: '#components/schemas/GuestResponse'
+ *         - $ref: '#components/schemas/UserResponse'
+ */
+// * https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#oneof
+const updateCurrentUserSchema = Joi.object({
+  name: Joi.string(),
+  fullName: Joi.string(),
+  email: Joi.string().email(),
+  avatar: Joi.object({
+    originalname: Joi.string().required(),
+    size: Joi.number().required(),
+    mimetype: Joi.string()
+      .pattern(/^image/)
+      .required()
+  })
+})
+
+export default { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema, updateCurrentUserSchema }

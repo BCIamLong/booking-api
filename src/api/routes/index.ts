@@ -15,6 +15,7 @@ declare module 'express-serve-static-core' {
   interface Request {
     user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
     token: string
+    fileName: string
   }
 }
 interface Options {

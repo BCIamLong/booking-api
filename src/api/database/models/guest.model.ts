@@ -103,7 +103,10 @@ const guestSchema = new Schema(
 )
 
 guestSchema.pre('save', async function (next) {
+  console.log(this.isModified('password'))
   if (this.isModified('password')) {
+    //@ts-ignore
+    this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
     return next()
   }

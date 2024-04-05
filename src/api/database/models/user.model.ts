@@ -44,6 +44,10 @@ const userSchema = new Schema(
       required: true,
       unique: true
     },
+    verifyEmail: {
+      type: Boolean,
+      default: true
+    },
     role: {
       type: String,
       default: 'user',
@@ -67,8 +71,10 @@ const userSchema = new Schema(
 )
 
 userSchema.pre('save', async function (next) {
-  console.log(this.isModified('password'))
+  // console.log(this.isModified('password'))
   if (this.isModified('password')) {
+    //@ts-ignore
+    this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
     return next()
   }

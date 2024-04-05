@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
+import sharp from 'sharp'
 import { Request, Response } from 'express'
-import { authService, guestsService } from '../services'
+import { authService, guestsService, usersService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser } from '../interfaces'
 import { AppError, Email } from '../utils'
@@ -23,6 +24,7 @@ const {
   checkResetPwdTokenService
 } = authService
 const { findAndUpdateGuest, editGuest } = guestsService
+const { editUser } = usersService
 
 // interface IUserDocument extends Document {
 //   _id: string
@@ -255,7 +257,7 @@ const resetPassword = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
   const { token } = req.params
-  console.log(token)
+  // console.log(token)
   const { password } = req.body
   // * convert this token to reset token (1)
   // * then query to the user or guest to find the user send this token if we have no users for this token then  just throw error (2)
@@ -285,6 +287,37 @@ const logout = async function (req: Request, res: Response) {
   })
 }
 
+// * because we have validator with Joi then we don't need to it to validate our req body
+const filterObject = function (body: any, ...fields: string[]) {
+  const newBody: any = {}
+  fields.forEach((field: string) => body[field] && (newBody[field] = body[field]))
+
+  return newBody
+}
+
+const updateCurrentUser = async function (req: Request, res: Response) {
+  // * user logged in, and go to the user profile page
+  // * user click to the edit form then fill new data for like name, email (normal data, credential data) and don't allow user updates password
+  // * user also can change the avatar (image data related to file)
+  // * check if user change normal? credential? file? data
+  // * if it's normal data and credential data we just update normal
+  // * if it's file data we need to store this image in our app, or upload it to the hosting image platform like cloudinary
+  // * to do that we need to create the file name then use this file name for the file we stored and also store this file name to our DB, we do not store the entire file to our DB
+  // * then if the process success we just return the response with some message
+  if (req.file) req.body.avatar = req.fileName
+
+  let updatedUser
+  if (req.user.role === 'admin') updatedUser = await editUser(req.user._id, req.body, false)
+  if (req.user.role === 'user') updatedUser = await editGuest(req.user._id, req.body, false)
+
+  res.json({
+    status: 'success',
+    data: {
+      user: updatedUser?.data
+    }
+  })
+}
+
 const resetPasswordV0 = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
@@ -311,5 +344,6 @@ export default {
   verifyEmail,
   forgotPassword,
   resetPassword,
-  checkResetPasswordToken
+  checkResetPasswordToken,
+  updateCurrentUser
 }

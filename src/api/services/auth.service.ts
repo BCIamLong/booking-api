@@ -132,10 +132,10 @@ const forgotPwdService = async function ({ email }: { email: string }) {
     const token = crypto.randomBytes(64).toString('hex')
     const resetToken = crypto.createHash('sha256').update(token).digest('hex')
     user.passwordResetToken = resetToken
-    user.passwordResetTokenTimeout = new Date(Date.now() + 10000 * 60 * 60 * 1000)
+    user.passwordResetTokenTimeout = new Date(Date.now() + 3 * 60 * 60 * 1000)
     await user.save({ validateBeforeSave: false })
 
-    const emailUrl = `${SERVER_ORIGIN}/api/v1/users/reset-password/${token}/verify`
+    const emailUrl = `${SERVER_ORIGIN}/api/v1/auth/reset-password/${token}/verify`
 
     appEmitter.resetPassword(user, emailUrl)
   } catch (err) {
@@ -162,17 +162,20 @@ const resetPwdService = async function ({ token, password }: { password: string;
   const user = await checkResetPwdTokenService({ token })
 
   user.password = password
+  user.passwordConfirm = password
   user.updatedAt = new Date()
   user.passwordChangedAt = new Date()
   user.passwordResetToken = undefined
   user.passwordResetTokenTimeout = undefined
 
-  await user.save({ validateBeforeSave: false })
+  await user.save()
 }
 
 const logoutService = async function () {
   await redisClient.del('user')
 }
+
+// const updateCurrentUserService = async function () {}
 
 const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
   const resetToken = crypto.createHash('sha256').update(token).digest('hex')
@@ -203,4 +206,5 @@ export default {
   forgotPwdService,
   checkResetPwdTokenService,
   logoutService
+  // updateCurrentUserService
 }

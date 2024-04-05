@@ -1,14 +1,27 @@
 import { Router } from 'express'
 import { validator, authSchema } from '../validators'
-import { authMiddleware } from '../middlewares'
+import { authMiddleware, uploadMiddleware } from '../middlewares'
 import { authController } from '../controllers'
 import { asyncCatch } from '../utils'
+import { uploadConfig } from '~/config'
+
+const { upload } = uploadConfig
 
 const authRouter = Router()
-const { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema } = authSchema
-const { login, signup, loginWithGoogle, logout, verifyEmail, forgotPassword, checkResetPasswordToken, resetPassword } =
-  authController
+const { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema, updateCurrentUserSchema } = authSchema
+const {
+  login,
+  signup,
+  loginWithGoogle,
+  logout,
+  verifyEmail,
+  forgotPassword,
+  checkResetPasswordToken,
+  resetPassword,
+  updateCurrentUser
+} = authController
 const { authenticate } = authMiddleware
+const { resizeAndUploadAvatarToCloud } = uploadMiddleware
 
 authRouter.get('/login/oauth/google', asyncCatch(loginWithGoogle))
 
@@ -213,4 +226,54 @@ authRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgo
  */
 authRouter.get('/verify-email', asyncCatch(verifyEmail))
 
+authRouter.use(authenticate)
+
+/**
+ * @openapi
+ * '/api/v1/auth/update-me':
+ *  patch:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: update the user profile
+ *   consumes:
+ *    - multipart/form-data
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     multipart/form-data:
+ *      schema:
+ *       $ref: '#components/schemas/UpdateCurrentUserInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/UpdateCurrentUserResponse'
+ *    401:
+ *     description: Unauthorized
+ *    404:
+ *     description: Not found
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.patch(
+  '/update-me',
+  upload.single('avatar'),
+  resizeAndUploadAvatarToCloud,
+  validator(updateCurrentUserSchema),
+  asyncCatch(updateCurrentUser)
+)
+
 export default authRouter
+
+// *   requestBody:
+// *    required: true
+// *    content:
+// *     multipart/form-data:
+// *      schema:
+// *       $ref: '#components/schemas/UpdateCurrentUserInput'
