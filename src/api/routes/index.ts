@@ -30,6 +30,11 @@ declare module 'mongoose' {
     hashKey: string
     key: string
   }
+
+  interface Document {
+    createResetPasswordToken: () => string
+    checkPwd: (pwd: string, hashPwd: string) => boolean
+  }
 }
 
 declare module 'jsonwebtoken' {

@@ -25,7 +25,7 @@ const loginService = async function (email: string, password: string) {
   if (!user) throw new AppError(404, 'User is not exist')
 
   // @ts-ignore
-  const checked = await user?.checkPwd(password, user.password)
+  const checked = await user.checkPwd(password, user.password)
 
   if (!checked) throw new AppError(400, 'Password is not correct!')
 
@@ -131,10 +131,12 @@ const forgotPwdService = async function ({ email }: { email: string }) {
   if (!user) throw new AppError(400, "This user doesn't exist!")
 
   try {
-    const token = crypto.randomBytes(64).toString('hex')
-    const resetToken = crypto.createHash('sha256').update(token).digest('hex')
-    user.passwordResetToken = resetToken
-    user.passwordResetTokenTimeout = new Date(Date.now() + 3 * 60 * 60 * 1000)
+    // const token = crypto.randomBytes(64).toString('hex')
+    // const resetToken = crypto.createHash('sha256').update(token).digest('hex')
+    // user.passwordResetToken = resetToken
+    // user.passwordResetTokenTimeout = new Date(Date.now() + 3 * 60 * 60 * 1000)
+    // * all four lines of code above are done by createResetPasswordToken of user or guest schema in the user or guest model file
+    const token = await user.createResetPasswordToken()
     await user.save({ validateBeforeSave: false })
 
     const emailUrl = `${SERVER_ORIGIN}/api/v1/auth/reset-password/${token}/verify`
@@ -165,10 +167,11 @@ const resetPwdService = async function ({ token, password }: { password: string;
 
   user.password = password
   user.passwordConfirm = password
-  user.updatedAt = new Date()
-  user.passwordChangedAt = new Date()
-  user.passwordResetToken = undefined
-  user.passwordResetTokenTimeout = undefined
+  // * The code bellow will done in pre save hook guest model or user model
+  // user.updatedAt = new Date()
+  // user.passwordChangedAt = new Date()
+  // user.passwordResetToken = undefined
+  // user.passwordResetTokenTimeout = undefined
 
   await user.save()
 }

@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 import mongoose, { Schema } from 'mongoose'
@@ -76,6 +77,10 @@ userSchema.pre('save', async function (next) {
     //@ts-ignore
     this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
+    this.updatedAt = new Date()
+    this.passwordChangedAt = new Date()
+    this.passwordResetToken = undefined
+    this.passwordResetTokenTimeout = undefined
     return next()
   }
 
@@ -112,6 +117,15 @@ userSchema.methods.checkPwd = async function (plainPwd: string, hashPwd: string)
 
 userSchema.methods.hashPwd = async function (pwd: string) {
   return await bcrypt.hash(pwd, 10)
+}
+
+userSchema.methods.createResetPasswordToken = async function () {
+  const token = await crypto.randomBytes(64).toString('hex')
+  const resetToken = await crypto.createHash('sha256').update(token).digest('hex')
+  this.passwordResetToken = resetToken
+  this.passwordResetTokenTimeout = new Date(Date.now() + 3 * 60 * 60 * 1000)
+
+  return token
 }
 
 // export { userSchema }
