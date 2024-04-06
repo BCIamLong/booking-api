@@ -150,4 +150,65 @@ const updateCurrentUserSchema = Joi.object({
   })
 })
 
-export default { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema, updateCurrentUserSchema }
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   CheckCurrentPasswordInput:
+ *    type: object
+ *    required:
+ *     - password
+ *    properties:
+ *     password:
+ *      type: string
+ *      default: password123
+ *   CheckCurrentPasswordResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     token:
+ *      type: string
+ */
+const checkCurrentPasswordSchema = Joi.object({
+  password: Joi.string().min(8).required()
+})
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   UpdatePasswordInput:
+ *    type: object
+ *    required:
+ *     - password
+ *     - passwordConfirm
+ *    properties:
+ *     password:
+ *      type: string
+ *      default: password1234
+ *     passwordConfirm:
+ *      type: string
+ *      default: password1234
+ *   UpdatePasswordResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     token:
+ *      type: string
+ */
+const updatePasswordSchema = Joi.object({
+  password: Joi.string().min(8).required(),
+  passwordConfirm: Joi.ref('password')
+})
+
+export default {
+  loginSchema,
+  signupSchema,
+  forgotPwdSchema,
+  resetPwdSchema,
+  updateCurrentUserSchema,
+  checkCurrentPasswordSchema,
+  updatePasswordSchema
+}

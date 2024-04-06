@@ -21,7 +21,9 @@ const {
   forgotPwdService,
   resetPwdService,
   resetPwdServiceV0,
-  checkResetPwdTokenService
+  checkResetPwdTokenService,
+  checkCurrentPasswordService,
+  updatePasswordService
 } = authService
 const { findAndUpdateGuest, editGuest } = guestsService
 const { editUser } = usersService
@@ -306,6 +308,51 @@ const updateCurrentUser = async function (req: Request, res: Response) {
   })
 }
 
+const checkCurrentPassword = async function (req: Request, res: Response) {
+  // * user go to update password page, then enter the current password
+  // * validate this current password if false => throw err
+  // * if true create update password token
+  // * send response success with that token and later on when we will use this token to make the url and send back to the route update password on server
+  // * front-end display the form allow user enter new password and also confirm password
+  // ? Why we need update password token here? well if we don't have that then anyone is using the user account (maybe the user open web app then they go out for something then anyone go and use) can update their password by send request to updatePassword route and change password right
+  // ? Therefore we need to ensure they have to write the current password and because we divide this update password to two route handlers then we need something to ensure that like token or something else
+  // ? in this case we use token
+
+  const { password } = req.body
+  const { user } = req
+
+  const token = await checkCurrentPasswordService({ user, password })
+
+  res.json({
+    status: 'success',
+    token
+  })
+}
+
+const updatePassword = async function (req: Request, res: Response) {
+  // * get token from the url and validate this token
+  // * user enter new password, and confirm password
+  // * check passwords are the same, true format, if false throw error
+  // * if true update password
+  // * update passwordChangedAt, updatedAt
+  // * re-create access and refresh token and create cookies based on those tokens
+  // * send response success with message
+  const { token } = req.params
+  const { password } = req.body
+
+  const user = await updatePasswordService({ token, password })
+
+  const accessToken = signToken('access', user)
+  const refreshToken = signToken('refresh', user)
+
+  setCookies(res, accessToken, refreshToken)
+
+  res.json({
+    status: 'success',
+    token: accessToken
+  })
+}
+
 const resetPasswordV0 = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
@@ -333,5 +380,7 @@ export default {
   forgotPassword,
   resetPassword,
   checkResetPasswordToken,
-  updateCurrentUser
+  updateCurrentUser,
+  checkCurrentPassword,
+  updatePassword
 }

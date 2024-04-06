@@ -34,6 +34,7 @@ declare module 'mongoose' {
   interface Document {
     createResetPasswordToken: () => string
     checkPwd: (pwd: string, hashPwd: string) => boolean
+    createToken: () => string
   }
 }
 

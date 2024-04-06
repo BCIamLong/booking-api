@@ -42,7 +42,8 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
     if (!user) return next(new AppError(401, 'This use recently has been deleted, please contact us for more info'))
 
     // * check user recently have changed password or not?
-    if (new Date(user.passwordChangedAt!) >= new Date())
+    // console.log(decoded.iat! >= new Date(user.passwordChangedAt!).getTime())
+    if (new Date(user.passwordChangedAt!) >= new Date(decoded.iat! * 1000))
       return next(new AppError(401, 'This use recently has changed password, please login again'))
 
     if (!user.verifyEmail)

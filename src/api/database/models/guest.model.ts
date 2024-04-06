@@ -94,6 +94,7 @@ const guestSchema = new Schema(
       default: 'none'
       // required: true
     },
+    updatePasswordToken: String,
     verifyEmailToken: String,
     passwordChangedAt: Date,
     passwordResetToken: String,
@@ -111,9 +112,10 @@ guestSchema.pre('save', async function (next) {
     this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
     this.updatedAt = new Date()
-    this.passwordChangedAt = new Date()
+    this.passwordChangedAt = new Date(Date.now() - 1000)
     this.passwordResetToken = undefined
     this.passwordResetTokenTimeout = undefined
+    this.updatePasswordToken = undefined
     return next()
   }
 
@@ -187,6 +189,13 @@ guestSchema.methods.createResetPasswordToken = async function () {
   this.passwordResetTokenTimeout = new Date(Date.now() + 3 * 60 * 60 * 1000)
 
   return token
+}
+
+guestSchema.methods.createToken = async function () {
+  const token = await crypto.randomBytes(64).toString('hex')
+  const hashToken = await crypto.createHash('sha256').update(token).digest('hex')
+
+  return hashToken
 }
 
 const Guest = mongoose.model<IGuest>('Guest', guestSchema)

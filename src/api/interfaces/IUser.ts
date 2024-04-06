@@ -7,6 +7,7 @@ export interface IUserInput {
   password: string
   passwordConfirm: string
   role?: 'user' | 'admin'
+  updatePasswordToken?: string
   passwordChangedAt?: Date
   passwordResetToken?: string
   passwordResetTokenTimeout?: Date

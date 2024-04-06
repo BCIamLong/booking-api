@@ -10,6 +10,7 @@ export interface IGuestInput {
   nationalId?: string
   nationality?: string
   countryFlag?: string
+  updatePasswordToken?: string
   passwordChangedAt?: Date
   passwordResetToken?: string
   passwordResetTokenTimeout?: Date

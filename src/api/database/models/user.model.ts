@@ -62,6 +62,7 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
+    updatePasswordToken: String,
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetTokenTimeout: Date
@@ -78,7 +79,11 @@ userSchema.pre('save', async function (next) {
     this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
     this.updatedAt = new Date()
-    this.passwordChangedAt = new Date()
+    // * because the change password process can happen in a certain time like 1 second because it's hash password right
+    // * then to ensure that password changed time always happen some time with when we sign a new token we need to subtract to maybe 1 second
+    // ? the reason why we need to do it is we need to compare the password changed at and the timestamp when we signed token
+    // ? the case we have two or more users go in one account then if the one of both change password then all the rest users are using this account need to login again
+    this.passwordChangedAt = new Date(Date.now() - 1000)
     this.passwordResetToken = undefined
     this.passwordResetTokenTimeout = undefined
     return next()
@@ -126,6 +131,13 @@ userSchema.methods.createResetPasswordToken = async function () {
   this.passwordResetTokenTimeout = new Date(Date.now() + 3 * 60 * 60 * 1000)
 
   return token
+}
+
+userSchema.methods.createToken = async function () {
+  const token = await crypto.randomBytes(64).toString('hex')
+  const hashToken = await crypto.createHash('sha256').update(token).digest('hex')
+
+  return hashToken
 }
 
 // export { userSchema }

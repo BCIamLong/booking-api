@@ -8,7 +8,15 @@ import { uploadConfig } from '~/config'
 const { upload } = uploadConfig
 
 const authRouter = Router()
-const { loginSchema, signupSchema, forgotPwdSchema, resetPwdSchema, updateCurrentUserSchema } = authSchema
+const {
+  loginSchema,
+  signupSchema,
+  forgotPwdSchema,
+  resetPwdSchema,
+  updateCurrentUserSchema,
+  checkCurrentPasswordSchema,
+  updatePasswordSchema
+} = authSchema
 const {
   login,
   signup,
@@ -18,7 +26,9 @@ const {
   forgotPassword,
   checkResetPasswordToken,
   resetPassword,
-  updateCurrentUser
+  updateCurrentUser,
+  checkCurrentPassword,
+  updatePassword
 } = authController
 const { authenticate } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
@@ -230,6 +240,73 @@ authRouter.use(authenticate)
 
 /**
  * @openapi
+ * '/api/v1/auth/update-password/verify':
+ *  post:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: verify the user to allow update password
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/CheckCurrentPasswordInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/CheckCurrentPasswordResponse'
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.post('/update-password/verify', validator(checkCurrentPasswordSchema), asyncCatch(checkCurrentPassword))
+
+/**
+ * @openapi
+ * '/api/v1/auth/update-password/{token}':
+ *  patch:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: update the user password
+ *   parameters:
+ *    - name: token
+ *      in: path
+ *      description: the token for verify user password
+ *      required: true
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/UpdatePasswordInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/UpdatePasswordResponse'
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.patch('/update-password/:token', validator(updatePasswordSchema), asyncCatch(updatePassword))
+
+/**
+ * @openapi
  * '/api/v1/auth/update-me':
  *  patch:
  *   tags:
@@ -256,8 +333,6 @@ authRouter.use(authenticate)
  *        $ref: '#components/schemas/UpdateCurrentUserResponse'
  *    401:
  *     description: Unauthorized
- *    404:
- *     description: Not found
  *    500:
  *     description: Something went wrong
  */

@@ -182,6 +182,35 @@ const logoutService = async function () {
 
 // const updateCurrentUserService = async function () {}
 
+const checkCurrentPasswordService = async function ({
+  user,
+  password
+}: {
+  user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
+  password: string
+}) {
+  const check = await user.checkPwd(password, user.password!)
+  if (!check) throw new AppError(400, 'Password is not correct')
+
+  const token = await user.createToken()
+
+  user.updatePasswordToken = token
+  await user.save({ validateBeforeSave: false })
+
+  return token
+}
+
+const updatePasswordService = async function ({ token, password }: { token: string; password: string }) {
+  const user = await isUserExisted({ field: 'updatePasswordToken', value: token })
+  if (!user) throw new AppError(401, 'Your update password process is failed')
+
+  user.password = password
+  user.passwordConfirm = password
+  await user.save()
+
+  return user
+}
+
 const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
   const resetToken = crypto.createHash('sha256').update(token).digest('hex')
 
@@ -210,6 +239,8 @@ export default {
   resetPwdServiceV0,
   forgotPwdService,
   checkResetPwdTokenService,
-  logoutService
+  logoutService,
+  checkCurrentPasswordService,
+  updatePasswordService
   // updateCurrentUserService
 }
