@@ -107,7 +107,9 @@ const guestSchema = new Schema(
 
 guestSchema.pre('save', async function (next) {
   // console.log(this.isModified('password'))
-  if (this.isModified('password')) {
+  // console.log(this.isNew)
+  if (this.isModified('password') && !this.isNew) {
+    // console.log('ok')
     //@ts-ignore
     this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
@@ -144,7 +146,7 @@ guestSchema.pre('find', function (next) {
 
 guestSchema.post('findOneAndUpdate', async function (doc, next) {
   // *DELETE THE verifyEmailToken after we verify email because we use findAndUpdateGuest to update and cache the user then we need to remove this verifyEmailToken in this post hook of findOneAndUpdate
-  if (doc.verifyEmail && doc.verifyEmailToken) {
+  if (doc?.verifyEmail && doc?.verifyEmailToken) {
     doc.verifyEmailToken = undefined
     await doc.save({ validateBeforeSave: false })
   }

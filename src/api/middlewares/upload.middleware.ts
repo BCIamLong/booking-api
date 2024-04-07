@@ -8,7 +8,8 @@ const { cloudinary } = uploadConfig
 const resizeAndUploadAvatarToLocal = async function (req: Request, res: Response, next: NextFunction) {
   if (!req.file) return next()
 
-  const fileName = `user-${req.user._id}-${Date.now()}.jpeg`
+  // const fileName = `user-${req.user._id}-${Date.now()}.jpeg`
+  const fileName = `user-${req.user.id}-${Date.now()}.jpeg`
 
   await sharp(req.file.buffer)
     .resize(300, 300)
@@ -24,7 +25,8 @@ const resizeAndUploadAvatarToLocal = async function (req: Request, res: Response
 const resizeAndUploadAvatarToCloud = async function (req: Request, res: Response, next: NextFunction) {
   if (!req.file) return next()
 
-  const fileName = `user-${req.user._id}-${Date.now()}`
+  // const fileName = `user-${req.user._id}-${Date.now()}`
+  const fileName = `user-${req.user.id}-${Date.now()}`
 
   // * To get the data we need to make this to Promise because cloudinary.uploader.upload_stream itself doesn't promisify so we need to make this promise and then get the value resolve from this Promise
   // * and also this task is stream and it's definitely the async task right so therefore to get response data we need to promisify it

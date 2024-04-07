@@ -1,3 +1,4 @@
+import path from 'path'
 import express, { NextFunction, Request, Response } from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
@@ -13,6 +14,9 @@ const app = express()
 
 app.use(cors())
 app.options('*', cors())
+
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(swagger)
 
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))

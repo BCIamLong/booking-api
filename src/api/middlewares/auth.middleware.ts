@@ -37,8 +37,8 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
     if (decoded.exp! * 1000 < Date.now()) return next(new AppError(401, 'Your login turn expires, please login again'))
     // if (decoded.iat! * 1000 < Date.now()) return next(new AppError(401, 'Your login turn expires, please login again'))
     // * check user exist or not
-    let user = await Guest.findById(decoded.id)
-    if (!user) user = await User.findById(decoded.id)
+    let user: IGuest & IUser = (await Guest.findById(decoded.id)) as IGuest & IUser
+    if (!user) user = (await User.findById(decoded.id)) as IGuest & IUser
     if (!user) return next(new AppError(401, 'This use recently has been deleted, please contact us for more info'))
 
     // * check user recently have changed password or not?
@@ -48,8 +48,15 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
 
     if (!user.verifyEmail)
       return next(new AppError(401, 'Please check your email inbox and verify your email to start using our web app'))
+    const { _id: id, name, fullName, email, role = '' } = user
 
-    req.user = user
+    req.user = {
+      id,
+      name: name || fullName,
+      email,
+      role
+    }
+
     next()
   } catch (err) {
     next(err)

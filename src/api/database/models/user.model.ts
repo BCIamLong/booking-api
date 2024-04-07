@@ -74,7 +74,7 @@ const userSchema = new Schema(
 
 userSchema.pre('save', async function (next) {
   // console.log(this.isModified('password'))
-  if (this.isModified('password')) {
+  if (this.isModified('password') && !this.isNew) {
     //@ts-ignore
     this.passwordConfirm = undefined
     this.password = await bcrypt.hash(this.password, 10)
@@ -86,6 +86,7 @@ userSchema.pre('save', async function (next) {
     this.passwordChangedAt = new Date(Date.now() - 1000)
     this.passwordResetToken = undefined
     this.passwordResetTokenTimeout = undefined
+    this.updatePasswordToken = undefined
     return next()
   }
 

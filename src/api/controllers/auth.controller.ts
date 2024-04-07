@@ -6,10 +6,11 @@ import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser } from '../interfaces'
 import { AppError, Email } from '../utils'
 import { JwtPayload } from 'jsonwebtoken'
-import redis from '../database/redis'
+// import redis from '../database/redis'
+// import { Guest, User } from '../database/models'
 // import { Document } from 'mongoose'
 
-const { redisClient } = redis
+// const { redisClient } = redis
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
 const { CLIENT_ORIGIN, appEmitter } = appConfig
 const {
@@ -159,7 +160,7 @@ const loginWithGoogle = async function (req: Request, res: Response) {
   )!
 
   // *5, create session/ save to req/ save to memory server like redis
-  req.user = newUser!
+  // req.user = newUser!
 
   // *6, create the access and refresh token
   const accessToken = signToken('access', newUser!)
@@ -178,28 +179,39 @@ const verifyEmail = async function (req: Request, res: Response) {
   const { token: verifyEmailToken } = req.params
   const authToken =
     req.headers.authorization?.split(' ')[1] || req.cookies['access-token'] || req.cookies['refresh-token']
-  let userSession
-  let decoded
-  if (authToken)
-    decoded = (
-      req.cookies['access-token']
-        ? jwt.verify(authToken, ACCESS_TOKEN_SECRET)
-        : jwt.verify(authToken, REFRESH_TOKEN_SECRET)
-    ) as JwtPayload
-  else userSession = await redisClient.get('user')
 
-  if (!authToken && !userSession) throw new AppError(401, 'Verify email process is failed!')
+  if (!authToken) throw new AppError(401, 'Verify email process is failed!')
+  // ! BECAUSE WHEN USER SIGN UP WE DON'T CACHING YET, AFTER VERIFY EMAIL WE JUST CACHE THE USER DATA SO THEREFORE WE DON'T NEED TO CHECK THE USER DATA IN CACHE HERE
+  // let userSession
+  // let decoded
+  // if (authToken)
+  //   decoded = (
+  //     req.cookies['access-token']
+  //       ? jwt.verify(authToken, ACCESS_TOKEN_SECRET)
+  //       : jwt.verify(authToken, REFRESH_TOKEN_SECRET)
+  //   ) as JwtPayload
+  // else userSession = await redisClient.get('user')
+
+  // if (!authToken && !userSession) throw new AppError(401, 'Verify email process is failed!')
+  const decoded = (
+    req.cookies['access-token']
+      ? jwt.verify(authToken, ACCESS_TOKEN_SECRET)
+      : jwt.verify(authToken, REFRESH_TOKEN_SECRET)
+  ) as JwtPayload
+  // * If the token invalid like not fit with access secret or refresh secret
+  if (!decoded) throw new AppError(401, 'Verify email process is failed!')
 
   // console.log(decoded, userSession)
   // * remove verifyEmailToken done in the findOneAndUpdate post hook in guest model
+  // * we need to find with _id and verifyEmailToken to make sure this is exactly the user signed up
   const newUser = await findAndUpdateGuest(
-    { verifyEmailToken },
+    { _id: decoded.id, verifyEmailToken },
     { verifyEmail: true },
     {
       new: true
     }
   )
-  req.user = newUser as IGuest
+  // req.user = newUser as IGuest
 
   if (!newUser) throw new AppError(404, 'Verify email process is failed!')
   // const { data } = await editGuest(decoded?.id || JSON.parse(userSession!)._id, { verifyEmail: true })
@@ -296,9 +308,15 @@ const updateCurrentUser = async function (req: Request, res: Response) {
   // * then if the process success we just return the response with some message
   if (req.file) req.body.avatar = req.fileName
 
+  // const userCache: IGuest | IUser =
+  //   role === 'admin'
+  //     ? await getCache<IUser>({ key: 'user', model: User })
+  //     : await getCache<IGuest>({ key: 'user', model: Guest })
+  // const { role } = req.user || userCache
+  const { role, id } = req.user
   let updatedUser
-  if (req.user.role === 'admin') updatedUser = await editUser(req.user._id, req.body, false)
-  if (req.user.role === 'user') updatedUser = await editGuest(req.user._id, req.body, false)
+  if (role === 'admin') updatedUser = await editUser(id, req.body, false)
+  if (role === 'user') updatedUser = await editGuest(id, req.body, false)
 
   res.json({
     status: 'success',
@@ -319,9 +337,10 @@ const checkCurrentPassword = async function (req: Request, res: Response) {
   // ? in this case we use token
 
   const { password } = req.body
-  const { user } = req
+  // const { user } = req
 
-  const token = await checkCurrentPasswordService({ user, password })
+  // const token = await checkCurrentPasswordService({ user, password })
+  const token = await checkCurrentPasswordService({ password, role: req.user.role })
 
   res.json({
     status: 'success',

@@ -12,7 +12,7 @@ import { appConfig } from '~/config'
 import redis from '../database/redis'
 import { IGuestInput } from '../interfaces/IGuest'
 
-const { redisClient } = redis
+const { redisClient, getCache, deleteCache } = redis
 const { appEmitter, SERVER_ORIGIN } = appConfig
 const { findAndUpdateGuest, createGuest } = guestsService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
@@ -177,18 +177,26 @@ const resetPwdService = async function ({ token, password }: { password: string;
 }
 
 const logoutService = async function () {
-  await redisClient.del('user')
+  // await redisClient.del('user')
+  await deleteCache('user')
 }
 
 // const updateCurrentUserService = async function () {}
 
 const checkCurrentPasswordService = async function ({
-  user,
+  // user,
+  role,
   password
 }: {
-  user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
+  // user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
+  role: string
   password: string
 }) {
+  const user =
+    role === 'admin'
+      ? ((await getCache<IUser>({ key: 'user', model: User })) as IUser)
+      : ((await getCache<IGuest>({ key: 'user', model: Guest })) as IGuest)
+  // console.log(user)
   const check = await user.checkPwd(password, user.password!)
   if (!check) throw new AppError(400, 'Password is not correct')
 
