@@ -4,6 +4,10 @@ import cors from 'cors'
 import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
+import rateLimit from 'express-rate-limit'
+import helmet from 'helmet'
+import hpp from 'hpp'
+
 import { swagger } from './config'
 import router from './api/routes'
 import { errorsHandler as globalErrorsHandler } from './api/middlewares'
@@ -12,10 +16,29 @@ import { AppError } from './api/utils'
 
 const app = express()
 
+// *https://express-rate-limit.mintlify.app/reference/configuration
+// const allowlist = ['192.168.0.56', '192.168.0.21']
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: 'draft-7',
+  handler: (req, res, next, options) =>
+    res.status(options.statusCode).json({ status: 'fails', message: 'Too much requests' })
+  // skip: (req, res) => allowlist.includes(req.ip!),
+  // skip: (req, res) => req.user?.role === 'admin',
+  // legacyHeaders: false,
+  // message: 'Too much requests'
+  // statusCode: 429
+  // store: ... , // Redis, Memcached, etc. See below.
+})
+
 app.use(cors())
 app.options('*', cors())
 
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(helmet())
+app.use(limiter)
+app.use(hpp())
 
 app.use(swagger)
 
