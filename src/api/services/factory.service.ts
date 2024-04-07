@@ -1,10 +1,18 @@
 import { Model } from 'mongoose'
 import { AppError } from '../utils'
+import { APIFeatures } from '../utils'
+import { QueryStr } from '../utils/APIFeatures'
 
 const fetchAll =
   <T>(Model: Model<T>) =>
-  async () => {
-    const data = await Model.find()
+  async (queryStr?: QueryStr): Promise<{ data: T[]; collectionName: string }> => {
+    const count = await Model.countDocuments()
+    const apiFeatures = new APIFeatures<T>(Model.find(), queryStr).filter().sort().selectFields().pagination(count)
+    let query
+    if (queryStr) query = apiFeatures.query
+    else query = Model.find()
+
+    const data = await query
 
     return { data, collectionName: Model.collection.collectionName }
   }

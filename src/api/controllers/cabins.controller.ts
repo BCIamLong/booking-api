@@ -2,11 +2,12 @@ import { Request, Response } from 'express'
 import { cabinsService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 import { ICabin } from '../interfaces'
+import { QueryStr } from '../utils/APIFeatures'
 
 const { fetchCabins, fetchCabin, editCabin, createCabin, removeCabin } = cabinsService
 
-const getCabins = getAll(async () => {
-  const { data, collectionName } = await fetchCabins()
+const getCabins = getAll(async (options) => {
+  const { data, collectionName } = await fetchCabins(options.queryStr!)
   return { data, collectionName }
 })
 

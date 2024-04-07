@@ -1,15 +1,17 @@
 import { Request, Response } from 'express'
+import { QueryStr } from '../utils/APIFeatures'
 
 interface Options {
   id?: string
   body?: any
+  queryStr?: QueryStr
 }
 
 type ControllerFn = ({ id, body }: Options) => Promise<{ data: any; collectionName: string }>
 
 const getAll = (fn: ControllerFn) =>
   async function (req: Request, res: Response) {
-    const { data, collectionName } = await fn({})
+    const { data, collectionName } = await fn({ queryStr: req.query })
 
     res.json({
       status: 'success',

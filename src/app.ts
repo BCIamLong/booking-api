@@ -38,7 +38,11 @@ app.options('*', cors())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(helmet())
 app.use(limiter)
-app.use(hpp())
+app.use(
+  hpp({
+    whitelist: ['sort']
+  })
+)
 
 app.use(swagger)
 
