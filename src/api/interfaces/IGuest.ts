@@ -14,6 +14,10 @@ export interface IGuestInput {
   passwordChangedAt?: Date
   passwordResetToken?: string
   passwordResetTokenTimeout?: Date
+  deactivated?: boolean
+  deactivatedReason?: string
+  deleteAt?: Date
+  deactivatedAt?: Date
   photo?: string
   role?: 'user'
   createdAt: Date

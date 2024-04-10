@@ -35,6 +35,19 @@ const { appEmitter, SERVER_ORIGIN } = appConfig
  *      type: string
  *     countryFlag:
  *      type: string
+ *     deactivated:
+ *      type: boolean
+ *     deactivatedReason:
+ *      type: string
+ *     passwordChangedAt:
+ *      type: string
+ *      format: date
+ *     deleteAt:
+ *      type: string
+ *      format: date
+ *     deactivatedAt:
+ *      type: string
+ *      format: date
  *     createdAt:
  *      type: string
  *      format: date
@@ -94,6 +107,13 @@ const guestSchema = new Schema(
       default: 'none'
       // required: true
     },
+    deactivatedReason: String,
+    deactivated: {
+      type: Boolean,
+      default: false
+    },
+    deleteAt: Date,
+    deactivatedAt: Date,
     updatePasswordToken: String,
     verifyEmailToken: String,
     passwordChangedAt: Date,
@@ -104,6 +124,8 @@ const guestSchema = new Schema(
     timestamps: true
   }
 )
+
+guestSchema.index({ deleteAt: 1 }, { expireAfterSeconds: 0 })
 
 guestSchema.pre('save', async function (next) {
   // console.log(this.isModified('password'))
@@ -129,20 +151,23 @@ guestSchema.pre('save', async function (next) {
   next()
 })
 
-guestSchema.pre('findOne', function (next) {
-  this.select('-__v')
-  next()
-})
-
-guestSchema.pre('find', function (next) {
-  this.select('-__v')
-  next()
-})
-
-// guestSchema.pre(/^find/, function (next) {
+// guestSchema.pre('findOne', function (next) {
 //   this.select('-__v')
 //   next()
 // })
+
+// guestSchema.pre('find', function (next) {
+//   this.select('-__v')
+//   next()
+// })
+
+guestSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.find({ deactivated: { $ne: true } }).select('-__v')
+  // @ts-ignore
+  // this.select('-__v')
+  next()
+})
 
 guestSchema.post('findOneAndUpdate', async function (doc, next) {
   // *DELETE THE verifyEmailToken after we verify email because we use findAndUpdateGuest to update and cache the user then we need to remove this verifyEmailToken in this post hook of findOneAndUpdate

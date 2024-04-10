@@ -15,6 +15,7 @@ const getAll = (fn: ControllerFn) =>
 
     res.json({
       status: 'success',
+      results: data.length,
       data: {
         [collectionName]: data
       }

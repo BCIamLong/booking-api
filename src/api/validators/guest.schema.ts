@@ -70,6 +70,12 @@ const createGuestSchema = Joi.object({
  *     countryFlag:
  *      type: string
  *      default: 🇺🇸
+ *     deactivated:
+ *      type: boolean
+ *      default: false
+ *     deactivatedReason:
+ *      type: string
+ *      default: Bad user experience
  */
 const updateGuestSchema = Joi.object({
   fullName: Joi.string(),
@@ -80,7 +86,9 @@ const updateGuestSchema = Joi.object({
   avatar: Joi.string(),
   nationalId: Joi.string(),
   nationality: Joi.string(),
-  countryFlag: Joi.string()
+  countryFlag: Joi.string(),
+  deactivated: Joi.boolean(),
+  deactivatedReason: Joi.string()
 })
 // * in some case admin or some one have permission can change the password of the guest if it's needed
 

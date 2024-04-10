@@ -28,7 +28,8 @@ const {
   resetPassword,
   updateCurrentUser,
   checkCurrentPassword,
-  updatePassword
+  updatePassword,
+  deleteCurrentUser
 } = authController
 const { authenticate } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
@@ -236,7 +237,41 @@ authRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgo
  */
 authRouter.get('/verify-email/:token', asyncCatch(verifyEmail))
 
+// ! ONLY USERS LOGGED IN
 authRouter.use(authenticate)
+
+/**
+ * @openapi
+ * '/api/v1/auth/delete-me':
+ *  delete:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: delete the user themselves
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/DeleteCurrentUserInput'
+ *   responses:
+ *    204:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/DeleteCurrentUserResponse'
+ *    400:
+ *     description: Bad request
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.delete('/delete-me', asyncCatch(deleteCurrentUser))
 
 /**
  * @openapi

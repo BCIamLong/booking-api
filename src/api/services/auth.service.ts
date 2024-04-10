@@ -13,7 +13,7 @@ import redis from '../database/redis'
 import { IGuestInput } from '../interfaces/IGuest'
 
 const { redisClient, getCache, deleteCache } = redis
-const { appEmitter, SERVER_ORIGIN } = appConfig
+const { appEmitter, SERVER_ORIGIN, DELETE_ACCOUNT_TIMEOUT } = appConfig
 const { findAndUpdateGuest, createGuest } = guestsService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
 
@@ -219,6 +219,28 @@ const updatePasswordService = async function ({ token, password }: { token: stri
   return user
 }
 
+const deleteCurrentUserService = async function ({ reason, password }: { reason: string; password: string }) {
+  const user = (await getCache<IGuest>({ key: 'user', model: Guest })) as IGuest
+  // * maybe if the user does something to get access to delete account but doesn't have cache that means it might a invalid task, like user doesn't verify email but somehow the user can ignore that and access to our system
+  // * then the cache doesn't have and we can throw the error like this
+  if (!user) throw new AppError(401, 'Delete your account process is failed')
+
+  const check = await user.checkPwd(password, user.password!)
+  if (!check) throw new AppError(400, 'Your password is not corrected')
+
+  user.deactivated = true
+  user.deactivatedReason = reason
+  user.deactivatedAt = new Date()
+  user.deleteAt = new Date(Date.now() + DELETE_ACCOUNT_TIMEOUT * 1000)
+
+  await user.save({ validateBeforeSave: false })
+  // Guest.collection.createIndex({ deleteAt: 1 }, { expireAfterSeconds: DELETE_ACCOUNT_TIMEOUT })
+
+  await deleteCache('user')
+}
+
+const restoreUserService = async function ({ email }: { email: string }) {}
+
 const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
   const resetToken = crypto.createHash('sha256').update(token).digest('hex')
 
@@ -249,6 +271,8 @@ export default {
   checkResetPwdTokenService,
   logoutService,
   checkCurrentPasswordService,
-  updatePasswordService
+  updatePasswordService,
+  deleteCurrentUserService,
+  restoreUserService
   // updateCurrentUserService
 }

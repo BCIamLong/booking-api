@@ -22,7 +22,7 @@ export default class APIFeatures<T> {
   constructor(
     // *In Query generic type it requires at least two params T[] for result type and T for document type
     public query: Query<T[], T>,
-    public queryStr: any
+    public queryStr: any = {}
   ) {}
   filter() {
     const operations = ['fields', 'sort', 'limit', 'page']

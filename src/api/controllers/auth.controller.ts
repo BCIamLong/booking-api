@@ -24,7 +24,8 @@ const {
   resetPwdServiceV0,
   checkResetPwdTokenService,
   checkCurrentPasswordService,
-  updatePasswordService
+  updatePasswordService,
+  deleteCurrentUserService
 } = authService
 const { findAndUpdateGuest, editGuest } = guestsService
 const { editUser } = usersService
@@ -54,6 +55,11 @@ const setCookies = function (res: Response, accessToken: string, refreshToken: s
     ...cookieOptions,
     expires: new Date(Date.now() + Number(REFRESH_TOKEN_EXPIRES!))
   })
+}
+
+const deleteCookies = function (res: Response) {
+  res.clearCookie('access-token')
+  res.clearCookie('refresh-token')
 }
 
 const login = async function (req: Request, res: Response) {
@@ -372,6 +378,31 @@ const updatePassword = async function (req: Request, res: Response) {
   })
 }
 
+const deleteCurrentUser = async function (req: Request, res: Response) {
+  // ! don't allow the admin can delete themselves because it can lead to many issues especially if that admin is responsible for managing system...
+  // * user go to the page delete user themselves and choose the reason to delete app
+  // * because if user enter new word then we have a ton of reasons then it's so hard to filter and rating
+  // * then user enter the current password, and click delete we can display the box to make sure the user delete the account, if user click cancel then we just cancel the process
+  // * if user click delete then we check password: true format, true compare passwords if false just throw the error
+  // * if true we will deactivate the account and delete after 30 days (or we can do it like this we deactivated account in 30 days after 10 days we will start delete the user infos from the normal infos until to credential infos in the rest 20 days, this way we can do it later)
+  // * remove all things about user related to session, cookie, cache
+  // * set deactivated field to true, then set timestamp then after 30 days from the timestamp then we will delete the account
+  // * set authorization to authorize the user is deactivated don't allow they login
+  if (req.user.role === 'admin') throw new AppError(403, 'Admins cannot delete their own accounts')
+  const { reason, password } = req.body
+
+  await deleteCurrentUserService({ reason, password })
+
+  deleteCookies(res)
+
+  res.status(204).json({
+    status: 'success',
+    message: 'Delete your account successfully'
+  })
+}
+
+const restoreUser = async function (req: Request, res: Response) {}
+
 const resetPasswordV0 = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
@@ -401,5 +432,7 @@ export default {
   checkResetPasswordToken,
   updateCurrentUser,
   checkCurrentPassword,
-  updatePassword
+  updatePassword,
+  deleteCurrentUser,
+  restoreUser
 }

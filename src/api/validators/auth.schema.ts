@@ -203,6 +203,35 @@ const updatePasswordSchema = Joi.object({
   passwordConfirm: Joi.ref('password')
 })
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   DeleteCurrentUserInput:
+ *    type: object
+ *    required:
+ *     - reason
+ *     - password
+ *    properties:
+ *     reason:
+ *      type: string
+ *      default: Bad user experience
+ *     password:
+ *      type: string
+ *      default: password1234
+ *   DeleteCurrentUserResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     message:
+ *      type: string
+ */
+const deleteCurrentUserSchema = Joi.object({
+  reason: Joi.string().required(),
+  password: Joi.string().min(8).required()
+})
+
 export default {
   loginSchema,
   signupSchema,
@@ -210,5 +239,6 @@ export default {
   resetPwdSchema,
   updateCurrentUserSchema,
   checkCurrentPasswordSchema,
-  updatePasswordSchema
+  updatePasswordSchema,
+  deleteCurrentUserSchema
 }
