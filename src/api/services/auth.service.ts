@@ -1,20 +1,21 @@
 import crypto from 'crypto'
-import bcrypt from 'bcrypt'
-import { encode } from 'hi-base32'
-import * as OTPAuth from 'otpauth'
 import axios from 'axios'
 import qs from 'qs'
+
+import redis from '../database/redis'
 import { Guest, User } from '../database/models'
 import { IGuest, IUser } from '../interfaces'
-import { AppError } from '../utils'
-import { oauthConfig } from '~/config'
-import { Query } from 'mongoose'
+import { IGuestInput } from '../interfaces/IGuest'
+import { AppError, authUtil } from '../utils'
 import guestsService from './guests.service'
 import usersService from './users.service'
-import { appConfig } from '~/config'
-import redis from '../database/redis'
-import { IGuestInput } from '../interfaces/IGuest'
+import { appConfig, oauthConfig } from '~/config'
+// import { Query } from 'mongoose'
+// import bcrypt from 'bcrypt'
+// import { encode } from 'hi-base32'
+// import * as OTPAuth from 'otpauth'
 
+const { generateTotp, generateBase32Token } = authUtil
 const { redisClient, getCache, deleteCache } = redis
 const { appEmitter, SERVER_ORIGIN, DELETE_ACCOUNT_TIMEOUT } = appConfig
 const { findAndUpdateGuest, createGuest, editGuest } = guestsService
@@ -245,19 +246,33 @@ const deleteCurrentUserService = async function ({ reason, password }: { reason:
 
 const restoreUserService = async function ({ email }: { email: string }) {}
 
+// const generateTotp = function ({ secret, period = 30 }: { secret: string; period?: number }) {
+//   const totp = new OTPAuth.TOTP({
+//     issuer: 'BA',
+//     label: 'BookingApp',
+//     algorithm: 'SHA1',
+//     digits: 6,
+//     period,
+//     secret
+//   })
+//   return totp
+// }
+
 const generate2FAOtpService = async function ({ id, role }: { id: string; role: string }) {
-  const base32Token = encode(crypto.randomBytes(32))
-    .replace(/=/g, (val) => '')
-    .substring(0, 24)
+  const base32Token = generateBase32Token()
+  const totp = generateTotp({ secret: base32Token })
+  // const base32Token = encode(crypto.randomBytes(32))
+  //   .replace(/=/g, (val) => '')
+  //   .substring(0, 24)
   // const { base32: base32Token } = OTPAuth.Secret.fromBase32('rawSecret')
-  const totp = new OTPAuth.TOTP({
-    issuer: 'BA',
-    label: 'BookingApp',
-    algorithm: 'SHA1',
-    digits: 6,
-    // period: 30,
-    secret: base32Token
-  })
+  // const totp = new OTPAuth.TOTP({
+  //   issuer: 'BA',
+  //   label: 'BookingApp',
+  //   algorithm: 'SHA1',
+  //   digits: 6,
+  //   // period: 30,
+  //   secret: base32Token
+  // })
   // const otp = totp.generate()
   const googleURI = totp.toString()
   // const user = await Guest.findByIdAndUpdate(id, { otpAuthUrl: googleURI, otpSecret: otp })
@@ -271,14 +286,15 @@ const generate2FAOtpService = async function ({ id, role }: { id: string; role: 
 const verify2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
   const user = await isUserExisted({ field: '_id', value: id })
 
-  const totp = new OTPAuth.TOTP({
-    issuer: 'BA',
-    label: 'BookingApp',
-    algorithm: 'SHA1',
-    digits: 6,
-    // period: 30,
-    secret: user?.otp2FAToken
-  })
+  const totp = generateTotp({ secret: user?.otp2FAToken as string })
+  // const totp = new OTPAuth.TOTP({
+  //   issuer: 'BA',
+  //   label: 'BookingApp',
+  //   algorithm: 'SHA1',
+  //   digits: 6,
+  //   // period: 30,
+  //   secret: user?.otp2FAToken
+  // })
 
   const delta = totp.validate({ token: otp })
   if (delta === null) throw new AppError(401, 'Your otp code is invalid')
@@ -290,14 +306,15 @@ const verify2FAOtpService = async function ({ id, role, otp }: { id: string; rol
 const validate2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
   const user = await isUserExisted({ field: '_id', value: id })
 
-  const totp = new OTPAuth.TOTP({
-    issuer: 'BA',
-    label: 'BookingApp',
-    algorithm: 'SHA1',
-    digits: 6,
-    // period: 30,
-    secret: user?.otp2FAToken
-  })
+  const totp = generateTotp({ secret: user?.otp2FAToken as string })
+  // const totp = new OTPAuth.TOTP({
+  //   issuer: 'BA',
+  //   label: 'BookingApp',
+  //   algorithm: 'SHA1',
+  //   digits: 6,
+  //   // period: 30,
+  //   secret: user?.otp2FAToken
+  // })
 
   const delta = totp.validate({ token: otp, window: 1 })
   if (delta === null) throw new AppError(401, 'Your otp code is invalid')
