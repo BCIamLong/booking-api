@@ -181,8 +181,13 @@ const resetPwdService = async function ({ token, password }: { password: string;
   await user.save()
 }
 
-const logoutService = async function () {
+const logoutService = async function ({ id, role, enable2FA }: { id: string; role: string; enable2FA: boolean }) {
   // await redisClient.del('user')
+  if (!enable2FA) return await deleteCache('user')
+
+  if (role === 'admin') await editUser(id, { verify2FAOtp: false })
+  if (role === 'user') await editGuest(id, { verify2FAOtp: false })
+
   await deleteCache('user')
 }
 
@@ -299,8 +304,8 @@ const verify2FAOtpService = async function ({ id, role, otp }: { id: string; rol
   const delta = totp.validate({ token: otp })
   if (delta === null) throw new AppError(401, 'Your otp code is invalid')
 
-  if (role === 'user') await editGuest(id, { enable2FA: true })
-  if (role === 'admin') await editUser(id, { enable2FA: true })
+  if (role === 'user') await editGuest(id, { enable2FA: true, verify2FAOtp: true })
+  if (role === 'admin') await editUser(id, { enable2FA: true, verify2FAOtp: true })
 }
 
 const validate2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
@@ -318,11 +323,16 @@ const validate2FAOtpService = async function ({ id, role, otp }: { id: string; r
 
   const delta = totp.validate({ token: otp, window: 1 })
   if (delta === null) throw new AppError(401, 'Your otp code is invalid')
+
+  if (role === 'user') await editGuest(id, { verify2FAOtp: true })
+  if (role === 'admin') await editUser(id, { verify2FAOtp: true })
 }
 
 const disable2FAService = async function ({ id, role }: { id: string; role: string }) {
-  if (role === 'user') await editGuest(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1 }, enable2FA: false })
-  if (role === 'admin') await editUser(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1 }, enable2FA: false })
+  if (role === 'user')
+    await editGuest(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1, verify2FAOtp: 1 }, enable2FA: false })
+  if (role === 'admin')
+    await editUser(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1, verify2FAOtp: 1 }, enable2FA: false })
 
   // @ts-ignore
   // @ts-ignore

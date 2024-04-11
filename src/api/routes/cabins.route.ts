@@ -6,7 +6,7 @@ import { authMiddleware } from '../middlewares'
 
 const { createCabinSchema, updateCabinSchema } = cabinSchema
 const { getCabins, getCabin, postCabin, updateCabin, deleteCabin } = cabinsController
-const { authenticate, authorize } = authMiddleware
+const { authenticate, authorize, auth2FA } = authMiddleware
 
 const cabinsRouter = Router()
 
@@ -82,7 +82,7 @@ cabinsRouter
    *
    *
    */
-  .post(authenticate, authorize('admin'), validator(createCabinSchema), asyncCatch(postCabin))
+  .post(authenticate, auth2FA, authorize('admin'), validator(createCabinSchema), asyncCatch(postCabin))
 
 cabinsRouter
   .route('/:id')
@@ -154,7 +154,7 @@ cabinsRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(authenticate, authorize('admin'), validator(updateCabinSchema), asyncCatch(updateCabin))
+  .patch(authenticate, auth2FA, authorize('admin'), validator(updateCabinSchema), asyncCatch(updateCabin))
   /**
    * @openapi
    * '/api/v1/cabins/{id}':
@@ -188,6 +188,6 @@ cabinsRouter
    *    500:
    *     description: Something went wrong
    */
-  .delete(authenticate, authorize('admin'), asyncCatch(deleteCabin))
+  .delete(authenticate, auth2FA, authorize('admin'), asyncCatch(deleteCabin))
 
 export default cabinsRouter

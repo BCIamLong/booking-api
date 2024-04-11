@@ -6,12 +6,12 @@ import { authMiddleware } from '../middlewares'
 
 const { createUserSchema, updateUserSchema } = userSchema
 
-const { authenticate, authorize } = authMiddleware
+const { authenticate, authorize, auth2FA } = authMiddleware
 const { getUsers, getUser, postUser, updateUser, deleteUser } = usersController
 const userRouter = Router()
 
 // ! ONLY USERS LOGGED IN
-userRouter.use(authenticate)
+userRouter.use(authenticate, auth2FA)
 
 // ! ONLY ADMIN
 userRouter.use(authorize('admin'))

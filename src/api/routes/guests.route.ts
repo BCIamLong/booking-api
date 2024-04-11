@@ -6,11 +6,11 @@ import { authMiddleware } from '../middlewares'
 
 const { createGuestSchema, updateGuestSchema } = guestSchema
 const { getGuests, postGuest, getGuest, updateGuest, deleteGuest } = guestsController
-const { authenticate, authorize } = authMiddleware
+const { authenticate, authorize, auth2FA } = authMiddleware
 
 const guestRouter = Router()
 
-guestRouter.use(authenticate, authorize('admin'))
+guestRouter.use(authenticate, auth2FA, authorize('admin'))
 
 guestRouter
   .route('/')

@@ -1,8 +1,8 @@
 import 'dotenv/config'
-import app from './app'
-import { Email, log } from './api/utils'
 import './api/database'
 import { appConfig } from './config'
+import app from './app'
+import { Email, log } from './api/utils'
 
 const { appEmitter } = appConfig
 
@@ -27,7 +27,7 @@ appEmitter.on('reset-password', (user, url) => {
 
 process.on('unhandledRejection', (err: Error) => {
   log.error(err.name, err.message)
-  log.error(err)
+  log.error(err, 'UNHANDLED REJECTION ERROR!')
   server.close(() => {
     log.info('Application is shutting down !')
     process.exit(1)

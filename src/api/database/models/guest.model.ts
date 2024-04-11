@@ -37,6 +37,8 @@ const { appEmitter, SERVER_ORIGIN } = appConfig
  *      type: string
  *     deactivated:
  *      type: boolean
+ *     enable2FA:
+ *      type: boolean
  *     deactivatedReason:
  *      type: string
  *     passwordChangedAt:
@@ -119,6 +121,7 @@ const guestSchema = new Schema(
       type: Boolean,
       default: false
     },
+    verify2FAOtp: Boolean,
     deactivatedAt: Date,
     updatePasswordToken: String,
     verifyEmailToken: String,

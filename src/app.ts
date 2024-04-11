@@ -51,6 +51,12 @@ app.use(cookieParser())
 app.use(bodyParser.json({ limit: '90kb' }))
 app.use(bodyParser.urlencoded({ extended: true }))
 
+if (process.env.NODE_ENV === 'production')
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (!req.secure) return next(new AppError(400, 'Your request is not secure'))
+    next()
+  })
+
 app.use(router)
 
 app.all('*', (req: Request, res: Response, next: NextFunction) =>

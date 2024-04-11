@@ -77,6 +77,13 @@ const login = async function (req: Request, res: Response) {
   // * send back access token if we have no error
   setCookies(res, accessToken, refreshToken)
 
+  if (user.enable2FA)
+    return res.json({
+      status: 'success',
+      enable2FA: true,
+      message: 'Please verify 2FA otp to login'
+    })
+
   res.json({
     status: 'success',
     token: accessToken
@@ -289,7 +296,8 @@ const resetPassword = async function (req: Request, res: Response) {
 }
 
 const logout = async function (req: Request, res: Response) {
-  await logoutService()
+  const { id, role, enable2FA } = req.user
+  await logoutService({ id, role, enable2FA })
   res.clearCookie('access-token')
   res.clearCookie('refresh-token')
 

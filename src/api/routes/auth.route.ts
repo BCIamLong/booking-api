@@ -37,7 +37,7 @@ const {
   validate2FAOtp,
   disable2FA
 } = authController
-const { authenticate } = authMiddleware
+const { authenticate, auth2FA } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
 
 authRouter.get('/login/oauth/google', asyncCatch(loginWithGoogle))
@@ -99,33 +99,6 @@ authRouter.post('/signup', validator(signupSchema), asyncCatch(signup))
  *     description: Something went wrong
  */
 authRouter.post('/login', validator(loginSchema), asyncCatch(login))
-
-/**
- * @openapi
- * '/api/v1/auth/logout':
- *  get:
- *   tags:
- *   - Auth
- *   security: []
- *   summary: log user out of web app
- *   responses:
- *    200:
- *     description: Success
- *     content:
- *      application/json:
- *       schema:
- *        type: object
- *        properties:
- *         status:
- *          type: string
- *         message:
- *          type: string
- *    401:
- *     description: unauthorized
- *    500:
- *     description: Something went wrong
- */
-authRouter.get('/logout', asyncCatch(logout))
 
 /**
  * @openapi
@@ -244,8 +217,39 @@ authRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgo
  */
 authRouter.get('/verify-email/:token', asyncCatch(verifyEmail))
 
+/**
+ * @openapi
+ * '/api/v1/auth/2FA/validate-otp':
+ *  post:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: validate otp code of 2FA authentication to login
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/Validate2FAOtpInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/Validate2FAOtpResponse'
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.post('/2FA/validate-otp', authenticate, validator(validate2FAOtpSchema), asyncCatch(validate2FAOtp))
+
 // ! ONLY USERS LOGGED IN
-authRouter.use(authenticate)
+authRouter.use(authenticate, auth2FA)
 
 /**
  * @openapi
@@ -312,37 +316,6 @@ authRouter.patch('/2FA/verify-otp', validator(verify2FAOtpSchema), asyncCatch(ve
 
 /**
  * @openapi
- * '/api/v1/auth/2FA/validate-otp':
- *  post:
- *   tags:
- *   - Auth
- *   security:
- *    - bearerAuth: []
- *    - cookieAuth: []
- *    - refreshCookieAuth: []
- *   summary: validate otp code of 2FA authentication to login
- *   requestBody:
- *    required: true
- *    content:
- *     application/json:
- *      schema:
- *       $ref: '#components/schemas/Validate2FAOtpInput'
- *   responses:
- *    200:
- *     description: Success
- *     content:
- *      application/json:
- *       schema:
- *        $ref: '#components/schemas/Validate2FAOtpResponse'
- *    401:
- *     description: Unauthorized
- *    500:
- *     description: Something went wrong
- */
-authRouter.post('/2FA/validate-otp', validator(validate2FAOtpSchema), asyncCatch(validate2FAOtp))
-
-/**
- * @openapi
  * '/api/v1/auth/2FA/disable':
  *  get:
  *   tags:
@@ -370,6 +343,36 @@ authRouter.post('/2FA/validate-otp', validator(validate2FAOtpSchema), asyncCatch
  *     description: Something went wrong
  */
 authRouter.get('/2FA/disable', asyncCatch(disable2FA))
+
+/**
+ * @openapi
+ * '/api/v1/auth/logout':
+ *  get:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: log user out of web app
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         message:
+ *          type: string
+ *    401:
+ *     description: unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.get('/logout', asyncCatch(logout))
 
 /**
  * @openapi

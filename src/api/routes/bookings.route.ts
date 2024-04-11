@@ -6,7 +6,7 @@ import { authMiddleware } from '../middlewares'
 
 const { createBookingSchema, updateBookingSchema } = bookingSchema
 const { getBookings, getBooking, updateBooking, postBooking, deleteBooking } = bookingsController
-const { authenticate, authorize } = authMiddleware
+const { authenticate, authorize, auth2FA } = authMiddleware
 
 const bookingRouter = Router()
 
@@ -45,7 +45,7 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .get(authenticate, authorize('admin'), asyncCatch(getBookings))
+  .get(authenticate, auth2FA, authorize('admin'), asyncCatch(getBookings))
   /**
    * @openapi
    * '/api/v1/bookings':
@@ -86,7 +86,7 @@ bookingRouter
    *
    *
    */
-  .post(authenticate, validator(createBookingSchema), asyncCatch(postBooking))
+  .post(authenticate, auth2FA, validator(createBookingSchema), asyncCatch(postBooking))
 
 bookingRouter
   .route('/:id')
@@ -118,7 +118,7 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .get(authenticate, asyncCatch(getBooking))
+  .get(authenticate, auth2FA, asyncCatch(getBooking))
   /**
    * @openapi
    * '/api/v1/bookings/{id}':
@@ -162,7 +162,7 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(authenticate, authorize('admin'), validator(updateBookingSchema), asyncCatch(updateBooking))
+  .patch(authenticate, auth2FA, authorize('admin'), validator(updateBookingSchema), asyncCatch(updateBooking))
   /**
    * @openapi
    * '/api/v1/bookings/{id}':
@@ -196,6 +196,6 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .delete(authenticate, authorize('admin'), asyncCatch(deleteBooking))
+  .delete(authenticate, auth2FA, authorize('admin'), asyncCatch(deleteBooking))
 
 export default bookingRouter

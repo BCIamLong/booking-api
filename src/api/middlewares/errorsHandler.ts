@@ -11,7 +11,7 @@ const devErrorHandler = function (err: AppError, res: Response) {
 }
 const prodErrorHandler = function (err: AppError, res: Response) {
   if (err.isOperation)
-    res.status(err.statusCode).json({
+    return res.status(err.statusCode).json({
       status: err.status,
       message: err.message
     })

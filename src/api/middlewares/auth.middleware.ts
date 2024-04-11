@@ -48,7 +48,12 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
 
     if (!user.verifyEmail)
       return next(new AppError(401, 'Please check your email inbox and verify your email to start using our web app'))
-    const { _id: id, name, fullName, email, role = '', enable2FA = false } = user
+
+    // if (user.enable2FA)
+    //   if (!user.verify2FAOtp)
+    //     return next(new AppError(403, 'Please verify your 2FA authentication to continue using our app'))
+
+    const { _id: id, name, fullName, email, role = '', enable2FA = false, verify2FAOtp } = user
 
     req.user = {
       id,
@@ -57,11 +62,21 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
       role,
       enable2FA
     }
+    if (enable2FA) req.user.verify2FAOtp = verify2FAOtp
 
     next()
   } catch (err) {
     next(err)
   }
+}
+
+const auth2FA = (req: Request, res: Response, next: NextFunction) => {
+  const { user } = req
+  if (user.enable2FA)
+    if (!user.verify2FAOtp)
+      return next(new AppError(403, 'Please verify your 2FA authentication to continue using our app'))
+
+  next()
 }
 
 const authorize =
@@ -73,4 +88,4 @@ const authorize =
     next()
   }
 
-export default { authenticate, authorize }
+export default { authenticate, authorize, auth2FA }

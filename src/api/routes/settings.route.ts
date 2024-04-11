@@ -6,11 +6,11 @@ import { authMiddleware } from '../middlewares'
 
 const { createSettingSchema, updateSettingSchema } = settingSchema
 const { getSettings, getSetting, postSetting, updateSetting, deleteSetting } = settingsController
-const { authenticate, authorize } = authMiddleware
+const { authenticate, authorize, auth2FA } = authMiddleware
 
 const settingsRouter = Router()
 
-settingsRouter.use(authenticate, authorize('admin'))
+settingsRouter.use(authenticate, auth2FA, authorize('admin'))
 
 settingsRouter
   .route('/')

@@ -38,7 +38,7 @@ const createOne =
 // * { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1 }, enable2FA: false }
 // * $unset is operation(we can do more operations here), enable2FA is field we want to update value
 interface UpdateOperations {
-  $unset?: { otp2FAAuthUrl: number; otp2FAToken: number }
+  $unset?: { otp2FAAuthUrl: number; otp2FAToken: number; verify2FAOtp: number }
 }
 
 const editOne =

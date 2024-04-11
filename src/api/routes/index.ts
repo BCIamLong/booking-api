@@ -14,7 +14,7 @@ declare module 'express-serve-static-core' {
   // * for authentication and authorization purposes
   interface Request {
     // user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
-    user: { id: string; name: string; email: string; role: string; enable2FA: boolean }
+    user: { id: string; name: string; email: string; role: string; enable2FA: boolean; verify2FAOtp?: boolean }
     token: string
     fileName: string
   }

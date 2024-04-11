@@ -23,6 +23,7 @@ export interface IGuestInput {
   otp2FAAuthUrl?: string
   otp2FAToken?: string
   enable2FA?: boolean
+  verify2FAOtp?: boolean
   createdAt: Date
   updatedAt: Date
 }

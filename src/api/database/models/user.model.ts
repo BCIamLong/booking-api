@@ -21,6 +21,10 @@ import { IUser } from '~/api/interfaces'
  *      type: string
  *     password:
  *      type: string
+ *     verifyEmail:
+ *      type: Boolean
+ *     enable2FA:
+ *      type: Boolean
  *     createdAt:
  *      type: string
  *      format: date
@@ -68,6 +72,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false
     },
+    verify2FAOtp: Boolean,
     updatePasswordToken: String,
     passwordChangedAt: Date,
     passwordResetToken: String,
