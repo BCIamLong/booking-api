@@ -113,6 +113,12 @@ const guestSchema = new Schema(
       default: false
     },
     deleteAt: Date,
+    otp2FAAuthUrl: String,
+    otp2FAToken: String,
+    enable2FA: {
+      type: Boolean,
+      default: false
+    },
     deactivatedAt: Date,
     updatePasswordToken: String,
     verifyEmailToken: String,

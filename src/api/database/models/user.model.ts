@@ -62,6 +62,12 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
+    otp2FAAuthUrl: String,
+    otp2FAToken: String,
+    enable2FA: {
+      type: Boolean,
+      default: false
+    },
     updatePasswordToken: String,
     passwordChangedAt: Date,
     passwordResetToken: String,

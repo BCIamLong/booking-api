@@ -20,6 +20,9 @@ export interface IGuestInput {
   deactivatedAt?: Date
   photo?: string
   role?: 'user'
+  otp2FAAuthUrl?: string
+  otp2FAToken?: string
+  enable2FA?: boolean
   createdAt: Date
   updatedAt: Date
 }

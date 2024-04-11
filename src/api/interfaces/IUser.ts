@@ -11,6 +11,9 @@ export interface IUserInput {
   passwordChangedAt?: Date
   passwordResetToken?: string
   passwordResetTokenTimeout?: Date
+  otp2FAAuthUrl?: string
+  otp2FAToken?: string
+  enable2FA?: boolean
   createdAt: Date
   updatedAt: Date
 }

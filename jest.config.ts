@@ -19,7 +19,8 @@ const config: Config = {
     // !https://chat.openai.com/c/bcf98546-4512-4d3d-a657-21608ced5e12
     '~/config': ['<rootDir>/src/config'],
     '~/api/services': ['<rootDir>/src/api/services'],
-    '~/api/database/models': ['<rootDir>/src/api/database/models']
+    '~/api/database/models': ['<rootDir>/src/api/database/models'],
+    '~/api/utils': ['<rootDir>/src/api/utils']
     // '^@components/(.*)': '<rootDir>/src/components/$1'
   })
 }

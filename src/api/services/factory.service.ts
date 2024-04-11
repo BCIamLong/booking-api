@@ -34,9 +34,16 @@ const createOne =
     return { data: newData, collectionName: Model.collection.collectionName }
   }
 
+// * This is using for something like this:
+// * { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1 }, enable2FA: false }
+// * $unset is operation(we can do more operations here), enable2FA is field we want to update value
+interface UpdateOperations {
+  $unset?: { otp2FAAuthUrl: number; otp2FAToken: number }
+}
+
 const editOne =
   <T>(Model: Model<T>) =>
-  async (id: string, editData: Partial<T>, validate: boolean = true) => {
+  async (id: string, editData: Partial<T> & UpdateOperations, validate: boolean = true) => {
     const data = await Model.findByIdAndUpdate(id, editData, {
       new: true,
       runValidators: validate

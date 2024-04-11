@@ -15,7 +15,9 @@ const {
   resetPwdSchema,
   updateCurrentUserSchema,
   checkCurrentPasswordSchema,
-  updatePasswordSchema
+  updatePasswordSchema,
+  verify2FAOtpSchema,
+  validate2FAOtpSchema
 } = authSchema
 const {
   login,
@@ -29,7 +31,11 @@ const {
   updateCurrentUser,
   checkCurrentPassword,
   updatePassword,
-  deleteCurrentUser
+  deleteCurrentUser,
+  generate2FAOtp,
+  verify2FAOtp,
+  validate2FAOtp,
+  disable2FA
 } = authController
 const { authenticate } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
@@ -212,6 +218,7 @@ authRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgo
 // ! ONLY USERS LOGGED IN
 // * BECAUSE WE NEED TO VERIFY EMAIL AND AUTHENTICATE DON'T ALLOW USER IS NOT VERIFY EMAIL
 // * SO THEREFORE THIS VERIFY EMAIL ROUTE HANDLER WILL VERIFY THE TOKEN WITH ITSELF AND WE DO NOT USE AUTHENTICATE MIDDLEWARE HERE
+// * IT CAN IMPLEMENT SOME AUTHENTICATION WITH BEARER TOKEN, COOKIE WITH ITSELF AND DO NOT USE AUTHENTICATE BECAUSE AUTHENTICATE CHECK USER VERIFY EMAIL
 // authRouter.use(authenticate)
 
 /**
@@ -239,6 +246,130 @@ authRouter.get('/verify-email/:token', asyncCatch(verifyEmail))
 
 // ! ONLY USERS LOGGED IN
 authRouter.use(authenticate)
+
+/**
+ * @openapi
+ * '/api/v1/auth/2FA/generate-otp':
+ *  get:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: generate the otp code for enable their 2FA authentication
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         token:
+ *          type: string
+ *         URI:
+ *          type: string
+ *    401:
+ *     description: unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.get('/2FA/generate-otp', asyncCatch(generate2FAOtp))
+
+/**
+ * @openapi
+ * '/api/v1/auth/2FA/verify-otp':
+ *  patch:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: verify otp code to finally enable 2FA authentication
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/Verify2FAOtpInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/Verify2FAOtpResponse'
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.patch('/2FA/verify-otp', validator(verify2FAOtpSchema), asyncCatch(verify2FAOtp))
+
+/**
+ * @openapi
+ * '/api/v1/auth/2FA/validate-otp':
+ *  post:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: validate otp code of 2FA authentication to login
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/Validate2FAOtpInput'
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#components/schemas/Validate2FAOtpResponse'
+ *    401:
+ *     description: Unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.post('/2FA/validate-otp', validator(validate2FAOtpSchema), asyncCatch(validate2FAOtp))
+
+/**
+ * @openapi
+ * '/api/v1/auth/2FA/disable':
+ *  get:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: disable 2FA authentication
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         message:
+ *          type: string
+ *    401:
+ *     description: unauthorized
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.get('/2FA/disable', asyncCatch(disable2FA))
 
 /**
  * @openapi

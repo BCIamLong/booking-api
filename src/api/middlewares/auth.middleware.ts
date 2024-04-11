@@ -48,13 +48,14 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
 
     if (!user.verifyEmail)
       return next(new AppError(401, 'Please check your email inbox and verify your email to start using our web app'))
-    const { _id: id, name, fullName, email, role = '' } = user
+    const { _id: id, name, fullName, email, role = '', enable2FA = false } = user
 
     req.user = {
       id,
       name: name || fullName,
       email,
-      role
+      role,
+      enable2FA
     }
 
     next()

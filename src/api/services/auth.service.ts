@@ -1,5 +1,7 @@
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
+import { encode } from 'hi-base32'
+import * as OTPAuth from 'otpauth'
 import axios from 'axios'
 import qs from 'qs'
 import { Guest, User } from '../database/models'
@@ -8,13 +10,15 @@ import { AppError } from '../utils'
 import { oauthConfig } from '~/config'
 import { Query } from 'mongoose'
 import guestsService from './guests.service'
+import usersService from './users.service'
 import { appConfig } from '~/config'
 import redis from '../database/redis'
 import { IGuestInput } from '../interfaces/IGuest'
 
 const { redisClient, getCache, deleteCache } = redis
 const { appEmitter, SERVER_ORIGIN, DELETE_ACCOUNT_TIMEOUT } = appConfig
-const { findAndUpdateGuest, createGuest } = guestsService
+const { findAndUpdateGuest, createGuest, editGuest } = guestsService
+const { editUser } = usersService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
 
 const loginService = async function (email: string, password: string) {
@@ -241,6 +245,74 @@ const deleteCurrentUserService = async function ({ reason, password }: { reason:
 
 const restoreUserService = async function ({ email }: { email: string }) {}
 
+const generate2FAOtpService = async function ({ id, role }: { id: string; role: string }) {
+  const base32Token = encode(crypto.randomBytes(32))
+    .replace(/=/g, (val) => '')
+    .substring(0, 24)
+  // const { base32: base32Token } = OTPAuth.Secret.fromBase32('rawSecret')
+  const totp = new OTPAuth.TOTP({
+    issuer: 'BA',
+    label: 'BookingApp',
+    algorithm: 'SHA1',
+    digits: 6,
+    // period: 30,
+    secret: base32Token
+  })
+  // const otp = totp.generate()
+  const googleURI = totp.toString()
+  // const user = await Guest.findByIdAndUpdate(id, { otpAuthUrl: googleURI, otpSecret: otp })
+  // if (!user) throw new AppError(401, "User doesn't exist or has been recently deleted")
+  if (role === 'user') await editGuest(id, { otp2FAAuthUrl: googleURI, otp2FAToken: base32Token })
+  if (role === 'admin') await editUser(id, { otp2FAAuthUrl: googleURI, otp2FAToken: base32Token })
+
+  return { base32Token, googleURI }
+}
+
+const verify2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
+  const user = await isUserExisted({ field: '_id', value: id })
+
+  const totp = new OTPAuth.TOTP({
+    issuer: 'BA',
+    label: 'BookingApp',
+    algorithm: 'SHA1',
+    digits: 6,
+    // period: 30,
+    secret: user?.otp2FAToken
+  })
+
+  const delta = totp.validate({ token: otp })
+  if (delta === null) throw new AppError(401, 'Your otp code is invalid')
+
+  if (role === 'user') await editGuest(id, { enable2FA: true })
+  if (role === 'admin') await editUser(id, { enable2FA: true })
+}
+
+const validate2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
+  const user = await isUserExisted({ field: '_id', value: id })
+
+  const totp = new OTPAuth.TOTP({
+    issuer: 'BA',
+    label: 'BookingApp',
+    algorithm: 'SHA1',
+    digits: 6,
+    // period: 30,
+    secret: user?.otp2FAToken
+  })
+
+  const delta = totp.validate({ token: otp, window: 1 })
+  if (delta === null) throw new AppError(401, 'Your otp code is invalid')
+}
+
+const disable2FAService = async function ({ id, role }: { id: string; role: string }) {
+  if (role === 'user') await editGuest(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1 }, enable2FA: false })
+  if (role === 'admin') await editUser(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1 }, enable2FA: false })
+
+  // @ts-ignore
+  // @ts-ignore
+  // if (role === 'user') await editGuest(id, { otp2FAToken: undefined, otp2FAAuthUrl: undefined, enable2FA: false })
+  // if (role === 'admin') await editUser(id, { otp2FAToken: undefined, otp2FAAuthUrl: undefined, enable2FA: false })
+}
+
 const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
   const resetToken = crypto.createHash('sha256').update(token).digest('hex')
 
@@ -273,6 +345,10 @@ export default {
   checkCurrentPasswordService,
   updatePasswordService,
   deleteCurrentUserService,
-  restoreUserService
+  restoreUserService,
+  generate2FAOtpService,
+  verify2FAOtpService,
+  validate2FAOtpService,
+  disable2FAService
   // updateCurrentUserService
 }

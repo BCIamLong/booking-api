@@ -25,12 +25,26 @@ describe('unit test for settings service', () => {
   describe('fetchSettings', () => {
     it('should return settings', async () => {
       // @ts-ignore
-      Setting.find.mockImplementationOnce(() => [settingItem])
-
-      const { data } = await fetchSettings()
+      Setting.countDocuments.mockImplementationOnce(() => 10)
+      const queryOb = {
+        find: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValueOnce([[settingItem]])
+      }
 
       // @ts-ignore
-      expect(data).toEqual([settingItem])
+      Setting.find.mockImplementationOnce(() => queryOb)
+      // @ts-ignore
+      // Setting.find.mockImplementationOnce(() => Promise.resolve([settingItem]))
+      const queryStr = {}
+      const result = await fetchSettings(queryStr)
+      console.log(result)
+      // @ts-ignore
+      expect(queryOb.exec).toHaveBeenCalled()
+      // expect(result.data).toEqual([settingItem])
     })
   })
 

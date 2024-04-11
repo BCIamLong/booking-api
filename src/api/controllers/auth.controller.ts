@@ -25,7 +25,11 @@ const {
   checkResetPwdTokenService,
   checkCurrentPasswordService,
   updatePasswordService,
-  deleteCurrentUserService
+  deleteCurrentUserService,
+  generate2FAOtpService,
+  verify2FAOtpService,
+  validate2FAOtpService,
+  disable2FAService
 } = authService
 const { findAndUpdateGuest, editGuest } = guestsService
 const { editUser } = usersService
@@ -403,6 +407,53 @@ const deleteCurrentUser = async function (req: Request, res: Response) {
 
 const restoreUser = async function (req: Request, res: Response) {}
 
+const generate2FAOtp = async function (req: Request, res: Response) {
+  const { id, role, enable2FA } = req.user
+  if (enable2FA) throw new AppError(401, 'Your 2FA feature is enabled')
+
+  const { base32Token, googleURI } = await generate2FAOtpService({ id, role })
+
+  res.json({
+    status: 'success',
+    token: base32Token,
+    URI: googleURI
+  })
+}
+
+const verify2FAOtp = async function (req: Request, res: Response) {
+  const { id, role, enable2FA } = req.user
+  if (enable2FA) throw new AppError(401, 'Your 2FA feature is already enabled')
+
+  await verify2FAOtpService({ id, role, otp: req.body.otp })
+
+  res.json({
+    status: 'success',
+    message: 'Enable 2FA authentication successfully'
+  })
+}
+
+const validate2FAOtp = async function (req: Request, res: Response) {
+  const { id, role } = req.user
+  await validate2FAOtpService({ id, role, otp: req.body.otp })
+
+  res.json({
+    status: 'success',
+    message: 'Verify 2FA successfully'
+  })
+}
+
+const disable2FA = async function (req: Request, res: Response) {
+  const { id, role, enable2FA } = req.user
+  if (!enable2FA) throw new AppError(401, 'You don\t enable the 2FA feature')
+
+  await disable2FAService({ id, role })
+
+  res.json({
+    status: 'success',
+    message: 'Disable 2FA authentication successfully'
+  })
+}
+
 const resetPasswordV0 = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
@@ -434,5 +485,9 @@ export default {
   checkCurrentPassword,
   updatePassword,
   deleteCurrentUser,
-  restoreUser
+  restoreUser,
+  generate2FAOtp,
+  verify2FAOtp,
+  validate2FAOtp,
+  disable2FA
 }

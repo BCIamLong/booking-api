@@ -1,3 +1,14 @@
 {
-  "cSpell.words": ["alphanum", "cloudinary", "Lanh", "longhoang", "opeanapi", "openapi", "pino", "uuidv"]
+  "cSpell.words": [
+    "alphanum",
+    "cloudinary",
+    "Lanh",
+    "longhoang",
+    "opeanapi",
+    "openapi",
+    "otpauth",
+    "pino",
+    "TOTP",
+    "uuidv"
+  ]
 }

@@ -232,6 +232,54 @@ const deleteCurrentUserSchema = Joi.object({
   password: Joi.string().min(8).required()
 })
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   Verify2FAOtpInput:
+ *    type: object
+ *    required:
+ *     - otp
+ *    properties:
+ *     otp:
+ *      type: string
+ *      default: 123456
+ *   Verify2FAOtpResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     message:
+ *      type: string
+ */
+const verify2FAOtpSchema = Joi.object({
+  otp: Joi.string().required().min(6)
+})
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   Validate2FAOtpInput:
+ *    type: object
+ *    required:
+ *     - otp
+ *    properties:
+ *     otp:
+ *      type: string
+ *      default: 123456
+ *   Validate2FAOtpResponse:
+ *    type: object
+ *    properties:
+ *     status:
+ *      type: string
+ *     message:
+ *      type: string
+ */
+const validate2FAOtpSchema = Joi.object({
+  otp: Joi.string().required().min(6)
+})
+
 export default {
   loginSchema,
   signupSchema,
@@ -240,5 +288,7 @@ export default {
   updateCurrentUserSchema,
   checkCurrentPasswordSchema,
   updatePasswordSchema,
-  deleteCurrentUserSchema
+  deleteCurrentUserSchema,
+  verify2FAOtpSchema,
+  validate2FAOtpSchema
 }
