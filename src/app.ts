@@ -12,8 +12,10 @@ import { swagger } from './config'
 import router from './api/routes'
 import { errorsHandler as globalErrorsHandler } from './api/middlewares'
 import { AppError } from './api/utils'
+import { loggerConfig } from './config'
 // import './config/modules.d'
 
+const { accessLogStream } = loggerConfig
 const app = express()
 
 // *https://express-rate-limit.mintlify.app/reference/configuration
@@ -46,7 +48,9 @@ app.use(
 
 app.use(swagger)
 
+// if (process.env.NODE_ENV === 'development') app.use(morgan('dev', { stream: accessLogStream }))
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
+if (process.env.NODE_ENV === 'production') app.use(morgan('combined', { stream: accessLogStream }))
 app.use(cookieParser())
 app.use(bodyParser.json({ limit: '90kb' }))
 app.use(bodyParser.urlencoded({ extended: true }))

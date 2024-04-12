@@ -11,8 +11,8 @@ const connectDB = async () => {
     log.info('Connect Redis successfully')
     await mongoose.connect(DB_LOCAL!)
     log.info('Connect DB successfully')
-  } catch (err) {
-    log.error(err)
+  } catch (err: any) {
+    log.error(err, err.message)
   }
 }
 

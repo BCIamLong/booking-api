@@ -5,5 +5,6 @@ import oauthConfig from './oauth.config'
 import appConfig from './app.config'
 import emailConfig from './email.config'
 import uploadConfig from './upload.config'
+import loggerConfig from './logger.config'
 
-export { swagger, dbConfig, jwtConfig, oauthConfig, appConfig, emailConfig, uploadConfig }
+export { swagger, dbConfig, jwtConfig, oauthConfig, appConfig, emailConfig, uploadConfig, loggerConfig }

@@ -27,5 +27,7 @@ export default function (err: AppError, req: Request, res: Response, next: NextF
   err.status = err.status || 'error'
 
   if (process.env.NODE_ENV === 'development') devErrorHandler(err, res)
-  if (process.env.NODE_ENV === 'production') prodErrorHandler(err, res)
+  if (process.env.NODE_ENV !== 'production') return
+
+  prodErrorHandler(err, res)
 }
