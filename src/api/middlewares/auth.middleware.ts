@@ -18,19 +18,28 @@ interface CustomJwtPayload extends JwtPayload {
   id: string
 }
 
+// !NOTE THAT SEND COOKIE HEADERS IS NOT POSSIBLE IN SWAGGER RIGHT NOW SO IF WE USE THE SWAGGER UI AND AUTHENTICATE WITH COOKIE THEN IT WILL NOT WORK
+// * BUT FOR BEARER AUTH IT WILL WORK
+// * WITH COOKIE WE CAN USE THE COOKIE FROM THE BROWSER LIKE WE CAN LEAVE THE BROWSER STORE THESE COOKIES AND THEN WE SEND COOKIE HEADERS THEN IT WILL WORK
+// ! BUT IF WE DELETE THESE COOKIE FROM BROWSER AND DO IT WITH SWAGGER UI THEN IT WILL NOT POSSIBLE RIGHT NOW
+// !https://stackoverflow.com/questions/49272171/sending-cookie-session-id-with-swagger-3-0
+
 const authenticate = async function (req: Request, res: Response, next: NextFunction) {
   try {
     // console.log(req.cookies['access-token'])
     // * check token (notice that because we set cookie with form like access-token so we need to use req.cookies['access-token'] not req.cookies.accessToken likewise (tuong tu nhu vay) with refresh-token)
     const token =
       req.headers.authorization?.split(' ')[1] || req.cookies['access-token'] || req.cookies['refresh-token']
-
+    // console.log(req.cookies)
+    // console.log(req.cookies['access-token'])
+    // console.log(req.cookies['refresh-token'])
     if (!token) return next(new AppError(401, 'Please login to perform this action'))
 
     // * decoded token and check token expires or not
     let decoded: CustomJwtPayload
-    if (req.cookies['access-token']) decoded = jwt.verify(token, ACCESS_TOKEN_SECRET!) as CustomJwtPayload
-    else decoded = jwt.verify(token, REFRESH_TOKEN_SECRET!) as CustomJwtPayload
+    if (req.cookies['access-token'] || req.headers.authorization?.split(' ')[1])
+      decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as CustomJwtPayload
+    else decoded = jwt.verify(token, REFRESH_TOKEN_SECRET) as CustomJwtPayload
     // ||  jwt.verify(token,REFRESH_TOKEN_SECRET!)
 
     // * decoded.iat is time sign of token, decoded.exp is time expires of token
