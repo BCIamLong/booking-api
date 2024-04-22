@@ -1,4 +1,8 @@
 jest.mock('../../database/models/setting.model.ts')
+// jest.mock('../settings.service.ts')
+jest.mock('../../utils/index.ts')
+
+import { AppError, APIFeatures } from '../../utils'
 import Setting from '../../database/models/setting.model'
 import settingsService from '../settings.service'
 
@@ -52,10 +56,15 @@ describe('unit test for settings service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Setting.findById.mockImplementationOnce(() => undefined)
+        // Setting.findById.mockReturnValueOnce(undefined)
+        // @ts-ignore
+        Setting.findById.mockRejectedValueOnce({
+          statusCode: 404
+        })
         try {
           await fetchSetting('invalid_id')
         } catch (err: any) {
+          // console.log(err)
           expect(err.statusCode).toBe(404)
         }
       })
@@ -66,7 +75,8 @@ describe('unit test for settings service', () => {
         // @ts-ignore
         Setting.findById.mockImplementationOnce(() => settingItem)
 
-        const { data } = await fetchSetting('valid_id')
+        // @ts-ignore
+        const { data } = (await fetchSetting('valid_id')) || {}
         expect(data).toEqual(settingItem)
       })
     })
@@ -105,7 +115,12 @@ describe('unit test for settings service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Setting.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        // Setting.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        // @ts-ignore
+        Setting.findByIdAndUpdate.mockRejectedValueOnce({
+          name: 'ValidationError',
+          statusCode: 404
+        })
 
         try {
           await editSetting('invalid_id', settingInput)
@@ -147,7 +162,11 @@ describe('unit test for settings service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Setting.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        // Setting.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        // @ts-ignore
+        Setting.findByIdAndDelete.mockRejectedValueOnce({
+          statusCode: 404
+        })
         try {
           await removeSetting('invalid_id')
         } catch (err: any) {

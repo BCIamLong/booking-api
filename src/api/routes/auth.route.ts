@@ -35,7 +35,8 @@ const {
   generate2FAOtp,
   verify2FAOtp,
   validate2FAOtp,
-  disable2FA
+  disable2FA,
+  getUserSession
 } = authController
 const { authenticate, auth2FA } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
@@ -217,6 +218,44 @@ authRouter.post('/forgot-password', validator(forgotPwdSchema), asyncCatch(forgo
  */
 authRouter.get('/verify-email/:token', asyncCatch(verifyEmail))
 
+// ! ONLY USERS LOGGED IN
+authRouter.use(authenticate)
+
+/**
+ * @openapi
+ * '/api/v1/auth/session':
+ *  get:
+ *   tags:
+ *   - Auth
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: get the user session
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         session:
+ *          type: object
+ *          properties:
+ *           user:
+ *            type: object
+ *    401:
+ *     description: Unauthorized
+ *    404:
+ *     description: Not found
+ *    500:
+ *     description: Something went wrong
+ */
+authRouter.get('/session', asyncCatch(getUserSession))
+
 /**
  * @openapi
  * '/api/v1/auth/2FA/validate-otp':
@@ -246,10 +285,9 @@ authRouter.get('/verify-email/:token', asyncCatch(verifyEmail))
  *    500:
  *     description: Something went wrong
  */
-authRouter.post('/2FA/validate-otp', authenticate, validator(validate2FAOtpSchema), asyncCatch(validate2FAOtp))
+authRouter.post('/2FA/validate-otp', validator(validate2FAOtpSchema), asyncCatch(validate2FAOtp))
 
-// ! ONLY USERS LOGGED IN
-authRouter.use(authenticate, auth2FA)
+authRouter.use(auth2FA)
 
 /**
  * @openapi
@@ -405,7 +443,7 @@ authRouter.get('/logout', asyncCatch(logout))
  *    500:
  *     description: Something went wrong
  */
-authRouter.delete('/delete-me', asyncCatch(deleteCurrentUser))
+authRouter.patch('/delete-me', asyncCatch(deleteCurrentUser))
 
 /**
  * @openapi
@@ -507,7 +545,7 @@ authRouter.patch('/update-password/:token', validator(updatePasswordSchema), asy
  */
 authRouter.patch(
   '/update-me',
-  upload.single('avatar'),
+  asyncCatch(upload.single('avatar')),
   resizeAndUploadAvatarToCloud,
   validator(updateCurrentUserSchema),
   asyncCatch(updateCurrentUser)

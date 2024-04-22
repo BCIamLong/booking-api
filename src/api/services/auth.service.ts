@@ -4,7 +4,7 @@ import qs from 'qs'
 
 import redis from '../database/redis'
 import { Guest, User } from '../database/models'
-import { IGuest, IUser } from '../interfaces'
+import { IGuest, IUser, UpdateCurrentUserInput } from '../interfaces'
 import { IGuestInput } from '../interfaces/IGuest'
 import { AppError, authUtil } from '../utils'
 import guestsService from './guests.service'
@@ -16,8 +16,8 @@ import { appConfig, oauthConfig } from '~/config'
 // import * as OTPAuth from 'otpauth'
 
 const { generateTotp, generateBase32Token } = authUtil
-const { redisClient, getCache, deleteCache } = redis
-const { appEmitter, SERVER_ORIGIN, DELETE_ACCOUNT_TIMEOUT } = appConfig
+const { redisClient, getCache, deleteCache, setCache } = redis
+const { appEmitter, SERVER_ORIGIN, CLIENT_ORIGIN, DELETE_ACCOUNT_TIMEOUT } = appConfig
 const { findAndUpdateGuest, createGuest, editGuest } = guestsService
 const { editUser } = usersService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
@@ -145,6 +145,7 @@ const forgotPwdService = async function ({ email }: { email: string }) {
     await user.save({ validateBeforeSave: false })
 
     const emailUrl = `${SERVER_ORIGIN}/api/v1/auth/reset-password/${token}/verify`
+    // const emailUrl = `${CLIENT_ORIGIN}/reset-password/${token}`
 
     appEmitter.resetPassword(user, emailUrl)
   } catch (err) {
@@ -191,7 +192,22 @@ const logoutService = async function ({ id, role, enable2FA }: { id: string; rol
   await deleteCache('user')
 }
 
-// const updateCurrentUserService = async function () {}
+const updateCurrentUserService = async function ({
+  id,
+  role,
+  data
+}: {
+  id: string
+  role: string
+  data: UpdateCurrentUserInput
+}) {
+  let updatedUser
+  if (role === 'admin') updatedUser = await editUser(id, data, false, true)
+  if (role === 'user') updatedUser = await editGuest(id, data, false, true)
+
+  // setCache('user', '', JSON.stringify(updatedUser?.data))
+  return updatedUser
+}
 
 const checkCurrentPasswordService = async function ({
   // user,
@@ -214,6 +230,8 @@ const checkCurrentPasswordService = async function ({
 
   user.updatePasswordToken = token
   await user.save({ validateBeforeSave: false })
+
+  setCache('user', '', JSON.stringify(user))
 
   return token
 }
@@ -245,6 +263,7 @@ const deleteCurrentUserService = async function ({ reason, password }: { reason:
 
   await user.save({ validateBeforeSave: false })
   // Guest.collection.createIndex({ deleteAt: 1 }, { expireAfterSeconds: DELETE_ACCOUNT_TIMEOUT })
+  setCache('user', '', JSON.stringify(user))
 
   await deleteCache('user')
 }
@@ -282,8 +301,10 @@ const generate2FAOtpService = async function ({ id, role }: { id: string; role: 
   const googleURI = totp.toString()
   // const user = await Guest.findByIdAndUpdate(id, { otpAuthUrl: googleURI, otpSecret: otp })
   // if (!user) throw new AppError(401, "User doesn't exist or has been recently deleted")
-  if (role === 'user') await editGuest(id, { otp2FAAuthUrl: googleURI, otp2FAToken: base32Token })
-  if (role === 'admin') await editUser(id, { otp2FAAuthUrl: googleURI, otp2FAToken: base32Token })
+  let user
+  if (role === 'user') user = await editGuest(id, { otp2FAAuthUrl: googleURI, otp2FAToken: base32Token }, true, true)
+  if (role === 'admin') user = await editUser(id, { otp2FAAuthUrl: googleURI, otp2FAToken: base32Token }, true, true)
+  // setCache('user', '', JSON.stringify(user?.data))
 
   return { base32Token, googleURI }
 }
@@ -303,9 +324,11 @@ const verify2FAOtpService = async function ({ id, role, otp }: { id: string; rol
 
   const delta = totp.validate({ token: otp })
   if (delta === null) throw new AppError(401, 'Your otp code is invalid')
+  let userCache
+  if (role === 'user') userCache = await editGuest(id, { enable2FA: true, verify2FAOtp: true }, true, true)
+  if (role === 'admin') userCache = await editUser(id, { enable2FA: true, verify2FAOtp: true }, true, true)
 
-  if (role === 'user') await editGuest(id, { enable2FA: true, verify2FAOtp: true })
-  if (role === 'admin') await editUser(id, { enable2FA: true, verify2FAOtp: true })
+  // setCache('user', '', JSON.stringify(userCache?.data))
 }
 
 const validate2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
@@ -329,15 +352,35 @@ const validate2FAOtpService = async function ({ id, role, otp }: { id: string; r
 }
 
 const disable2FAService = async function ({ id, role }: { id: string; role: string }) {
+  let user
   if (role === 'user')
-    await editGuest(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1, verify2FAOtp: 1 }, enable2FA: false })
+    user = await editGuest(
+      id,
+      { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1, verify2FAOtp: 1 }, enable2FA: false },
+      true,
+      true
+    )
   if (role === 'admin')
-    await editUser(id, { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1, verify2FAOtp: 1 }, enable2FA: false })
+    user = await editUser(
+      id,
+      { $unset: { otp2FAAuthUrl: 1, otp2FAToken: 1, verify2FAOtp: 1 }, enable2FA: false },
+      true,
+      true
+    )
 
+  // setCache('user', '', JSON.stringify(user?.data))
   // @ts-ignore
   // @ts-ignore
   // if (role === 'user') await editGuest(id, { otp2FAToken: undefined, otp2FAAuthUrl: undefined, enable2FA: false })
   // if (role === 'admin') await editUser(id, { otp2FAToken: undefined, otp2FAAuthUrl: undefined, enable2FA: false })
+}
+
+const getUserSessionService = async function ({ role }: { role: string }) {
+  let user
+  if (role === 'admin') user = await getCache({ key: 'user', model: User })
+  if (role === 'user') user = await getCache({ key: 'user', model: Guest })
+
+  return user
 }
 
 const resetPwdServiceV0 = async function ({ token, password }: { token: string; password: string }) {
@@ -376,6 +419,7 @@ export default {
   generate2FAOtpService,
   verify2FAOtpService,
   validate2FAOtpService,
-  disable2FAService
-  // updateCurrentUserService
+  disable2FAService,
+  getUserSessionService,
+  updateCurrentUserService
 }

@@ -15,7 +15,10 @@ const multerFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCal
   if (file.mimetype.startsWith('image')) return cb(null, true)
 
   cb(null, false)
-  throw new AppError(400, 'Please only upload the image file!')
+  cb(new AppError(400, 'Please only upload the image file!'))
+  // ! we should use cb to broadcast the error instead of throw because the throw keyword will throw error as the current time when our app run is the very first time right
+  // * therefore we need to put it in the callback and it will run later after the first time run to setup our app
+  // throw new AppError(400, 'Please only upload the image file!')
 }
 
 const upload = multer({

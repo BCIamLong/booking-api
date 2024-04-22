@@ -7,8 +7,8 @@ import { QueryStr } from '../utils/APIFeatures'
 const { fetchCabins, fetchCabin, editCabin, createCabin, removeCabin } = cabinsService
 
 const getCabins = getAll(async (options) => {
-  const { data, collectionName } = await fetchCabins(options.queryStr!)
-  return { data, collectionName }
+  const { data, collectionName, count } = await fetchCabins(options.queryStr!)
+  return { data, count, collectionName }
 })
 
 const getCabin = getOne(async (options) => {

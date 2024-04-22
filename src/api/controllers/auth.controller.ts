@@ -3,7 +3,7 @@ import sharp from 'sharp'
 import { Request, Response } from 'express'
 import { authService, guestsService, usersService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
-import { IGuest, IUser } from '../interfaces'
+import { IGuest, IUser, UserSession } from '../interfaces'
 import { AppError, Email } from '../utils'
 import { JwtPayload } from 'jsonwebtoken'
 // import redis from '../database/redis'
@@ -29,7 +29,9 @@ const {
   generate2FAOtpService,
   verify2FAOtpService,
   validate2FAOtpService,
-  disable2FAService
+  disable2FAService,
+  getUserSessionService,
+  updateCurrentUserService
 } = authService
 const { findAndUpdateGuest, editGuest } = guestsService
 const { editUser } = usersService
@@ -76,17 +78,34 @@ const login = async function (req: Request, res: Response) {
   // * store user data to session or something like that (protected middleware will do this task)
   // * send back access token if we have no error
   setCookies(res, accessToken, refreshToken)
+  if (!user.verifyEmail)
+    return res.json({
+      status: 'success',
+      verifyEmail: false,
+      message: 'Please verify your email to login'
+    })
 
   if (user.enable2FA)
     return res.json({
       status: 'success',
+      token: accessToken,
       enable2FA: true,
       message: 'Please verify 2FA otp to login'
     })
 
+  // const { _id, fullName, name, role = 'user', enable2FA = false, verify2FAOtp = false } = user as IGuest & IUser
+  // const userInfo: UserSession = {
+  //   _id,
+  //   name: fullName || name,
+  //   role,
+  //   enable2FA
+  // }
+  // if (enable2FA) userInfo.verify2FAOtp = verify2FAOtp
+
   res.json({
     status: 'success',
     token: accessToken
+    // user: userInfo
   })
 }
 
@@ -223,7 +242,7 @@ const verifyEmail = async function (req: Request, res: Response) {
   // * we need to find with _id and verifyEmailToken to make sure this is exactly the user signed up
   const newUser = await findAndUpdateGuest(
     { _id: decoded.id, verifyEmailToken },
-    { verifyEmail: true },
+    { verifyEmail: true, $unset: { verifyEmailToken: 1 } },
     {
       new: true
     }
@@ -269,7 +288,7 @@ const checkResetPasswordToken = async function (req: Request, res: Response) {
   // req.user = user
   req.token = token
 
-  res.redirect(`${CLIENT_ORIGIN}/reset-password`)
+  res.redirect(`${CLIENT_ORIGIN}/reset-password/${token}`)
 }
 
 const resetPassword = async function (req: Request, res: Response) {
@@ -332,9 +351,10 @@ const updateCurrentUser = async function (req: Request, res: Response) {
   //     : await getCache<IGuest>({ key: 'user', model: Guest })
   // const { role } = req.user || userCache
   const { role, id } = req.user
-  let updatedUser
-  if (role === 'admin') updatedUser = await editUser(id, req.body, false)
-  if (role === 'user') updatedUser = await editGuest(id, req.body, false)
+  const updatedUser = await updateCurrentUserService({ id, role, data: req.body })
+  // let updatedUser
+  // if (role === 'admin') updatedUser = await editUser(id, req.body, false)
+  // if (role === 'user') updatedUser = await editGuest(id, req.body, false)
 
   res.json({
     status: 'success',
@@ -462,6 +482,18 @@ const disable2FA = async function (req: Request, res: Response) {
   })
 }
 
+const getUserSession = async function (req: Request, res: Response) {
+  const user = await getUserSessionService({ role: req.user.role })
+  // const user = req.user
+
+  res.json({
+    status: 'success',
+    session: {
+      user
+    }
+  })
+}
+
 const resetPasswordV0 = async function (req: Request, res: Response) {
   // * user click to the link from email
   // * get the token from the url
@@ -497,5 +529,6 @@ export default {
   generate2FAOtp,
   verify2FAOtp,
   validate2FAOtp,
-  disable2FA
+  disable2FA,
+  getUserSession
 }

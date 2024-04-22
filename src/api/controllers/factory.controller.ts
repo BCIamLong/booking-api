@@ -7,14 +7,15 @@ interface Options {
   queryStr?: QueryStr
 }
 
-type ControllerFn = ({ id, body }: Options) => Promise<{ data: any; collectionName: string }>
+type ControllerFn = ({ id, body }: Options) => Promise<{ data: any; count?: number; collectionName: string }>
 
 const getAll = (fn: ControllerFn) =>
   async function (req: Request, res: Response) {
-    const { data, collectionName } = await fn({ queryStr: req.query })
-
+    const { data, collectionName, count } = await fn({ queryStr: req.query })
+    // console.log(count)
     res.json({
       status: 'success',
+      count: count,
       results: data.length,
       data: {
         [collectionName]: data

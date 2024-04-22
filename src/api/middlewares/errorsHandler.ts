@@ -49,10 +49,10 @@ export default function (err: AppError, req: Request, res: Response, next: NextF
   let prodErr = { ...err, isOperation, statusCode, status, message, code } as CustomError
 
   if (process.env.NODE_ENV === 'development') devErrorHandler(err, res)
-  log.error(err, err.message)
+  // log.error(err, err.message)
 
   if (process.env.NODE_ENV !== 'production') return
-  log.error(prodErr, 'Product Error')
+  // log.error(prodErr, 'Product Error')
 
   if (prodErr?.code === 11000) prodErr = castErrorHandler() //Mongo DB
   if (prodErr?.name === 'BSONError') prodErr = bsonErrorHandler() //Mongo DB

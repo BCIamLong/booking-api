@@ -34,7 +34,11 @@ const limiter = rateLimit({
   // store: ... , // Redis, Memcached, etc. See below.
 })
 
-app.use(cors())
+app.use(
+  cors({
+    origin: 'http://localhost:5173'
+  })
+)
 app.options('*', cors())
 
 app.use(express.static(path.join(__dirname, 'public')))

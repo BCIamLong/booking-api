@@ -5,7 +5,7 @@ import { QueryStr } from '../utils/APIFeatures'
 
 const fetchAll =
   <T>(Model: Model<T>) =>
-  async (queryStr?: QueryStr): Promise<{ data: T[]; collectionName: string }> => {
+  async (queryStr?: QueryStr): Promise<{ data: T[]; count: number; collectionName: string }> => {
     const count = await Model.countDocuments()
     const apiFeatures = new APIFeatures<T>(Model.find(), queryStr).filter().sort().selectFields().pagination(count)
     let query
@@ -14,7 +14,7 @@ const fetchAll =
 
     const data = await query
 
-    return { data, collectionName: Model.collection.collectionName }
+    return { data, count, collectionName: Model.collection.collectionName }
   }
 
 const fetchOne =
@@ -43,12 +43,20 @@ interface UpdateOperations {
 
 const editOne =
   <T>(Model: Model<T>) =>
-  async (id: string, editData: Partial<T> & UpdateOperations, validate: boolean = true) => {
-    const data = await Model.findByIdAndUpdate(id, editData, {
+  async (id: string, editData: Partial<T> & UpdateOperations, validate: boolean = true, cache: boolean = false) => {
+    let query = Model.findByIdAndUpdate(id, editData, {
       new: true,
       runValidators: validate
     })
-    if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found with this id`)
+    const collectionName = Model.collection.collectionName
+    let formatCollectionName = collectionName.slice(0, collectionName.length - 1).toLowerCase()
+    // console.log(formatCollectionName)
+    if (formatCollectionName === 'user' || formatCollectionName === 'guest') formatCollectionName = 'user'
+
+    if (cache) query = query.cache({ key: formatCollectionName, type: 'session' })
+
+    const data = await query
+    if (!data) throw new AppError(404, `No ${collectionName} found with this id`)
 
     return { data, collectionName: Model.collection.collectionName }
   }
