@@ -5,10 +5,28 @@ import { validator, bookingSchema } from '../validators'
 import { authMiddleware } from '../middlewares'
 
 const { createBookingSchema, updateBookingSchema } = bookingSchema
-const { getBookings, getBooking, updateBooking, postBooking, deleteBooking } = bookingsController
+const {
+  getBookings,
+  getBooking,
+  updateBooking,
+  postBooking,
+  deleteBooking,
+  getCheckOutSession,
+  createBookingCheckout
+} = bookingsController
 const { authenticate, authorize, auth2FA } = authMiddleware
 
 const bookingRouter = Router()
+
+bookingRouter.post('/checkout-session', authenticate, auth2FA, authorize('user'), asyncCatch(getCheckOutSession))
+
+bookingRouter.get(
+  '/create-booking-checkout',
+  authenticate,
+  auth2FA,
+  authorize('user'),
+  asyncCatch(createBookingCheckout)
+)
 
 bookingRouter
   .route('/')

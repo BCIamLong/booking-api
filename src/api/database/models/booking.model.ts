@@ -94,8 +94,8 @@ const bookingSchema = new Schema(
     },
     status: {
       type: String,
-      default: 'c',
-      enum: ['unconfirmed', 'confirmed', 'cancelled']
+      default: 'unconfirmed',
+      enum: ['unconfirmed', 'confirmed', 'checked-in', 'checked-out', 'cancelled']
     },
     hasBreakfast: {
       type: Boolean,
