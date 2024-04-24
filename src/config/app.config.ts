@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { IGuest, IUser } from '~/api/interfaces'
+import { IBooking, ICabin, IGuest, IUser } from '~/api/interfaces'
 import { log } from '~/api/utils'
 
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN as string
@@ -24,6 +24,12 @@ class AppEmitter extends EventEmitter {
   resetPassword(user: IGuest | IUser, url: string) {
     // console.log('ok')
     this.emit('reset-password', user, url)
+    return
+  }
+
+  bookingSuccess(user: IGuest | IUser, booking: IBooking & { cabinId: string | ICabin }, url: string) {
+    // console.log('ok')
+    this.emit('booking-success', user, booking, url)
     return
   }
 }

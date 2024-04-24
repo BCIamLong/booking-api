@@ -25,6 +25,12 @@ appEmitter.on('reset-password', (user, url) => {
   emailHost.sendResetPwdMail()
 })
 
+appEmitter.on('booking-success', (user, booking, url) => {
+  // console.log('hello')
+  const emailHost = new Email(user, url)
+  emailHost.sendBookingSuccessMail(booking)
+})
+
 process.on('unhandledRejection', (err: Error) => {
   log.error(err.name, err.message)
   log.error(err, 'UNHANDLED REJECTION ERROR!')

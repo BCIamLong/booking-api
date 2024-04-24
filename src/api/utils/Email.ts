@@ -1,7 +1,7 @@
 import { TransportOptions, createTransport } from 'nodemailer'
 import { convert } from 'html-to-text'
 import { emailConfig } from '~/config'
-import { IGuest, IUser } from '../interfaces'
+import { IBooking, ICabin, IGuest, IUser } from '../interfaces'
 
 const {
   EMAIL_FROM,
@@ -10,7 +10,8 @@ const {
   EMAIL_USERNAME,
   EMAIL_PASSWORD,
   welcomeEmailTemplate,
-  resetPasswordEmailTemplate
+  resetPasswordEmailTemplate,
+  bookingSuccessEmailTemplate
 } = emailConfig
 
 export default class Email {
@@ -21,6 +22,17 @@ export default class Email {
     public url: string
   ) {
     this.firstName = this.user?.fullName?.split(' ')[0] || this.user?.name?.split(' ')[0]
+  }
+
+  sendBookingSuccessMail(booking: IBooking & { cabinId: string | ICabin }) {
+    const { cabinId, totalPrice } = booking
+    const { name } = cabinId as ICabin
+    const subject = `Booking Confirmation - Booking App`
+    let html = this.getTemplate(bookingSuccessEmailTemplate)
+    html = html.replace('%BOOKING_NAME%', name)
+    html = html.replace('%BOOKING_PRICE%', String(totalPrice))
+
+    this.sendEmail(html, subject)
   }
 
   sendResetPwdMail() {

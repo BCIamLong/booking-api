@@ -3,9 +3,10 @@ import { bookingsService, cabinsService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 import { paymentConfig, appConfig } from '~/config'
 import { AppError } from '../utils'
+import { IBooking, ICabin, IGuest, IUser } from '../interfaces'
 
 const { stripe } = paymentConfig
-const { CLIENT_ORIGIN } = appConfig
+const { CLIENT_ORIGIN, appEmitter } = appConfig
 const { fetchCabin } = cabinsService
 const { fetchBookings, fetchBooking, editBooking, createBooking, removeBooking, removeUserBooking } = bookingsService
 
@@ -66,7 +67,8 @@ const getUserBookings = async function (req: Request, res: Response) {
 const createBookingCheckout = async function (req: Request, res: Response) {
   const { user, cabin, price } = req.query
   if (!user || !cabin || !price) throw new AppError(400, 'Purchase process is failed')
-  await createBooking({
+  const { data: cabinData } = await fetchCabin(cabin as string)
+  const { data: booking } = await createBooking({
     cabinId: cabin as string,
     guestId: user as string,
     startDate: new Date(),
@@ -79,6 +81,12 @@ const createBookingCheckout = async function (req: Request, res: Response) {
     observation: 'I will checking later',
     status: 'checked-in'
   })
+  const url = `${CLIENT_ORIGIN}/profile/bookings`
+  const customBooking = { ...booking, totalPrice: +price, cabinId: { name: cabinData.name } } as IBooking & {
+    cabinId: string | ICabin
+  }
+
+  appEmitter.bookingSuccess(req.user as IUser & IGuest, customBooking, url)
 
   res.redirect(`${CLIENT_ORIGIN}/bookings/success`)
 }

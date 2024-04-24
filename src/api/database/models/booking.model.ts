@@ -124,6 +124,10 @@ bookingSchema.pre(/^find/, function (next) {
   next()
 })
 
+bookingSchema.post('save', function (doc, next) {
+  next()
+})
+
 const Booking = mongoose.model<IBooking>('Booking', bookingSchema)
 
 export default Booking
