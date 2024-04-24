@@ -4,5 +4,6 @@ import settingsService from './settings.service'
 import bookingsService from './bookings.service'
 import usersService from './users.service'
 import authService from './auth.service'
+import reviewsService from './reviews.service'
 
-export { cabinsService, guestsService, settingsService, bookingsService, usersService, authService }
+export { cabinsService, guestsService, settingsService, bookingsService, usersService, authService, reviewsService }
