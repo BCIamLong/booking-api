@@ -12,11 +12,20 @@ const {
   postBooking,
   deleteBooking,
   getCheckOutSession,
-  createBookingCheckout
+  createBookingCheckout,
+  getUserBookings,
+  getUserBooking,
+  deleteUserBooking
 } = bookingsController
 const { authenticate, authorize, auth2FA } = authMiddleware
 
 const bookingRouter = Router()
+
+bookingRouter.delete('/:id/me', authenticate, auth2FA, authorize('user'), asyncCatch(deleteUserBooking))
+
+bookingRouter.get('/me', authenticate, auth2FA, authorize('user'), asyncCatch(getUserBookings))
+
+bookingRouter.get('/me/latest', authenticate, auth2FA, authorize('user'), asyncCatch(getUserBooking))
 
 bookingRouter.post('/checkout-session', authenticate, auth2FA, authorize('user'), asyncCatch(getCheckOutSession))
 

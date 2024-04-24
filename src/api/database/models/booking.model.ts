@@ -118,6 +118,12 @@ const bookingSchema = new Schema(
 // *https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/
 bookingSchema.index({ cabinId: 1, guestId: -1 })
 
+bookingSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.populate({ path: 'cabinId', select: 'name' })
+  next()
+})
+
 const Booking = mongoose.model<IBooking>('Booking', bookingSchema)
 
 export default Booking

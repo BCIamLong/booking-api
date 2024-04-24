@@ -7,35 +7,61 @@ import { AppError } from '../utils'
 const { stripe } = paymentConfig
 const { CLIENT_ORIGIN } = appConfig
 const { fetchCabin } = cabinsService
-const { fetchBookings, fetchBooking, editBooking, createBooking, removeBooking } = bookingsService
+const { fetchBookings, fetchBooking, editBooking, createBooking, removeBooking, removeUserBooking } = bookingsService
 
 const getBookings = getAll(async () => {
   const { data, collectionName } = await fetchBookings()
   return { data, collectionName }
 })
-
 const getBooking = getOne(async (options) => {
   const { data, collectionName } = await fetchBooking(options.id || '')
   return { data, collectionName }
 })
-
 const postBooking = postOne(async (options) => {
   const { data, collectionName } = await createBooking(options.body || {})
 
   return { data, collectionName }
 })
-
 const updateBooking = updateOne(async (options) => {
   const { data, collectionName } = await editBooking(options.id || '', options.body || {})
 
   return { data, collectionName }
 })
-
 const deleteBooking = deleteOne(async (options) => {
   const { data, collectionName } = await removeBooking(options.id || '')
 
   return { data, collectionName }
 })
+
+const deleteUserBooking = async function (req: Request, res: Response) {
+  const booking = await removeUserBooking({ bookingId: req.params.id, guestId: req.user.id })
+  res.status(204).json({
+    status: 'success',
+    data: {
+      booking
+    }
+  })
+}
+
+const getUserBooking = async function (req: Request, res: Response) {
+  // console.log(req.user.id)
+  const { data: userBookings } = await fetchBookings({ guestId: req.user.id, sort: '-createdAt' })
+  // console.log(userBookings)
+
+  res.json({
+    status: 'success',
+    booking: userBookings[0]
+  })
+}
+
+const getUserBookings = async function (req: Request, res: Response) {
+  const { data: userBookings } = await fetchBookings({ guestId: req.user.id, sort: '-createdAt' })
+
+  res.json({
+    status: 'success',
+    bookings: userBookings
+  })
+}
 
 const createBookingCheckout = async function (req: Request, res: Response) {
   const { user, cabin, price } = req.query
@@ -143,5 +169,8 @@ export default {
   updateBooking,
   deleteBooking,
   getCheckOutSession,
-  createBookingCheckout
+  createBookingCheckout,
+  getUserBookings,
+  getUserBooking,
+  deleteUserBooking
 }
