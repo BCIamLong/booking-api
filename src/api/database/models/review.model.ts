@@ -2,6 +2,30 @@ import { v4 as uuidv4 } from 'uuid'
 import { Schema, model } from 'mongoose'
 import { IReview } from '~/api/interfaces'
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   ReviewResponse:
+ *    type: object
+ *    properties:
+ *     _id:
+ *      type: string
+ *     review:
+ *      type: string
+ *     rating:
+ *      type: number
+ *     user:
+ *      type: string
+ *     cabin:
+ *      type: string
+ *     createdAt:
+ *      type: string
+ *      format: date
+ *     updatedAt:
+ *      type: string
+ *      format: date
+ */
 const reviewSchema = new Schema(
   {
     _id: {

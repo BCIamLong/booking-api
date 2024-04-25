@@ -1,11 +1,13 @@
 import { Router } from 'express'
+
 import cabinsRouter from './cabins.route'
 import guestRouter from './guests.route'
 import settingsRouter from './settings.route'
 import bookingRouter from './bookings.route'
 import userRouter from './users.route'
-import { IGuest, IUser } from '../interfaces'
 import authRouter from './auth.route'
+import reviewRouter from './review.route'
+import { IGuest, IUser } from '../interfaces'
 
 const router = Router()
 
@@ -68,7 +70,8 @@ router.use('/api/v1/auth', authRouter)
 router.use('/api/v1/users', userRouter)
 router.use('/api/v1/cabins', cabinsRouter)
 router.use('/api/v1/guests', guestRouter)
-router.use('/api/v1/settings', settingsRouter)
 router.use('/api/v1/bookings', bookingRouter)
+router.use('/api/v1/reviews', reviewRouter)
+router.use('/api/v1/settings', settingsRouter)
 
 export default router

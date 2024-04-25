@@ -4,5 +4,14 @@ import settingsController from './settings.controller'
 import bookingsController from './bookings.controller'
 import usersController from './users.controller'
 import authController from './auth.controller'
+import reviewController from './review.controller'
 
-export { cabinsController, guestsController, settingsController, bookingsController, usersController, authController }
+export {
+  cabinsController,
+  guestsController,
+  settingsController,
+  bookingsController,
+  usersController,
+  authController,
+  reviewController
+}

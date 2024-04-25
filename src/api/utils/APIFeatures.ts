@@ -76,7 +76,7 @@ export default class APIFeatures<T> {
     const limitVal = Number(this.queryStr.limit) || 10
     const pageVal = Number(this.queryStr.page) || 1
     const skipVal = (pageVal - 1) * limitVal
-    const totalPage = Math.ceil(count / limitVal)
+    const totalPage = Math.ceil(count / limitVal) || 1
 
     if (pageVal <= totalPage) this.query = this.query.limit(limitVal).skip(skipVal)
     else throw new AppError(404, 'The page you looking for is not found!')
