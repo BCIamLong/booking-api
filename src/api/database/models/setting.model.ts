@@ -31,7 +31,7 @@ const settingSchema = new Schema(
     _id: {
       type: String,
       default: `setting-${uuidv4()}`,
-      unique: true
+      // unique: true
       // required: true,
     },
     minBookingLength: {

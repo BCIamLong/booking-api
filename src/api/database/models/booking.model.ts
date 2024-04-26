@@ -51,7 +51,7 @@ const bookingSchema = new Schema(
     _id: {
       type: String,
       default: `booking-${uuidv4()}`,
-      unique: true
+      // unique: true
       // required: true,
     },
     cabinId: {

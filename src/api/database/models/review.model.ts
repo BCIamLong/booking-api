@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Schema, model } from 'mongoose'
 import { IReview } from '~/api/interfaces'
+import Cabin from './cabin.model'
 
 /**
  * @openapi
@@ -30,8 +31,11 @@ const reviewSchema = new Schema(
   {
     _id: {
       type: String,
-      default: `review-${uuidv4()}`,
-      unique: true
+      default: `review-${uuidv4()}`
+      //* _id will already have this in place, that is we cannot have _id to have non-unique value even if the condition from mongoose is not there and it is always required.
+      // * so by default mongoose is always set this _id property to unique, therefore the error here that we overwrite this unique property and maybe this property _id always have this unique like it can be change outside right so it might be private
+      // * so therefore if we custom this _id we should not set the unique property of the _id
+      // unique: true
     },
     review: {
       type: String,
@@ -55,8 +59,49 @@ const reviewSchema = new Schema(
   },
   {
     timestamps: true
+    // _id: false
   }
 )
+
+reviewSchema.index({ cabin: 1, user: 1 }, { unique: true })
+
+reviewSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.populate({
+    path: 'user',
+    select: 'fullName avatar'
+  })
+  // .populate({ path: 'cabin', select: 'ratingAverage ratingQuantity' })
+
+  next()
+})
+
+reviewSchema.post('save', async function (doc, next) {
+  const stats = await this.model('Review').aggregate([
+    {
+      $match: { cabin: doc.cabin }
+    },
+    {
+      $group: {
+        _id: null,
+        ratingQuantity: { $sum: 1 },
+        ratingAverage: { $avg: '$rating' }
+      }
+    }
+  ])
+  // console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
+  const { ratingQuantity, ratingAverage } = stats[0] || {}
+  // await this.model('Cabin').findByIdAndUpdate(
+  await Cabin.findByIdAndUpdate(
+    doc.cabin,
+    // doc.cabin.split('$')[1],
+    { ratingQuantity, ratingAverage },
+    {
+      runValidators: true
+    }
+  )
+  next()
+})
 
 const Review = model<IReview>('Review', reviewSchema)
 export default Review

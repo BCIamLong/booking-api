@@ -36,8 +36,8 @@ const userSchema = new Schema(
   {
     _id: {
       type: String,
-      default: `user-${uuidv4()}`,
-      unique: true
+      default: `user-${uuidv4()}`
+      // unique: true
       // required: true,
     },
     name: {

@@ -23,6 +23,10 @@ import { ICabin } from '~/api/interfaces'
  *      type: string
  *     image:
  *      type: string
+ *     ratingAverage:
+ *      type: number
+ *     ratingQuantity:
+ *      type: number
  *     createdAt:
  *      type: string
  *      format: date
@@ -36,7 +40,7 @@ const cabinSchema = new Schema(
       type: String,
       // required: true,
       default: `cabin-${uuidv4()}`,
-      unique: true
+      // unique: true
     },
     name: {
       type: String,
@@ -61,6 +65,16 @@ const cabinSchema = new Schema(
     image: {
       type: String,
       required: true
+    },
+    ratingAverage: {
+      type: Number,
+      default: 5,
+      min: 1,
+      max: 5
+    },
+    ratingQuantity: {
+      type: Number,
+      default: 0
     }
   },
   {
