@@ -27,6 +27,7 @@ export default class APIFeatures<T> {
   filter() {
     const operations = ['fields', 'sort', 'limit', 'page']
     // console.log(this.queryStr)
+
     const queryOb = { ...this.queryStr }
 
     // * we get query object

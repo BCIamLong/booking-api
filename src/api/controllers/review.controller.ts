@@ -3,8 +3,8 @@ import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.control
 
 const { fetchReviews, fetchReview, editReview, createReview, removeReview } = reviewsService
 
-const getReviews = getAll(async () => {
-  const { data, collectionName } = await fetchReviews()
+const getReviews = getAll(async (options) => {
+  const { data, collectionName } = await fetchReviews(options.queryStr)
   return { data, collectionName }
 })
 const getReview = getOne(async (options) => {

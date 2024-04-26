@@ -125,7 +125,7 @@ reviewRouter
    *
    *
    */
-  .post(authorize('user'), validator(createReviewSchema), asyncCatch(postReview))
+  .post(authorize('user'), reviewsQueryModifier, validator(createReviewSchema), asyncCatch(postReview))
 
 reviewRouter
   .route('/:id')

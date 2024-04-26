@@ -52,9 +52,9 @@ const swaggerOptions: SwaggerOptions = {
 const swaggerSpec = swaggerJSDoc(swaggerOptions)
 
 const options = {
-  // customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Booking API'
-  // customfavIcon: '/assets/favicon.ico'
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Booking API',
+  customfavIcon: '/logo-light.png'
 }
 
 swagger.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, options))
