@@ -26,7 +26,8 @@ const updateSetting = updateOne(async (options) => {
 })
 
 const deleteSetting = deleteOne(async (options) => {
-  const { data, collectionName } = await removeSetting(options.id || '')
+  const { data, collectionName } = await removeSetting(options)
+  // const { data, collectionName } = await removeSetting(options.id || '')
 
   return { data, collectionName }
 })

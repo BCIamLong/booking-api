@@ -22,7 +22,7 @@ const updateReview = updateOne(async (options) => {
   return { data, collectionName }
 })
 const deleteReview = deleteOne(async (options) => {
-  const { data, collectionName } = await removeReview(options.id || '')
+  const { data, collectionName } = await removeReview(options)
 
   return { data, collectionName }
 })

@@ -29,7 +29,8 @@ const updateCabin = updateOne(async (options) => {
 })
 
 const deleteCabin = deleteOne(async (options) => {
-  const { data, collectionName } = await removeCabin(options.id || '')
+  const { data, collectionName } = await removeCabin(options)
+  // const { data, collectionName } = await removeCabin(options.id || '')
 
   return { data, collectionName }
 })

@@ -30,7 +30,8 @@ const updateGuest = updateOne(async (options) => {
 })
 
 const deleteGuest = deleteOne(async (options) => {
-  const { data, collectionName } = await removeGuest(options.id || '')
+  const { data, collectionName } = await removeGuest(options)
+  // const { data, collectionName } = await removeGuest(options.id || '')
 
   return { data, collectionName }
 })

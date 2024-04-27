@@ -29,7 +29,8 @@ const updateBooking = updateOne(async (options) => {
   return { data, collectionName }
 })
 const deleteBooking = deleteOne(async (options) => {
-  const { data, collectionName } = await removeBooking(options.id || '')
+  const { data, collectionName } = await removeBooking(options)
+  // const { data, collectionName } = await removeBooking(options.id || '')
 
   return { data, collectionName }
 })

@@ -29,6 +29,7 @@ const fetchOne =
 const createOne =
   <T, U>(Model: Model<T>) =>
   async (data: Omit<U, 'createdAt' | 'updatedAt'>) => {
+    // console.log(data)
     const newData = await Model.create(data)
 
     return { data: newData, collectionName: Model.collection.collectionName }
@@ -63,8 +64,11 @@ const editOne =
 
 const removeOne =
   <T>(Model: Model<T>) =>
-  async (id: string) => {
-    const data = await Model.findByIdAndDelete(id)
+  async ({ id, queryStr }: { id?: string; queryStr?: QueryStr }) => {
+    let query
+    if (id) query = Model.findOneAndDelete({ _id: id })
+    if (queryStr && Object.keys(queryStr).length) query = Model.findOneAndDelete(queryStr)
+    const data = await query
     // const isDeleted = await Cabin.findOne({ _id: id })
     if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found with this id`)
 

@@ -66,7 +66,7 @@ const updateOne = (fn: ControllerFn) =>
 
 const deleteOne = (fn: ControllerFn) =>
   async function (req: Request, res: Response) {
-    const { data, collectionName } = await fn({ id: req.params.id })
+    const { data, collectionName } = await fn({ id: req.params.id, queryStr: req.query })
 
     const formatCollectionName = collectionName.slice(0, collectionName.length - 1)
 

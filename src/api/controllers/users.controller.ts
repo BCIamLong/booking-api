@@ -28,7 +28,8 @@ const updateUser = updateOne(async (options) => {
 })
 
 const deleteUser = deleteOne(async (options) => {
-  const { data, collectionName } = await removeUser(options.id || '')
+  const { data, collectionName } = await removeUser(options)
+  // const { data, collectionName } = await removeUser(options.id || '')
 
   return { data, collectionName }
 })
