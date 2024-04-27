@@ -98,8 +98,7 @@ reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
     select: 'fullName avatar'
-  })
-  // .populate({ path: 'cabin', select: 'ratingAverage ratingQuantity' })
+  }).populate({ path: 'cabin', select: 'name' })
 
   next()
 })

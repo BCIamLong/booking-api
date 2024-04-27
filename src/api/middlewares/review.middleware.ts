@@ -6,6 +6,11 @@ const { authorize } = authMiddleware
 const reviewsQueryModifier = async function (req: Request, res: Response, next: NextFunction) {
   const { cabinId, userId, userSlug } = req.params
 
+  if (req.baseUrl.split('/').includes('me')) {
+    req.query.user = req.user.id
+    return next()
+  }
+
   if (cabinId) {
     if (req.method === 'POST') {
       // console.log('run ok')
