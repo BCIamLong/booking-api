@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Schema, model } from 'mongoose'
+import mongoose, { Model, Schema, model } from 'mongoose'
 import { IReview } from '~/api/interfaces'
 import Cabin from './cabin.model'
 
@@ -65,6 +65,34 @@ const reviewSchema = new Schema(
 
 reviewSchema.index({ cabin: 1, user: 1 }, { unique: true })
 
+reviewSchema.methods.updateCabinWithReview = async function (model: Model<IReview>, cabinId: string) {
+  const stats = await model.aggregate([
+    {
+      $match: { cabin: cabinId }
+    },
+    {
+      $group: {
+        _id: null,
+        ratingQuantity: { $sum: 1 },
+        ratingAverage: { $avg: '$rating' }
+      }
+    }
+  ])
+
+  console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
+  const ratingQuantity = stats[0]?.ratingQuantity || 0
+  const ratingAverage = stats[0]?.ratingAverage || 5
+  // await this.model('Cabin').findByIdAndUpdate(
+  await Cabin.findByIdAndUpdate(
+    cabinId,
+    // doc.cabin.split('$')[1],
+    { ratingQuantity, ratingAverage },
+    {
+      runValidators: true
+    }
+  )
+}
+
 reviewSchema.pre(/^find/, function (next) {
   // @ts-ignore
   this.populate({
@@ -76,32 +104,54 @@ reviewSchema.pre(/^find/, function (next) {
   next()
 })
 
-reviewSchema.post('save', async function (doc, next) {
-  const stats = await this.model('Review').aggregate([
-    {
-      $match: { cabin: doc.cabin }
-    },
-    {
-      $group: {
-        _id: null,
-        ratingQuantity: { $sum: 1 },
-        ratingAverage: { $avg: '$rating' }
-      }
-    }
-  ])
-  // console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
-  const { ratingQuantity, ratingAverage } = stats[0] || {}
-  // await this.model('Cabin').findByIdAndUpdate(
-  await Cabin.findByIdAndUpdate(
-    doc.cabin,
-    // doc.cabin.split('$')[1],
-    { ratingQuantity, ratingAverage },
-    {
-      runValidators: true
-    }
-  )
-  next()
-})
+reviewSchema.post(
+  'findOneAndDelete',
+  async function (doc: IReview & { updateCabinWithReview: (model: Model<IReview>, cabinId: string) => void }, next) {
+    doc.updateCabinWithReview(mongoose.model<IReview>('Review'), doc.cabin)
+    next()
+  }
+)
+
+reviewSchema.post(
+  'findOneAndUpdate',
+  async function (doc: IReview & { updateCabinWithReview: (model: Model<IReview>, cabinId: string) => void }, next) {
+    doc.updateCabinWithReview(mongoose.model<IReview>('Review'), doc.cabin)
+    next()
+  }
+)
+
+reviewSchema.post(
+  'save',
+  async function (doc: IReview & { updateCabinWithReview: (model: Model<IReview>, cabinId: string) => void }, next) {
+    doc.updateCabinWithReview(mongoose.model<IReview>('Review'), doc.cabin)
+    // doc.updateCabinWithReview(this.model('Review'), doc.cabin)
+
+    // const stats = await this.model('Review').aggregate([
+    //   {
+    //     $match: { cabin: doc.cabin }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       ratingQuantity: { $sum: 1 },
+    //       ratingAverage: { $avg: '$rating' }
+    //     }
+    //   }
+    // ])
+    // // console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
+    // const { ratingQuantity, ratingAverage } = stats[0] || {}
+    // // await this.model('Cabin').findByIdAndUpdate(
+    // await Cabin.findByIdAndUpdate(
+    //   doc.cabin,
+    //   // doc.cabin.split('$')[1],
+    //   { ratingQuantity, ratingAverage },
+    //   {
+    //     runValidators: true
+    //   }
+    // )
+    next()
+  }
+)
 
 const Review = model<IReview>('Review', reviewSchema)
 export default Review

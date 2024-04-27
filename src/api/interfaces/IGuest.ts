@@ -18,7 +18,7 @@ export interface IGuestInput {
   deactivatedReason?: string
   deleteAt?: Date
   deactivatedAt?: Date
-  photo?: string
+  avatar?: File | string
   role?: 'user'
   otp2FAAuthUrl?: string
   otp2FAToken?: string

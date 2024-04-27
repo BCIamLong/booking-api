@@ -64,6 +64,12 @@ const createCabinSchema = Joi.object({
  *     image:
  *      type: string
  *      default: cozy_cabin.jpg
+ *     ratingAverage:
+ *      type: number
+ *      default: 4
+ *     ratingQuantity:
+ *      type: number
+ *      default: 12
  */
 const updateCabinSchema = Joi.object({
   name: Joi.string(),
@@ -71,7 +77,9 @@ const updateCabinSchema = Joi.object({
   regularPrice: Joi.number().min(0),
   discount: Joi.number().min(0),
   description: Joi.string(),
-  image: Joi.string()
+  image: Joi.string(),
+  ratingAverage: Joi.number().max(5).min(0),
+  ratingQuantity: Joi.number().min(0)
 })
 
 export default { createCabinSchema, updateCabinSchema }

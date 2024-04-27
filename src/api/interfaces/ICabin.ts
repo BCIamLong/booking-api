@@ -7,6 +7,8 @@ export interface ICabinInput {
   discount: number
   description: string
   image: string
+  ratingAverage?: number
+  ratingQuantity?: number
   createdAt: Date
   updatedAt: Date
 }
