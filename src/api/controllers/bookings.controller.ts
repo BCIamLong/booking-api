@@ -57,7 +57,11 @@ const getUserBooking = async function (req: Request, res: Response) {
 }
 
 const getUserBookings = async function (req: Request, res: Response) {
-  const { data: userBookings } = await fetchBookings({ guestId: req.user.id, sort: '-createdAt' })
+  const { cabinId } = req.params
+  const queryOb: { guestId: string; sort: string; cabinId?: string } = { guestId: req.user.id, sort: '-createdAt' }
+  if (cabinId) queryOb.cabinId = cabinId
+
+  const { data: userBookings } = await fetchBookings(queryOb)
 
   res.json({
     status: 'success',

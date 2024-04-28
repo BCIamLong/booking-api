@@ -4,6 +4,7 @@ import { asyncCatch } from '../utils'
 import { validator, cabinSchema } from '../validators'
 import { authMiddleware } from '../middlewares'
 import reviewRouter from './review.route'
+import bookingRouter from './bookings.route'
 
 const { createCabinSchema, updateCabinSchema } = cabinSchema
 const { getCabins, getCabin, postCabin, updateCabin, deleteCabin } = cabinsController
@@ -12,6 +13,7 @@ const { authenticate, authorize, auth2FA } = authMiddleware
 const cabinsRouter = Router()
 
 cabinsRouter.use('/:cabinId/reviews', reviewRouter)
+cabinsRouter.use('/:cabinId/bookings', bookingRouter)
 
 cabinsRouter
   .route('/')

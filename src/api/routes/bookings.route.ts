@@ -19,7 +19,7 @@ const {
 } = bookingsController
 const { authenticate, authorize, auth2FA } = authMiddleware
 
-const bookingRouter = Router()
+const bookingRouter = Router({ mergeParams: true })
 
 bookingRouter.delete('/:id/me', authenticate, auth2FA, authorize('user'), asyncCatch(deleteUserBooking))
 
