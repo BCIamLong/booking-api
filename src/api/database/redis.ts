@@ -5,7 +5,11 @@ import { createClient } from 'redis'
 // const { REDIS_URI } = dbConfig
 import { jwtConfig } from '~/config'
 
-const redisClient = createClient()
+const redisClient = createClient({
+  socket: {
+    connectTimeout: 10000
+  }
+})
 const { REFRESH_TOKEN_EXPIRES } = jwtConfig
 // redisClient.set = util.promisify(redisClient.set) //! we don't need to do it now from v4 Redis all the functions from redis client are come with native promisify
 
