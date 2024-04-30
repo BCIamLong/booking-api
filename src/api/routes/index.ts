@@ -7,6 +7,7 @@ import bookingRouter from './bookings.route'
 import userRouter from './users.route'
 import authRouter from './auth.route'
 import reviewRouter from './review.route'
+import bookmarksRouter from './bookmarks.route'
 import { IGuest, IUser } from '../interfaces'
 
 const router = Router()
@@ -73,5 +74,6 @@ router.use('/api/v1/guests', guestRouter)
 router.use('/api/v1/bookings', bookingRouter)
 router.use('/api/v1/reviews', reviewRouter)
 router.use('/api/v1/settings', settingsRouter)
+router.use('/api/v1/bookmarks', bookmarksRouter)
 
 export default router
