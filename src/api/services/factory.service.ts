@@ -6,15 +6,23 @@ import { QueryStr } from '../utils/APIFeatures'
 const fetchAll =
   <T>(Model: Model<T>) =>
   async (queryStr?: QueryStr): Promise<{ data: T[]; count: number; collectionName: string }> => {
-    const count = await Model.countDocuments()
-    const apiFeatures = new APIFeatures<T>(Model.find(), queryStr).filter().sort().selectFields().pagination(count)
+    // const count = await Model.countDocuments()
+    // * we want the count reflect to the count of docs after we query them, we don't want it always fixed by the count of all docs right
+    // * this is really important because we want to do some actions after we query like pagination we need the correct count of docs after query right
+    const countDocs = await new APIFeatures<T>(Model.find(), queryStr).filter().query
+
+    const apiFeatures = new APIFeatures<T>(Model.find(), queryStr)
+      .filter()
+      .sort()
+      .selectFields()
+      .pagination(countDocs.length)
     let query
     if (queryStr) query = apiFeatures.query
     else query = Model.find()
 
     const data = await query
 
-    return { data, count, collectionName: Model.collection.collectionName }
+    return { data, count: countDocs?.length, collectionName: Model.collection.collectionName }
   }
 
 const fetchOne =
