@@ -5,6 +5,7 @@ import bookingsController from './bookings.controller'
 import usersController from './users.controller'
 import authController from './auth.controller'
 import reviewController from './review.controller'
+import bookmarksController from './bookmarks.controller'
 
 export {
   cabinsController,
@@ -13,5 +14,6 @@ export {
   bookingsController,
   usersController,
   authController,
-  reviewController
+  reviewController,
+  bookmarksController
 }

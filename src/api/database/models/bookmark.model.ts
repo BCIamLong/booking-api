@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Schema, model } from 'mongoose'
+import { IBookmark } from '~/api/interfaces'
 
 const bookmarkSchema = new Schema(
   {
@@ -27,6 +28,6 @@ const bookmarkSchema = new Schema(
   }
 )
 
-const Bookmark = model('Bookmark', bookmarkSchema)
+const Bookmark = model<IBookmark>('Bookmark', bookmarkSchema)
 
 export default Bookmark
