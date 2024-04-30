@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Schema, model } from 'mongoose'
+
+import Cabin from './cabin.model'
+import Guest from './guest.model'
 import { IBookmark } from '~/api/interfaces'
+import { AppError } from '~/api/utils'
 
 /**
  * @openapi
@@ -49,6 +53,17 @@ const bookmarkSchema = new Schema(
     timestamps: true
   }
 )
+
+bookmarkSchema.pre('save', async function (next) {
+  const { cabin } = this
+  // * we have authenticate to check the current user therefore we don't need do this
+  // const isUserExist = await Guest.findById(user)
+  // if(isUserExist) throw new AppError(400, )
+  const isCabinExist = await Cabin.findById(cabin)
+  if (!isCabinExist) throw new AppError(400, "We have no way to bookmark the cabin doesn't exist")
+
+  next()
+})
 
 const Bookmark = model<IBookmark>('Bookmark', bookmarkSchema)
 
