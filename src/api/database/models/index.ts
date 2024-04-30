@@ -4,5 +4,6 @@ import Setting from './setting.model'
 import Booking from './booking.model'
 import User from './user.model'
 import Review from './review.model'
+import Bookmark from './bookmark.model'
 
-export { Cabin, Guest, Setting, Booking, User, Review }
+export { Cabin, Guest, Setting, Booking, User, Review, Bookmark }

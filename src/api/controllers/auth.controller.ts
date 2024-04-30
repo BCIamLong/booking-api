@@ -61,6 +61,14 @@ const setCookies = function (res: Response, accessToken: string, refreshToken: s
     ...cookieOptions,
     expires: new Date(Date.now() + Number(REFRESH_TOKEN_EXPIRES!))
   })
+
+  // * add cookie for cors
+  // ! problem when we set cookie only for server because we only have the probably set cookie as cors when our http is secure so https
+  // * that mean we will handle this issues in the deployment process
+  // res.cookie('access-token', accessToken, {
+  //   ...cookieOptions,
+  //   expires: new Date(Date.now() + Number(ACCESS_TOKEN_EXPIRES!))
+  // })
 }
 
 const deleteCookies = function (res: Response) {

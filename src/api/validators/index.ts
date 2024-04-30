@@ -9,6 +9,7 @@ import bookingSchema from './booking.schema'
 import userSchema from './user.schema'
 import authSchema from './auth.schema'
 import reviewSchema from './review.schema'
+import bookmarkSchema from './bookmark.schema'
 
 export const validator = (schema: ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
   // console.log(req.file, req.body)
@@ -23,4 +24,4 @@ export const validator = (schema: ObjectSchema) => (req: Request, res: Response,
   next()
 }
 
-export { cabinSchema, guestSchema, settingSchema, bookingSchema, userSchema, authSchema, reviewSchema }
+export { cabinSchema, guestSchema, settingSchema, bookingSchema, userSchema, authSchema, reviewSchema, bookmarkSchema }
