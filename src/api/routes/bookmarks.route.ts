@@ -2,11 +2,14 @@ import { Router } from 'express'
 
 import { asyncCatch } from '../utils'
 import { bookmarksController } from '../controllers'
-import { authMiddleware } from '../middlewares'
+import { authMiddleware, bookmarkMiddleware } from '../middlewares'
+import { validator, bookmarkSchema } from '../validators'
 
 const bookmarksRouter = Router()
 const { getBookmark, getBookmarks, postBookmark, updateBookmark, deleteBookmark } = bookmarksController
 const { auth2FA, authenticate, authorize } = authMiddleware
+const { createBookmarkSchema, updateBookmarkSchema } = bookmarkSchema
+const { bookmarksQueryModifier } = bookmarkMiddleware
 
 bookmarksRouter.use(authenticate, auth2FA)
 
@@ -48,7 +51,7 @@ bookmarksRouter
   .get(asyncCatch(getBookmarks))
   /**
    * @openapi
-   * '/api/v1/bookmarks':
+   * '/api/v1/cabins/{cabinId}/bookmarks':
    *  post:
    *   tags:
    *   - Bookmark
@@ -56,7 +59,7 @@ bookmarksRouter
    *    - bearerAuth: []
    *    - cookieAuth: []
    *    - refreshCookieAuth: []
-   *   summary: create bookmark
+   *   summary: create bookmark for a cabin
    *   requestBody:
    *    required: true
    *    content:
@@ -86,7 +89,7 @@ bookmarksRouter
    *
    *
    */
-  .post(authorize('user'), asyncCatch(postBookmark))
+  .post(authorize('user'), bookmarksQueryModifier, validator(createBookmarkSchema), asyncCatch(postBookmark))
 
 bookmarksRouter
   .route('/:id')

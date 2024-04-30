@@ -5,6 +5,7 @@ import { validator, cabinSchema } from '../validators'
 import { authMiddleware } from '../middlewares'
 import reviewRouter from './review.route'
 import bookingRouter from './bookings.route'
+import bookmarksRouter from './bookmarks.route'
 
 const { createCabinSchema, updateCabinSchema } = cabinSchema
 const { getCabins, getCabin, postCabin, updateCabin, deleteCabin } = cabinsController
@@ -14,6 +15,7 @@ const cabinsRouter = Router()
 
 cabinsRouter.use('/:cabinId/reviews', reviewRouter)
 cabinsRouter.use('/:cabinId/bookings', bookingRouter)
+cabinsRouter.use('/:cabinId/bookmarks', bookmarksRouter)
 
 cabinsRouter
   .route('/')
