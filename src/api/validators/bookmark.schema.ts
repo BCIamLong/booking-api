@@ -22,8 +22,8 @@ import Joi from 'joi'
  *      default: http://localhost:5137/cabins/cabin4
  */
 const createBookmarkSchema = Joi.object({
-  user: Joi.string().uuid().required(),
-  cabin: Joi.string().uuid().required(),
+  user: Joi.string().required(),
+  cabin: Joi.string().required(),
   link: Joi.string().required()
 })
 

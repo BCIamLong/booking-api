@@ -5,6 +5,7 @@ import { authController } from '../controllers'
 import { asyncCatch } from '../utils'
 import { uploadConfig } from '~/config'
 import reviewRouter from './review.route'
+import bookmarksRouter from './bookmarks.route'
 
 const { upload } = uploadConfig
 
@@ -43,6 +44,7 @@ const { authenticate, auth2FA } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
 
 authRouter.use('/me/reviews', reviewRouter)
+authRouter.use('/me/bookmarks', bookmarksRouter)
 
 authRouter.get('/login/oauth/google', asyncCatch(loginWithGoogle))
 

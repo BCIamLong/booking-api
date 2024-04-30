@@ -3,8 +3,8 @@ import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.control
 
 const { fetchBookmarks, fetchBookmark, editBookmark, createBookmark, removeBookmark } = bookmarksService
 
-const getBookmarks = getAll(async () => {
-  const { data, collectionName } = await fetchBookmarks()
+const getBookmarks = getAll(async (options) => {
+  const { data, collectionName } = await fetchBookmarks(options.queryStr)
   return { data, collectionName }
 })
 

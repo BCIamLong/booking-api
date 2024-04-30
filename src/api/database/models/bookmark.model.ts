@@ -65,6 +65,12 @@ bookmarkSchema.pre('save', async function (next) {
   next()
 })
 
+bookmarkSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.populate('cabin')
+  next()
+})
+
 const Bookmark = model<IBookmark>('Bookmark', bookmarkSchema)
 
 export default Bookmark

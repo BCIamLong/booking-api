@@ -5,7 +5,7 @@ import { bookmarksController } from '../controllers'
 import { authMiddleware, bookmarkMiddleware } from '../middlewares'
 import { validator, bookmarkSchema } from '../validators'
 
-const bookmarksRouter = Router()
+const bookmarksRouter = Router({ mergeParams: true })
 const { getBookmark, getBookmarks, postBookmark, updateBookmark, deleteBookmark } = bookmarksController
 const { auth2FA, authenticate, authorize } = authMiddleware
 const { createBookmarkSchema, updateBookmarkSchema } = bookmarkSchema
@@ -47,8 +47,39 @@ bookmarksRouter
    *     description: Not found
    *    500:
    *     description: Something went wrong
+   * @openapi
+   * '/api/v1/auth/me/bookmarks':
+   *  get:
+   *   tags:
+   *   - Bookmark
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get all bookmarks of the current user
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           bookmarks:
+   *            type: array
+   *            items:
+   *             $ref: '#/components/schemas/BookmarkResponse'
+   *    404:
+   *     description: Not found
+   *    500:
+   *     description: Something went wrong
    */
-  .get(asyncCatch(getBookmarks))
+  .get(bookmarksQueryModifier, asyncCatch(getBookmarks))
   /**
    * @openapi
    * '/api/v1/cabins/{cabinId}/bookmarks':
