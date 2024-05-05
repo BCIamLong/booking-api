@@ -31,7 +31,8 @@ const {
   validate2FAOtpService,
   disable2FAService,
   getUserSessionService,
-  updateCurrentUserService
+  updateCurrentUserService,
+  getCurrentUserService
 } = authService
 const { findAndUpdateGuest, editGuest } = guestsService
 const { editUser } = usersService
@@ -418,6 +419,17 @@ const updatePassword = async function (req: Request, res: Response) {
   })
 }
 
+const getCurrentUser = async function (req: Request, res: Response) {
+  const user = await getCurrentUserService(req.user.id)
+
+  res.json({
+    status: 'success',
+    data: {
+      user
+    }
+  })
+}
+
 const deleteCurrentUser = async function (req: Request, res: Response) {
   // ! don't allow the admin can delete themselves because it can lead to many issues especially if that admin is responsible for managing system...
   // * user go to the page delete user themselves and choose the reason to delete app
@@ -538,5 +550,6 @@ export default {
   verify2FAOtp,
   validate2FAOtp,
   disable2FA,
-  getUserSession
+  getUserSession,
+  getCurrentUser
 }

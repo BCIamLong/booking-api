@@ -375,6 +375,13 @@ const disable2FAService = async function ({ id, role }: { id: string; role: stri
   // if (role === 'admin') await editUser(id, { otp2FAToken: undefined, otp2FAAuthUrl: undefined, enable2FA: false })
 }
 
+const getCurrentUserService = async function (id: string) {
+  const user = await isUserExisted({ field: '_id', value: id })
+  if (!user) throw new AppError(404, 'No users found')
+
+  return user
+}
+
 const getUserSessionService = async function ({ role }: { role: string }) {
   let user
   if (role === 'admin') user = await getCache({ key: 'user', model: User })
@@ -421,5 +428,6 @@ export default {
   validate2FAOtpService,
   disable2FAService,
   getUserSessionService,
-  updateCurrentUserService
+  updateCurrentUserService,
+  getCurrentUserService
 }

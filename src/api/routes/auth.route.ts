@@ -38,7 +38,8 @@ const {
   verify2FAOtp,
   validate2FAOtp,
   disable2FA,
-  getUserSession
+  getUserSession,
+  getCurrentUser
 } = authController
 const { authenticate, auth2FA } = authMiddleware
 const { resizeAndUploadAvatarToCloud } = uploadMiddleware
@@ -294,6 +295,112 @@ authRouter.post('/2FA/validate-otp', validator(validate2FAOtpSchema), asyncCatch
 
 authRouter.use(auth2FA)
 
+authRouter
+  .route('/me')
+  /**
+   * @openapi
+   * '/api/v1/auth/me':
+   *  get:
+   *   tags:
+   *   - Auth
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get the current user
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           user:
+   *            $ref: '#components/schemas/UserResponse'
+   *    401:
+   *     description: Unauthorized
+   *    403:
+   *     description: Forbidden
+   *    500:
+   *     description: Something went wrong
+   */
+  .get(asyncCatch(getCurrentUser))
+  /**
+   * @openapi
+   * '/api/v1/auth/me':
+   *  post:
+   *   tags:
+   *   - Auth
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: delete the user themselves
+   *   requestBody:
+   *    required: true
+   *    content:
+   *     application/json:
+   *      schema:
+   *       $ref: '#components/schemas/DeleteCurrentUserInput'
+   *   responses:
+   *    204:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        $ref: '#components/schemas/DeleteCurrentUserResponse'
+   *    400:
+   *     description: Bad request
+   *    401:
+   *     description: Unauthorized
+   *    500:
+   *     description: Something went wrong
+   */
+  .post(asyncCatch(deleteCurrentUser))
+  /**
+   * @openapi
+   * '/api/v1/auth/me':
+   *  patch:
+   *   tags:
+   *   - Auth
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: update the user profile
+   *   consumes:
+   *    - multipart/form-data
+   *   requestBody:
+   *    required: true
+   *    content:
+   *     multipart/form-data:
+   *      schema:
+   *       $ref: '#components/schemas/UpdateCurrentUserInput'
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        $ref: '#components/schemas/UpdateCurrentUserResponse'
+   *    401:
+   *     description: Unauthorized
+   *    500:
+   *     description: Something went wrong
+   */
+  .patch(
+    asyncCatch(upload.single('avatar')),
+    resizeAndUploadAvatarToCloud,
+    validator(updateCurrentUserSchema),
+    asyncCatch(updateCurrentUser)
+  )
+
 /**
  * @openapi
  * '/api/v1/auth/2FA/generate-otp':
@@ -419,39 +526,6 @@ authRouter.get('/logout', asyncCatch(logout))
 
 /**
  * @openapi
- * '/api/v1/auth/delete-me':
- *  delete:
- *   tags:
- *   - Auth
- *   security:
- *    - bearerAuth: []
- *    - cookieAuth: []
- *    - refreshCookieAuth: []
- *   summary: delete the user themselves
- *   requestBody:
- *    required: true
- *    content:
- *     application/json:
- *      schema:
- *       $ref: '#components/schemas/DeleteCurrentUserInput'
- *   responses:
- *    204:
- *     description: Success
- *     content:
- *      application/json:
- *       schema:
- *        $ref: '#components/schemas/DeleteCurrentUserResponse'
- *    400:
- *     description: Bad request
- *    401:
- *     description: Unauthorized
- *    500:
- *     description: Something went wrong
- */
-authRouter.patch('/delete-me', asyncCatch(deleteCurrentUser))
-
-/**
- * @openapi
  * '/api/v1/auth/update-password/verify':
  *  post:
  *   tags:
@@ -516,45 +590,6 @@ authRouter.post('/update-password/verify', validator(checkCurrentPasswordSchema)
  *     description: Something went wrong
  */
 authRouter.patch('/update-password/:token', validator(updatePasswordSchema), asyncCatch(updatePassword))
-
-/**
- * @openapi
- * '/api/v1/auth/update-me':
- *  patch:
- *   tags:
- *   - Auth
- *   security:
- *    - bearerAuth: []
- *    - cookieAuth: []
- *    - refreshCookieAuth: []
- *   summary: update the user profile
- *   consumes:
- *    - multipart/form-data
- *   requestBody:
- *    required: true
- *    content:
- *     multipart/form-data:
- *      schema:
- *       $ref: '#components/schemas/UpdateCurrentUserInput'
- *   responses:
- *    200:
- *     description: Success
- *     content:
- *      application/json:
- *       schema:
- *        $ref: '#components/schemas/UpdateCurrentUserResponse'
- *    401:
- *     description: Unauthorized
- *    500:
- *     description: Something went wrong
- */
-authRouter.patch(
-  '/update-me',
-  asyncCatch(upload.single('avatar')),
-  resizeAndUploadAvatarToCloud,
-  validator(updateCurrentUserSchema),
-  asyncCatch(updateCurrentUser)
-)
 
 export default authRouter
 
