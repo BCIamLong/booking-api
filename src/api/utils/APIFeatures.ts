@@ -1,5 +1,9 @@
 import { Query, Model } from 'mongoose'
+
 import AppError from './AppError'
+import redis from '../database/redis'
+
+const { getCache, setCache } = redis
 
 interface Operations {
   gt?: string
@@ -73,15 +77,37 @@ export default class APIFeatures<T> {
     return this
   }
 
-  pagination(count: number) {
+  async pagination(count: number) {
     const limitVal = Number(this.queryStr.limit) || 10
     const pageVal = Number(this.queryStr.page) || 1
     const skipVal = (pageVal - 1) * limitVal
     const totalPage = Math.ceil(count / limitVal) || 1
 
-    if (pageVal <= totalPage) this.query = this.query.limit(limitVal).skip(skipVal)
-    else throw new AppError(404, 'The page you looking for is not found!')
+    if (pageVal > totalPage) throw new AppError(404, 'The page you looking for is not found!')
 
+    // * 1 check the data is cached in the cache?
+    // * 2 if true then just get the data from the cache based on the current page and return it
+    // * 3 if false loop and fetch data of all pages then store it to the cache (each page), then return the data from the current page
+    // * 4 promise this data
+    // console.log(this.query.model)
+    const dataCached = await getCache({ hashKey: 'page', key: String(pageVal), model: this.query.model })
+
+    if (dataCached) {
+      console.log('ok')
+      this.query = Promise.resolve(dataCached) as Query<T[], T>
+      return this
+    }
+    // console.log(dataCached)
+
+    const data = await this.query.limit(limitVal).skip(skipVal)
+
+    setCache(String(pageVal), 'page', JSON.stringify(data))
+    this.query = Promise.resolve(data) as Query<T[], T>
+
+    // if (pageVal <= totalPage) this.query = this.query.limit(limitVal).skip(skipVal)
+    // else throw new AppError(404, 'The page you looking for is not found!')
+
+    // return this
     return this
   }
 }

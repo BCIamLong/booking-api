@@ -3,13 +3,14 @@ import { Model } from 'mongoose'
 import { createClient } from 'redis'
 // import { dbConfig } from '~/config'
 // const { REDIS_URI } = dbConfig
-import { jwtConfig } from '~/config'
+import { jwtConfig, dbConfig } from '~/config'
 
-const redisClient = createClient({
-  socket: {
-    connectTimeout: 10000
-  }
-})
+// const redisClient = createClient({
+//   socket: {
+//     connectTimeout: 10000
+//   }
+// })
+const { redisClient } = dbConfig
 const { REFRESH_TOKEN_EXPIRES } = jwtConfig
 // redisClient.set = util.promisify(redisClient.set) //! we don't need to do it now from v4 Redis all the functions from redis client are come with native promisify
 
@@ -18,19 +19,24 @@ const { REFRESH_TOKEN_EXPIRES } = jwtConfig
 // * BUT WITH REDIS IN THIS CASE WE JUST CACHE THEN JUST PUT ALL OF THESE QUERY METHOD RIGHT HERE
 
 const getCache = async function <T>({ key, hashKey = '', model }: { key: string; hashKey?: string; model: Model<T> }) {
-  let data
-  if (hashKey) {
-    // ! WE DON'T USE NEW MODEL() TO CONVERT THE DATA BACK TO DOCUMENT OF MONGOOSE BECAUSE IT WILL TRY TO CREATE NEW ONE AND OF COURSE IT WILL CREATE THE CONFLICT BECAUSE THIS DATA IS ALREADY EXIST IN OUR DB RIGHT THEN IT CAN CREATE THE CONFLICT LIKE DUPLICATE ID
-    // * THEREFORE WE NEED TO USE MODEL.HYDRATE BASICALLY COVERT THE DATA BACK TO MONGO DOCUMENT AND DON'T TRY TO CREATE NEW ONE SO THAT'S WHAT WE WANT IN THIS CASE
-    const dataRaw = await redisClient.hGet(hashKey, key)
-    data = JSON.parse(dataRaw!)
-    if (Array.isArray(data)) return data.map((item) => model.hydrate(item))
+  try {
+    let data
+    if (hashKey) {
+      // ! WE DON'T USE NEW MODEL() TO CONVERT THE DATA BACK TO DOCUMENT OF MONGOOSE BECAUSE IT WILL TRY TO CREATE NEW ONE AND OF COURSE IT WILL CREATE THE CONFLICT BECAUSE THIS DATA IS ALREADY EXIST IN OUR DB RIGHT THEN IT CAN CREATE THE CONFLICT LIKE DUPLICATE ID
+      // * THEREFORE WE NEED TO USE MODEL.HYDRATE BASICALLY COVERT THE DATA BACK TO MONGO DOCUMENT AND DON'T TRY TO CREATE NEW ONE SO THAT'S WHAT WE WANT IN THIS CASE
+      const dataRaw = await redisClient.hGet(hashKey, key)
+      if (!dataRaw) return null
+      data = JSON.parse(dataRaw!)
+      if (Array.isArray(data)) return data.map((item) => model?.hydrate(item))
+      // console.log(model)
+      return model?.hydrate(data)
+    }
 
-    return model.hydrate(data)
+    data = await redisClient.get(key)
+    return model?.hydrate(JSON.parse(data!))
+  } catch (error) {
+    console.log(error)
   }
-
-  data = await redisClient.get(key)
-  return model.hydrate(JSON.parse(data!))
 }
 
 const setCache = async function (key: string, hashKey: string = '', value: string) {

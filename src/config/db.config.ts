@@ -77,8 +77,24 @@ const mongooseConfigWithRedis = async function (redisClient: ReturnType<typeof c
   }
 }
 
+let redisClient = createClient({
+  socket: {
+    connectTimeout: 10000
+  }
+})
+
+if (process.env.NODE_ENV === 'production')
+  redisClient = createClient({
+    password: process.env.REDIS_CLOUD_PWD,
+    socket: {
+      host: process.env.REDIS_CLOUD_HOST,
+      port: +process.env.PORT!
+    }
+  })
+
 export default {
   DB_LOCAL: process.env.MONGODB_LOCAL,
   REDIS_URI: process.env.REDIS_LOCAL,
-  mongooseConfigWithRedis
+  mongooseConfigWithRedis,
+  redisClient
 }

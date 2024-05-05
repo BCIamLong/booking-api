@@ -11,11 +11,10 @@ const fetchAll =
     // * this is really important because we want to do some actions after we query like pagination we need the correct count of docs after query right
     const countDocs = await new APIFeatures<T>(Model.find(), queryStr).filter().query
 
-    const apiFeatures = new APIFeatures<T>(Model.find(), queryStr)
-      .filter()
-      .sort()
-      .selectFields()
-      .pagination(countDocs.length)
+    let apiFeatures = new APIFeatures<T>(Model.find(), queryStr).filter().sort().selectFields()
+
+    if (queryStr?.page) apiFeatures = await apiFeatures.pagination(countDocs?.length)
+
     let query
     if (queryStr) query = apiFeatures.query
     else query = Model.find()

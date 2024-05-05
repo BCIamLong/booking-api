@@ -190,6 +190,7 @@ const logoutService = async function ({ id, role, enable2FA }: { id: string; rol
   if (role === 'user') await editGuest(id, { verify2FAOtp: false })
 
   await deleteCache('user')
+  await deleteCache('page')
 }
 
 const updateCurrentUserService = async function ({
