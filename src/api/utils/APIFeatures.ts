@@ -2,8 +2,10 @@ import { Query, Model } from 'mongoose'
 
 import AppError from './AppError'
 import redis from '../database/redis'
+import { appConfig } from '~/config'
 
 const { getCache, setCache } = redis
+const { PAGE_LIMIT } = appConfig
 
 interface Operations {
   gt?: string
@@ -59,6 +61,7 @@ export default class APIFeatures<T> {
     // * sort=duration => sort: 'price'
 
     const sortQueryStr = Array.isArray(sortVal) ? sortVal.join(' ') : sortVal
+
     this.query = this.query.sort(sortQueryStr)
     return this
   }
@@ -78,7 +81,7 @@ export default class APIFeatures<T> {
   }
 
   async pagination(count: number) {
-    const limitVal = Number(this.queryStr.limit) || 10
+    const limitVal = Number(this.queryStr.limit) || PAGE_LIMIT
     const pageVal = Number(this.queryStr.page) || 1
     const skipVal = (pageVal - 1) * limitVal
     const totalPage = Math.ceil(count / limitVal) || 1
@@ -90,7 +93,7 @@ export default class APIFeatures<T> {
     // * 3 if false loop and fetch data of all pages then store it to the cache (each page), then return the data from the current page
     // * 4 promise this data
     // console.log(this.query.model)
-    const dataCached = await getCache({ hashKey: 'page', key: String(pageVal), model: this.query.model })
+    const dataCached = await getCache({ hashKey: 'page', key: `${pageVal}-${this.queryStr}`, model: this.query.model })
 
     if (dataCached) {
       console.log('ok')
