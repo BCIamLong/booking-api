@@ -118,7 +118,30 @@ const bookingSchema = new Schema(
 // *https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/
 bookingSchema.index({ cabinId: 1, guestId: -1 })
 
-bookingSchema.pre(/^find/, function (next) {
+bookingSchema.pre(/^find/, async function (next) {
+  // const data = await mongoose.model('Booking').aggregate([
+  //   {
+  //     $match: {
+  //       endDate: { $lt: new Date() }
+  //     }
+  //   },
+  //   {
+  //     $set: {
+  //       status: 'checked-out'
+  //     }
+  //   }
+  // ])
+  // * update the status automatically if the endDate is less than the current date
+  await mongoose.model('Booking').updateMany(
+    { endDate: { $lt: new Date() }, status: { $ne: 'checked-out' } },
+    {
+      $set: {
+        status: 'checked-out'
+      }
+    }
+  )
+  // console.log(data)
+
   // @ts-ignore
   this.populate({ path: 'cabinId', select: 'name' })
   next()
