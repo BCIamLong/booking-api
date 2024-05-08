@@ -6,6 +6,7 @@ import { asyncCatch } from '../utils'
 import { uploadConfig } from '~/config'
 import reviewRouter from './review.route'
 import bookmarksRouter from './bookmarks.route'
+import bookingRouter from './bookings.route'
 
 const { upload } = uploadConfig
 
@@ -46,6 +47,7 @@ const { resizeAndUploadAvatarToCloud } = uploadMiddleware
 
 authRouter.use('/me/reviews', reviewRouter)
 authRouter.use('/me/bookmarks', bookmarksRouter)
+authRouter.use('/me/bookings', bookingRouter)
 
 authRouter.get('/login/oauth/google', asyncCatch(loginWithGoogle))
 
