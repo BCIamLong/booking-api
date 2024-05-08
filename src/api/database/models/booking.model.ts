@@ -143,7 +143,7 @@ bookingSchema.pre(/^find/, async function (next) {
   // console.log(data)
 
   // @ts-ignore
-  this.populate({ path: 'cabinId', select: 'name' })
+  this.populate({ path: 'cabinId', select: 'name discount' })
   next()
 })
 
