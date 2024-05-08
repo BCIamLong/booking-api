@@ -137,4 +137,16 @@ const updateBookingSchema = Joi.object({
   observation: Joi.string()
 })
 
-export default { createBookingSchema, updateBookingSchema }
+const checkoutBookingSchema = Joi.object({
+  cabinId: Joi.string().required(),
+  name: Joi.string().required(),
+  description: Joi.string().required(),
+  image: Joi.string().required(),
+  startDate: Joi.date().required(),
+  endDate: Joi.date().required(),
+  numNights: Joi.number().required().strict(true),
+  numGuests: Joi.number().required().strict(true),
+  regularPrice: Joi.number().required().strict(true)
+})
+
+export default { createBookingSchema, updateBookingSchema, checkoutBookingSchema }

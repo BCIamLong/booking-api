@@ -10,8 +10,8 @@ const { CLIENT_ORIGIN, appEmitter } = appConfig
 const { fetchCabin } = cabinsService
 const { fetchBookings, fetchBooking, editBooking, createBooking, removeBooking, removeUserBooking } = bookingsService
 
-const getBookings = getAll(async () => {
-  const { data, collectionName } = await fetchBookings()
+const getBookings = getAll(async (options) => {
+  const { data, collectionName } = await fetchBookings(options.queryStr)
   return { data, collectionName }
 })
 const getBooking = getOne(async (options) => {
@@ -70,21 +70,23 @@ const getUserBookings = async function (req: Request, res: Response) {
 }
 
 const createBookingCheckout = async function (req: Request, res: Response) {
-  const { user, cabin, price } = req.query
-  if (!user || !cabin || !price) throw new AppError(400, 'Purchase process is failed')
+  const { user, cabin, price, endDate, startDate, numGuests, numNights } = req.query
+  if (!user || !cabin || !price || !startDate || !endDate || !numGuests || !numNights)
+    throw new AppError(400, 'Purchase process is failed')
   const { data: cabinData } = await fetchCabin(cabin as string)
+  const { regularPrice } = cabinData
   const { data: booking } = await createBooking({
     cabinId: cabin as string,
     guestId: user as string,
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    numNights: 3,
-    numGuests: 3,
-    cabinPrice: +price!,
+    startDate: new Date(startDate as string),
+    endDate: new Date(endDate as string),
+    numNights: +numNights,
+    numGuests: +numGuests,
+    cabinPrice: regularPrice,
     extrasPrice: 0,
     totalPrice: +price!,
     observation: 'I will checking later',
-    status: 'checked-in'
+    status: 'confirmed'
   })
   const url = `${CLIENT_ORIGIN}/profile/bookings`
   const customBooking = { ...booking, totalPrice: +price, cabinId: { name: cabinData.name } } as IBooking & {
@@ -97,7 +99,7 @@ const createBookingCheckout = async function (req: Request, res: Response) {
 }
 
 const getCheckOutSession = async function (req: Request, res: Response) {
-  const { cabinId, regularPrice, name, description, image } = req.body
+  const { cabinId, regularPrice, name, description, image, endDate, startDate, numGuests, numNights } = req.body
   // console.log(req.user)
   const { id: userId, email } = req.user
 
@@ -108,7 +110,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/api/v1/bookings/create-booking-checkout?user=${userId}&cabin=${cabinId}&price=${regularPrice}`,
+    success_url: `${req.protocol}://${req.get('host')}/api/v1/bookings/create-booking-checkout?user=${userId}&cabin=${cabinId}&price=${regularPrice}&startDate=${startDate}&endDate=${endDate}&numGuests=${numGuests}&numNights=${numNights}`,
     cancel_url: `${CLIENT_ORIGIN}/cabins/${cabinId}`,
     customer_email: email,
     client_reference_id: cabinId,

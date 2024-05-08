@@ -42,10 +42,9 @@ export default class APIFeatures<T> {
     // * then we need to think about the case we have $gte, $gt, $lt, $lte... we have two factor $ and short name of operation: { price: { gte: '2' } } so the query string we get like this, url: price[gte]=2
     // * how we can add the $ to before gte like: $gte
     let queryObStr = JSON.stringify(queryOb)
-    queryObStr = queryObStr.replace(/(gt|lt|gte|gt)/g, (val) => `$${val}`)
+    queryObStr = queryObStr.replace(/(gt|lt|gte|gt|ne)/g, (val) => `$${val}`)
 
     // * and put this to the find() method
-
     this.query = this.query.find(JSON.parse(queryObStr))
     // * return this.query to chaining object
     return this

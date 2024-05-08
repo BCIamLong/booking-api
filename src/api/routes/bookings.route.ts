@@ -2,9 +2,9 @@ import { Router } from 'express'
 import { asyncCatch } from '../utils'
 import { bookingsController } from '../controllers'
 import { validator, bookingSchema } from '../validators'
-import { authMiddleware } from '../middlewares'
+import { authMiddleware, bookingMiddleware } from '../middlewares'
 
-const { createBookingSchema, updateBookingSchema } = bookingSchema
+const { createBookingSchema, updateBookingSchema, checkoutBookingSchema } = bookingSchema
 const {
   getBookings,
   getBooking,
@@ -18,6 +18,7 @@ const {
   deleteUserBooking
 } = bookingsController
 const { authenticate, authorize, auth2FA } = authMiddleware
+const { bookingsQueryModifier } = bookingMiddleware
 
 const bookingRouter = Router({ mergeParams: true })
 
@@ -27,7 +28,14 @@ bookingRouter.get('/me', authenticate, auth2FA, authorize('user'), asyncCatch(ge
 
 bookingRouter.get('/me/latest', authenticate, auth2FA, authorize('user'), asyncCatch(getUserBooking))
 
-bookingRouter.post('/checkout-session', authenticate, auth2FA, authorize('user'), asyncCatch(getCheckOutSession))
+bookingRouter.post(
+  '/checkout-session',
+  authenticate,
+  auth2FA,
+  authorize('user'),
+  validator(checkoutBookingSchema),
+  asyncCatch(getCheckOutSession)
+)
 
 bookingRouter.get(
   '/create-booking-checkout',
@@ -72,7 +80,8 @@ bookingRouter
    *    500:
    *     description: Something went wrong
    */
-  .get(authenticate, auth2FA, authorize('admin'), asyncCatch(getBookings))
+  .get(authenticate, auth2FA, bookingsQueryModifier, asyncCatch(getBookings))
+  // .get(authenticate, auth2FA, authorize('admin'), asyncCatch(getBookings))
   /**
    * @openapi
    * '/api/v1/bookings':
