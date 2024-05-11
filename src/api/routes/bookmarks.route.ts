@@ -48,6 +48,42 @@ bookmarksRouter
    *    500:
    *     description: Something went wrong
    * @openapi
+   * '/api/v1/cabins/{cabinId}/bookmarks':
+   *  get:
+   *   tags:
+   *   - Bookmark
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get all bookmarks of the cabin
+   *   parameters:
+   *    - name: cabinId
+   *      in: path
+   *      description: the id of the cabin
+   *      required: true
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           bookmarks:
+   *            type: array
+   *            items:
+   *             $ref: '#/components/schemas/BookmarkResponse'
+   *    404:
+   *     description: Not found
+   *    500:
+   *     description: Something went wrong
+   * @openapi
    * '/api/v1/auth/me/bookmarks':
    *  get:
    *   tags:
@@ -82,6 +118,41 @@ bookmarksRouter
   .get(bookmarksQueryModifier, asyncCatch(getBookmarks))
   /**
    * @openapi
+   * '/api/v1/bookmarks':
+   *  post:
+   *   tags:
+   *   - Bookmark
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: create new bookmark
+   *   requestBody:
+   *    required: true
+   *    content:
+   *     application/json:
+   *      schema:
+   *       $ref: '#components/schemas/CreateBookmarkInput'
+   *   responses:
+   *    201:
+   *     description: Success create new data
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           bookmark:
+   *            $ref: '#/components/schemas/BookmarkResponse'
+   *    400:
+   *     description: Bad request
+   *    500:
+   *     description: Something went wrong
+   * @openapi
    * '/api/v1/cabins/{cabinId}/bookmarks':
    *  post:
    *   tags:
@@ -112,13 +183,10 @@ bookmarksRouter
    *          properties:
    *           bookmark:
    *            $ref: '#/components/schemas/BookmarkResponse'
-   *
    *    400:
    *     description: Bad request
    *    500:
    *     description: Something went wrong
-   *
-   *
    */
   .post(authorize('user'), bookmarksQueryModifier, validator(createBookmarkSchema), asyncCatch(postBookmark))
 

@@ -277,6 +277,42 @@ bookingRouter
    *     description: Not found
    *    500:
    *     description: Something went wrong
+   * @openapi
+   * '/api/v1/cabins/{cabinId}/bookings':
+   *  get:
+   *   tags:
+   *   - Booking
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get all bookings of the cabin
+   *   parameters:
+   *    - name: cabinId
+   *      in: path
+   *      description: the id of the cabin
+   *      required: true
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           bookings:
+   *            type: array
+   *            items:
+   *             $ref: '#/components/schemas/BookingResponse'
+   *    404:
+   *     description: Not found
+   *    500:
+   *     description: Something went wrong
    */
   .get(authenticate, auth2FA, bookingsQueryModifier, asyncCatch(getBookings))
   // .get(authenticate, auth2FA, authorize('admin'), asyncCatch(getBookings))
