@@ -137,6 +137,51 @@ const updateBookingSchema = Joi.object({
   observation: Joi.string()
 })
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   CheckoutSessionInput:
+ *    type: object
+ *    required:
+ *     - cabinId
+ *     - name
+ *     - description
+ *     - image
+ *     - startDate
+ *     - endDate
+ *     - numNights
+ *     - numGuests
+ *     - regularPrice
+ *    properties:
+ *     cabinId:
+ *      type: string
+ *      default: cabin1
+ *     name:
+ *      type: string
+ *      default: The king cabin
+ *     description:
+ *      type: string
+ *      default: The king cabin is the king of all cabins
+ *     image:
+ *      type: string
+ *      default: cabin1.png
+ *     startDate:
+ *      type: string
+ *      format: date
+ *     endDate:
+ *      type: string
+ *      format: date
+ *     numNights:
+ *      type: number
+ *      default: 4
+ *     numGuests:
+ *      type: number
+ *      default: 2
+ *     regularPrice:
+ *      type: number
+ *      default: 200
+ */
 const checkoutBookingSchema = Joi.object({
   cabinId: Joi.string().required(),
   name: Joi.string().required(),

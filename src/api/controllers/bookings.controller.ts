@@ -131,7 +131,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
     ]
   })
   // res.redirect(303, session.url as string)
-  res.json({
+  res.status(201).json({
     status: 'success',
     redirectUrl: session.url
     // session

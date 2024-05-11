@@ -22,12 +22,146 @@ const { bookingsQueryModifier } = bookingMiddleware
 
 const bookingRouter = Router({ mergeParams: true })
 
+/**
+ * @openapi
+ * '/api/v1/bookings/{id}/me':
+ *  delete:
+ *   tags:
+ *   - Booking
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: delete a booking of the current user with the booking id
+ *   parameters:
+ *   - name: id
+ *     in: path
+ *     description: the id of the booking
+ *     required: true
+ *   responses:
+ *    204:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         data:
+ *          type: null
+ *    404:
+ *     description: No booking found
+ *    500:
+ *     description: Something went wrong
+ */
 bookingRouter.delete('/:id/me', authenticate, auth2FA, authorize('user'), asyncCatch(deleteUserBooking))
 
+/**
+ * @openapi
+ * '/api/v1/bookings/me':
+ *  get:
+ *   tags:
+ *   - Booking
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: get all bookings of the current user
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         data:
+ *          type: object
+ *          properties:
+ *           bookings:
+ *            type: array
+ *            items:
+ *             $ref: '#/components/schemas/BookingResponse'
+ *    404:
+ *     description: Not found
+ *    500:
+ *     description: Something went wrong
+ */
 bookingRouter.get('/me', authenticate, auth2FA, authorize('user'), asyncCatch(getUserBookings))
 
+/**
+ * @openapi
+ * '/api/v1/bookings/me/latest':
+ *  get:
+ *   tags:
+ *   - Booking
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: get the latest booking of the current user
+ *   responses:
+ *    200:
+ *     description: Success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         data:
+ *          type: object
+ *          properties:
+ *           bookings:
+ *            type: array
+ *            items:
+ *             $ref: '#/components/schemas/BookingResponse'
+ *    404:
+ *     description: Not found
+ *    500:
+ *     description: Something went wrong
+ */
 bookingRouter.get('/me/latest', authenticate, auth2FA, authorize('user'), asyncCatch(getUserBooking))
 
+/**
+ * @openapi
+ * '/api/v1/bookings/checkout-session':
+ *  post:
+ *   tags:
+ *   - Booking
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: create checkout session
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/CheckoutSessionInput'
+ *   responses:
+ *    201:
+ *     description: Success create checkout session
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         redirectUrl:
+ *          type: string
+ *
+ *    400:
+ *     description: Bad request
+ *    500:
+ *     description: Something went wrong
+ */
 bookingRouter.post(
   '/checkout-session',
   authenticate,
@@ -37,6 +171,70 @@ bookingRouter.post(
   asyncCatch(getCheckOutSession)
 )
 
+/**
+ * @openapi
+ * '/api/v1/bookings/create-booking-checkout':
+ *  get:
+ *   tags:
+ *   - Booking
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: create checkout booking with query string
+ *   parameters:
+ *    - name: user
+ *      in: query
+ *      schema:
+ *       type: string
+ *      description: the current user id
+ *      required: true
+ *    - name: cabin
+ *      in: query
+ *      schema:
+ *       type: string
+ *      description: the cabin id we check out
+ *      required: true
+ *    - name: price
+ *      in: query
+ *      schema:
+ *       type: integer
+ *      description: the price of the cabin
+ *      required: true
+ *    - name: endDate
+ *      in: query
+ *      schema:
+ *       type: string
+ *       format: date
+ *      description: the end date of the cabin booking
+ *      required: true
+ *    - name: startDate
+ *      in: query
+ *      schema:
+ *       type: string
+ *       format: date
+ *      description: the start date of the cabin booking
+ *      required: true
+ *    - name: numGuests
+ *      in: query
+ *      schema:
+ *       type: integer
+ *      description: the number of guests
+ *      required: true
+ *    - name: numNights
+ *      in: query
+ *      schema:
+ *       type: integer
+ *      description: the number of nights
+ *      required: true
+ *   responses:
+ *    200:
+ *     description: Success
+ *    404:
+ *     description: Not found
+ *    500:
+ *     description: Something went wrong
+ */
 bookingRouter.get(
   '/create-booking-checkout',
   authenticate,
