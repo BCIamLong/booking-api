@@ -3,12 +3,15 @@ import { guestsController } from '../controllers'
 import { asyncCatch } from '../utils'
 import { guestSchema, validator } from '../validators'
 import { authMiddleware } from '../middlewares'
+import reviewRouter from './review.route'
 
 const { createGuestSchema, updateGuestSchema } = guestSchema
 const { getGuests, postGuest, getGuest, updateGuest, deleteGuest } = guestsController
 const { authenticate, authorize, auth2FA } = authMiddleware
 
 const guestRouter = Router()
+
+guestRouter.use('/:userId/reviews', reviewRouter)
 
 guestRouter.use(authenticate, auth2FA, authorize('admin'))
 

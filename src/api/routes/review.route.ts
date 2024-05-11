@@ -48,7 +48,7 @@ reviewRouter
    *    500:
    *     description: Something went wrong
    * @openapi
-   * '/api/v1/cabins/:cabinId/reviews':
+   * '/api/v1/auth/me/reviews':
    *  get:
    *   tags:
    *   - Review
@@ -56,11 +56,78 @@ reviewRouter
    *    - bearerAuth: []
    *    - cookieAuth: []
    *    - refreshCookieAuth: []
-   *   summary: get all reviews
+   *   summary: get all reviews of the current user
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           settings:
+   *            type: array
+   *            items:
+   *             $ref: '#/components/schemas/ReviewResponse'
+   *    404:
+   *     description: Not found
+   *    500:
+   *     description: Something went wrong
+   * @openapi
+   * '/api/v1/cabins/{cabinId}/reviews':
+   *  get:
+   *   tags:
+   *   - Review
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get all reviews of the cabin
    *   parameters:
    *    - name: cabinId
    *      in: path
    *      description: the id of the cabin
+   *      required: true
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           settings:
+   *            type: array
+   *            items:
+   *             $ref: '#/components/schemas/ReviewResponse'
+   *    404:
+   *     description: Not found
+   *    500:
+   *     description: Something went wrong
+   * @openapi
+   * '/api/v1/users/{userId}/reviews':
+   *  get:
+   *   tags:
+   *   - Review
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get all reviews of the specific user
+   *   parameters:
+   *    - name: userId
+   *      in: path
+   *      description: the id of the user
    *      required: true
    *   responses:
    *    200:
@@ -131,7 +198,7 @@ reviewRouter
    *    - bearerAuth: []
    *    - cookieAuth: []
    *    - refreshCookieAuth: []
-   *   summary: create review
+   *   summary: create review for the specific cabin
    *   parameters:
    *    - name: cabinId
    *      in: path
@@ -179,6 +246,62 @@ reviewRouter
    *    - cookieAuth: []
    *    - refreshCookieAuth: []
    *   summary: get a review with review id
+   *   parameters:
+   *    - name: id
+   *      in: path
+   *      description: the id of the review
+   *      required: true
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        $ref: '#/components/schemas/ReviewResponse'
+   *    404:
+   *     description: No setting found
+   *    500:
+   *     description: Something went wrong
+   * @openapi
+   * '/api/v1/users/{userId}/reviews/{id}':
+   *  get:
+   *   tags:
+   *   - Review
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get a review with review id
+   *   parameters:
+   *    - name: userId
+   *      in: path
+   *      description: the id of the user
+   *      required: true
+   *    - name: id
+   *      in: path
+   *      description: the id of the review
+   *      required: true
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        $ref: '#/components/schemas/ReviewResponse'
+   *    404:
+   *     description: No setting found
+   *    500:
+   *     description: Something went wrong
+   * @openapi
+   * '/api/v1/auth/me/reviews/{id}':
+   *  get:
+   *   tags:
+   *   - Review
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: get a specific review of the current user with review id
    *   parameters:
    *    - name: id
    *      in: path

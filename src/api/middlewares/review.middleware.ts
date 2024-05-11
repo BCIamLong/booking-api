@@ -30,7 +30,7 @@ const reviewsQueryModifier = async function (req: Request, res: Response, next: 
 
   if (userId) {
     req.query = { user: userId }
-    return authorize('admin')
+    return authorize('admin')(req, res, next)
   }
 
   // ? here notice that we can use only userSlug but we need to think about how we can find the review based on the user slug not the id
@@ -43,9 +43,11 @@ const reviewQueryModifier = async function (req: Request, res: Response, next: N
   const { cabinId, userId, userSlug } = req.params
   if (cabinId) return next()
   if (userSlug) return next()
+  const isCurrentUser = req.baseUrl.split('/').includes('me')
+  if (isCurrentUser) return next()
   if (userSlug === 'me') return next()
 
-  if (!cabinId || userId || userSlug !== 'me') return authorize('admin')(req, res, next)
+  if (!cabinId || userId || !isCurrentUser || userSlug !== 'me') return authorize('admin')(req, res, next)
 }
 
 export default { reviewsQueryModifier, reviewQueryModifier }
