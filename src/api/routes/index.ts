@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import cabinsRouter from './cabins.route'
 import guestRouter from './guests.route'
@@ -47,6 +47,21 @@ declare module 'jsonwebtoken' {
     id: string
   }
 }
+
+/**
+ * @openapi
+ * /health-check:
+ *  get:
+ *    tags:
+ *    - HealthCheck
+ *    description: Response if the app is up and running
+ *    responses:
+ *     200:
+ *      description: App is up and running
+ */
+router.get('/health-check', (req: Request, res: Response) => res.sendStatus(200))
+// * if our health check depend on our api version then we can do the way bellow
+// router.get('/api/v1/health-check', (req: Request, res: Response) => res.sendStatus(200))
 
 /**
  * @openapi
