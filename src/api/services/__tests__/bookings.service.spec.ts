@@ -1,4 +1,16 @@
 jest.mock('../../database/models/booking.model.ts')
+jest.mock('../../utils/index.ts')
+jest.mock('../../utils/APIFeatures.ts', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      filter: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      selectFields: jest.fn().mockReturnThis(),
+      pagination: jest.fn().mockReturnThis()
+    }
+  })
+})
+
 import Booking from '../../database/models/booking.model'
 import bookingsService from '../bookings.service'
 
@@ -43,7 +55,9 @@ describe('unit test for bookings service', () => {
   describe('fetchBookings', () => {
     it('should return bookings', async () => {
       // @ts-ignore
-      Booking.find.mockImplementationOnce(() => [bookingItem])
+      Booking.find.mockResolvedValue([bookingItem])
+      // @ts-ignore
+      // Booking.find.mockImplementationOnce(() => [bookingItem])
 
       const { data } = await fetchBookings()
 
@@ -56,7 +70,13 @@ describe('unit test for bookings service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Booking.findById.mockImplementationOnce(() => undefined)
+        Booking.findById.mockRejectedValueOnce({
+          statusCode: 404
+        })
+
+        // @ts-ignore
+        // Booking.findById.mockImplementationOnce(() => undefined)
+
         try {
           await fetchBooking('invalid_id')
         } catch (err: any) {
@@ -109,7 +129,11 @@ describe('unit test for bookings service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Booking.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        Booking.findByIdAndUpdate.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // @ts-ignore
+        // Booking.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           await editBooking('invalid_id', bookingInput)
@@ -151,9 +175,15 @@ describe('unit test for bookings service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Booking.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        Booking.findOneAndDelete.mockRejectedValueOnce({
+          statusCode: 404
+        })
+
+        // @ts-ignore
+        // Booking.findByIdAndDelete.mockImplementationOnce(() => undefined)
+
         try {
-          await removeBooking('invalid_id')
+          await removeBooking({ id: 'invalid_id' })
         } catch (err: any) {
           expect(err.statusCode).toBe(404)
         }
@@ -163,9 +193,9 @@ describe('unit test for bookings service', () => {
     describe('given a valid id', () => {
       it('should return a booking', async () => {
         // @ts-ignore
-        Booking.findByIdAndDelete.mockImplementationOnce(() => bookingItem)
+        Booking.findOneAndDelete.mockImplementationOnce(() => bookingItem)
 
-        const { data } = await removeBooking('valid_id')
+        const { data } = await removeBooking({ id: 'valid_id' })
         expect(data).toEqual(bookingItem)
         // expect(data).toEqual(undefined)
       })

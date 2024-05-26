@@ -1,10 +1,25 @@
 jest.mock('../../database/models/setting.model.ts')
 // jest.mock('../settings.service.ts')
 jest.mock('../../utils/index.ts')
+// jest.mock('../../utils/APIFeatures.ts')
+jest.mock('../../utils/APIFeatures.ts', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      filter: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      selectFields: jest.fn().mockReturnThis(),
+      pagination: jest.fn().mockReturnThis()
+      // !when we mock class we doesn't need to mock properties on the constructor, but we can mock the properties before we pass these to the constructor
+      // query: jest.fn().mockResolvedValue(['item1'])
+    }
+  })
+})
 
-import { AppError, APIFeatures } from '../../utils'
+import APIFeatures from '../../utils/APIFeatures'
+import { AppError } from '../../utils'
 import Setting from '../../database/models/setting.model'
 import settingsService from '../settings.service'
+import APIFeaturesMock from './__mocks__/APIFeaturesMock'
 
 const { fetchSettings, fetchSetting, createSetting, editSetting, removeSetting } = settingsService
 
@@ -27,28 +42,63 @@ const settingInput = {
 
 describe('unit test for settings service', () => {
   describe('fetchSettings', () => {
-    it('should return settings', async () => {
-      // @ts-ignore
-      Setting.countDocuments.mockImplementationOnce(() => 10)
-      const queryOb = {
-        find: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValueOnce([[settingItem]])
-      }
+    describe('fetch settings data with no query string', () => {
+      it('should return settings', async () => {
+        // @ts-ignore
+        // APIFeatures.mockImplementationOnce(() => APIFeaturesMock)
+        // APIFeatures = jest.fn().mockImplementation(() => {
+        //   return {
+        //     // !when we mock class we doesn't need to mock properties on the constructor, but we can mock the properties before we pass these to the constructor
+        //     // query: Promise.resolve(['item1']),
+        //     filter: jest.fn().mockReturnThis(),
+        //     sort: jest.fn().mockReturnThis(),
+        //     selectFields: jest.fn().mockReturnThis(),
+        //     pagination: jest.fn().mockReturnThis()
+        //   }
+        // })
 
-      // @ts-ignore
-      Setting.find.mockImplementationOnce(() => queryOb)
-      // @ts-ignore
-      // Setting.find.mockImplementationOnce(() => Promise.resolve([settingItem]))
-      const queryStr = {}
-      const result = await fetchSettings(queryStr)
-      console.log(result)
-      // @ts-ignore
-      expect(queryOb.exec).toHaveBeenCalled()
-      // expect(result.data).toEqual([settingItem])
+        // APIFeatures.prototype.query = Promise.resolve(['item1'])
+        // APIFeatures.prototype.filter = jest.fn().mockReturnThis()
+        // APIFeatures.prototype.sort = jest.fn().mockReturnThis()
+        // APIFeatures.prototype.selectFields = jest.fn().mockReturnThis()
+        // APIFeatures.prototype.pagination = jest.fn().mockResolvedValue({
+        //   query: Promise.resolve(['item1'])
+        // })
+        // @ts-ignore
+
+        // @ts-ignore
+        Setting.find.mockResolvedValue([settingItem])
+
+        const data = await fetchSettings()
+        // console.log(data)
+        expect(data.data).toEqual([settingItem])
+      })
+    })
+
+    describe('fetch settings data with sort query string', () => {
+      it('should return the settings with sort ordered', async () => {
+        // @ts-ignore
+        // APIFeatures.mockImplementation(() => {
+        //   return {
+        //     // !when we mock class we doesn't need to mock properties on the constructor, but we can mock the properties before we pass these to the constructor
+        //     // query: Promise.resolve(['item1']),
+        //     filter: jest.fn().mockReturnThis(),
+        //     sort: jest.fn().mockReturnThis(),
+        //     selectFields: jest.fn().mockReturnThis(),
+        //     pagination: jest.fn().mockReturnThis()
+        //   }
+        // })
+        // APIFeatures.prototype.filter = jest.fn().mockReturnThis()
+        // APIFeatures.prototype.sort = jest.fn().mockReturnThis()
+        // APIFeatures.prototype.selectFields = jest.fn().mockReturnThis()
+        // APIFeatures.prototype.pagination = jest.fn().mockResolvedValue({
+        //   query: Promise.resolve(['item1'])
+        // })
+        // @ts-ignore
+        // Setting.find.mockResolvedValue([settingItem])
+        // const { data } = await fetchSettings({ sort: 'maxGuestsPersonal' })
+        // expect(data).toEqual([settingItem])
+      })
     })
   })
 
@@ -164,12 +214,14 @@ describe('unit test for settings service', () => {
         // @ts-ignore
         // Setting.findByIdAndDelete.mockImplementationOnce(() => undefined)
         // @ts-ignore
-        Setting.findByIdAndDelete.mockRejectedValueOnce({
+        Setting.findOneAndDelete.mockRejectedValueOnce({
           statusCode: 404
         })
         try {
-          await removeSetting('invalid_id')
+          // @ts-ignore
+          await removeSetting({ id: 'invalid_id' })
         } catch (err: any) {
+          // console.log(err)
           expect(err.statusCode).toBe(404)
         }
       })
@@ -178,9 +230,9 @@ describe('unit test for settings service', () => {
     describe('given a valid id', () => {
       it('should return a setting', async () => {
         // @ts-ignore
-        Setting.findByIdAndDelete.mockImplementationOnce(() => settingItem)
-
-        const { data } = await removeSetting('valid_id')
+        Setting.findOneAndDelete.mockImplementationOnce(() => settingItem)
+        // @ts-ignore
+        const { data } = await removeSetting({ id: 'valid_id' })
         expect(data).toEqual(settingItem)
       })
     })

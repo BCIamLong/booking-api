@@ -7,6 +7,7 @@
 
 jest.mock('bcrypt')
 jest.mock('axios')
+jest.mock('../../utils/index.ts')
 jest.mock('../auth.service')
 jest.mock('../../database/models/user.model.ts')
 jest.mock('../../database/models/guest.model.ts')

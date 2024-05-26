@@ -1,5 +1,17 @@
 jest.mock('bcrypt')
 jest.mock('../../database/models/guest.model.ts')
+jest.mock('../../utils/index.ts')
+jest.mock('../../utils/APIFeatures.ts', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      filter: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      selectFields: jest.fn().mockReturnThis(),
+      pagination: jest.fn().mockReturnThis()
+    }
+  })
+})
+
 import bcrypt from 'bcrypt'
 import Guest from '../../database/models/guest.model'
 import guestsService from '../guests.service'
@@ -32,7 +44,8 @@ describe('unit test for guests service', () => {
   describe('fetchGuests', () => {
     it('should return guests', async () => {
       // @ts-ignore
-      Guest.find.mockImplementationOnce(() => [guestItem])
+      Guest.find.mockResolvedValue([guestItem])
+      // Guest.find.mockImplementationOnce(() => [guestItem])
 
       const { data } = await fetchGuests()
 
@@ -45,7 +58,11 @@ describe('unit test for guests service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Guest.findById.mockImplementationOnce(() => undefined)
+        Guest.findById.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // Guest.findById.mockImplementationOnce(() => undefined)
+
         try {
           await fetchGuest('invalid_id')
         } catch (err: any) {
@@ -124,7 +141,10 @@ describe('unit test for guests service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Guest.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        Guest.findByIdAndUpdate.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // Guest.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           await editGuest('invalid_id', guestInput)
@@ -166,9 +186,13 @@ describe('unit test for guests service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        Guest.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        Guest.findOneAndDelete.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // Guest.findByIdAndDelete.mockImplementationOnce(() => undefined)
+
         try {
-          await removeGuest('invalid_id')
+          await removeGuest({ id: 'invalid_id' })
         } catch (err: any) {
           expect(err.statusCode).toBe(404)
         }
@@ -178,9 +202,9 @@ describe('unit test for guests service', () => {
     describe('given a valid id', () => {
       it('should return a guest', async () => {
         // @ts-ignore
-        Guest.findByIdAndDelete.mockImplementationOnce(() => guestItem)
+        Guest.findOneAndDelete.mockImplementationOnce(() => guestItem)
 
-        const { data } = await removeGuest('valid_id')
+        const { data } = await removeGuest({ id: 'valid_id' })
         expect(data).toEqual(guestItem)
         // expect(data).toEqual(undefined)
       })

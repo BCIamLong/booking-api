@@ -1,5 +1,17 @@
 jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
+jest.mock('../../utils/index.ts')
+jest.mock('../../utils/APIFeatures.ts', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      filter: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      selectFields: jest.fn().mockReturnThis(),
+      pagination: jest.fn().mockReturnThis()
+    }
+  })
+})
+
 import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
 import usersService from '../users.service'
@@ -31,7 +43,8 @@ describe('unit test for users service', () => {
   describe('fetchUsers', () => {
     it('should return users', async () => {
       // @ts-ignore
-      User.find.mockImplementationOnce(() => [userItem])
+      User.find.mockResolvedValue([userItem])
+      // User.find.mockImplementationOnce(() => [userItem])
 
       const { data } = await fetchUsers()
 
@@ -44,7 +57,11 @@ describe('unit test for users service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        User.findById.mockImplementationOnce(() => undefined)
+        User.findById.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // User.findById.mockImplementationOnce(() => undefined)
+
         try {
           await fetchUser('invalid_id')
         } catch (err: any) {
@@ -77,6 +94,7 @@ describe('unit test for users service', () => {
         })
 
         try {
+          // @ts-ignore
           await createUser(userInput)
         } catch (err: any) {
           expect(err.statusCode).toBe(400)
@@ -112,6 +130,7 @@ describe('unit test for users service', () => {
         // @ts-ignore
         User.create.mockImplementationOnce(() => userItem)
 
+        // @ts-ignore
         const { data } = await createUser(userInput)
 
         expect(data).toEqual(userItem)
@@ -123,7 +142,10 @@ describe('unit test for users service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        User.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        User.findByIdAndUpdate.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // User.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           await editUser('invalid_id', updateUserInput)
@@ -165,9 +187,13 @@ describe('unit test for users service', () => {
     describe('given an invalid id', () => {
       it('should throw an error with status code of 404', async () => {
         // @ts-ignore
-        User.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        User.findOneAndDelete.mockRejectedValueOnce({
+          statusCode: 404
+        })
+        // User.findByIdAndDelete.mockImplementationOnce(() => undefined)
+
         try {
-          await removeUser('invalid_id')
+          await removeUser({ id: 'invalid_id' })
         } catch (err: any) {
           expect(err.statusCode).toBe(404)
         }
@@ -177,9 +203,9 @@ describe('unit test for users service', () => {
     describe('given a valid id', () => {
       it('should return a user', async () => {
         // @ts-ignore
-        User.findByIdAndDelete.mockImplementationOnce(() => userItem)
+        User.findOneAndDelete.mockImplementationOnce(() => userItem)
 
-        const { data } = await removeUser('valid_id')
+        const { data } = await removeUser({ id: 'valid_id' })
         expect(data).toEqual(userItem)
       })
     })
