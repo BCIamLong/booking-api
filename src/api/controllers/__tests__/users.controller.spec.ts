@@ -1,11 +1,14 @@
 jest.mock('bcrypt')
 jest.mock('../../database/models/user.model.ts')
 jest.mock('../../services/auth.service')
+jest.mock('../../utils/index.ts')
+jest.mock('../../services/users.service')
 
 import bcrypt from 'bcrypt'
 import User from '../../database/models/user.model'
 import usersController from '../users.controller'
 import authService from '../../services/auth.service'
+import usersService from '../../services/users.service'
 
 const { getUsers, getUser, postUser, deleteUser, updateUser } = usersController
 
@@ -40,7 +43,13 @@ describe('unit test for users controller', () => {
   describe('test getUsers function', () => {
     it('should return a status of 200 and users list', async () => {
       // @ts-ignore
-      User.find.mockImplementationOnce(() => [userItem])
+      jest.spyOn(usersService, 'fetchUsers').mockImplementationOnce(() => ({
+        data: [userItem],
+        collectionName: 'users',
+        count: 1
+      }))
+      // @ts-ignore
+      // User.find.mockImplementationOnce(() => [userItem])
 
       // @ts-ignore
       await getUsers(req, res)
@@ -48,7 +57,9 @@ describe('unit test for users controller', () => {
       expect(res.json).toHaveBeenCalledTimes(1)
       expect(res.json).toHaveBeenCalledWith({
         status: 'success',
-        data: expect.any(Object)
+        data: expect.any(Object),
+        count: 1,
+        results: 1
       })
     })
   })
@@ -56,8 +67,11 @@ describe('unit test for users controller', () => {
   describe('test getUser function', () => {
     describe('given an invalid user id ', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(usersService, 'fetchUser').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        User.findById.mockImplementationOnce(() => undefined)
+        // User.findById.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -72,7 +86,13 @@ describe('unit test for users controller', () => {
     describe('given an valid user id ', () => {
       it('should return a status of 200 and user', async () => {
         // @ts-ignore
-        User.findById.mockImplementationOnce(() => userItem)
+        jest.spyOn(usersService, 'fetchUser').mockImplementationOnce(() => ({
+          data: userItem,
+          collectionName: 'users'
+        }))
+
+        // @ts-ignore
+        // User.findById.mockImplementationOnce(() => userItem)
 
         // @ts-ignore
         await getUser(req, res)
@@ -91,8 +111,11 @@ describe('unit test for users controller', () => {
   describe('test updateUser function', () => {
     describe('given the invalid user id', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(usersService, 'editUser').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        User.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        // User.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -106,11 +129,15 @@ describe('unit test for users controller', () => {
 
     describe('given the invalid input', () => {
       it('should return a status of 400', async () => {
-        // @ts-ignore
-        User.findByIdAndUpdate.mockRejectedValueOnce({
+        jest.spyOn(usersService, 'editUser').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
+        // @ts-ignore
+        // User.findByIdAndUpdate.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -125,7 +152,14 @@ describe('unit test for users controller', () => {
     describe('given the valid input', () => {
       it('should return a status of 200 and new updated user', async () => {
         // @ts-ignore
-        User.findByIdAndUpdate.mockImplementationOnce(() => userItem)
+        jest.spyOn(usersService, 'editUser').mockImplementationOnce(() => ({
+          data: userItem,
+          collectionName: 'users'
+        }))
+
+        // @ts-ignore
+        // User.findByIdAndUpdate.mockImplementationOnce(() => userItem)
+
         // @ts-ignore
         await updateUser(req, res)
 
@@ -149,11 +183,15 @@ describe('unit test for users controller', () => {
         // @ts-ignore
         jest.spyOn(authService, 'checkEmailExist').mockImplementationOnce(() => true)
 
-        // @ts-ignore
-        User.create.mockRejectedValueOnce({
+        jest.spyOn(usersService, 'createUser').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
+        // @ts-ignore
+        // User.create.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -173,11 +211,15 @@ describe('unit test for users controller', () => {
         // @ts-ignore
         bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
 
-        // @ts-ignore
-        User.create.mockRejectedValueOnce({
+        jest.spyOn(usersService, 'createUser').mockRejectedValueOnce({
           name: 'ConflictError',
           statusCode: 409
         })
+        // @ts-ignore
+        // User.create.mockRejectedValueOnce({
+        //   name: 'ConflictError',
+        //   statusCode: 409
+        // })
 
         try {
           // @ts-ignore
@@ -220,8 +262,15 @@ describe('unit test for users controller', () => {
       it('should return a status of 201 and new user', async () => {
         // @ts-ignore
         bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
+
         // @ts-ignore
-        User.create.mockImplementationOnce(() => userItem)
+        jest.spyOn(usersService, 'createUser').mockImplementationOnce(() => ({
+          data: userItem,
+          collectionName: 'users'
+        }))
+        // @ts-ignore
+        // User.create.mockImplementationOnce(() => userItem)
+
         // @ts-ignore
         await postUser(req, res)
 
@@ -241,8 +290,11 @@ describe('unit test for users controller', () => {
   describe('test deleteUser function', () => {
     describe('given an invalid id', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(usersService, 'removeUser').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        User.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        // User.findByIdAndDelete.mockImplementationOnce(() => undefined)
         try {
           // @ts-ignore
           await deleteUser(req, res)
@@ -256,7 +308,13 @@ describe('unit test for users controller', () => {
     describe('given a valid id', () => {
       it('should return a status of 204', async () => {
         // @ts-ignore
-        User.findByIdAndDelete.mockImplementationOnce(() => userItem)
+        jest.spyOn(usersService, 'removeUser').mockImplementationOnce(() => ({
+          data: userItem,
+          collectionName: 'users'
+        }))
+        // @ts-ignore
+        // User.findByIdAndDelete.mockImplementationOnce(() => userItem)
+
         // @ts-ignore
         await deleteUser(req, res)
 

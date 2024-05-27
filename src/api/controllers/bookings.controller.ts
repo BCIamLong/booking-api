@@ -11,8 +11,8 @@ const { fetchCabin } = cabinsService
 const { fetchBookings, fetchBooking, editBooking, createBooking, removeBooking, removeUserBooking } = bookingsService
 
 const getBookings = getAll(async (options) => {
-  const { data, collectionName } = await fetchBookings(options.queryStr)
-  return { data, collectionName }
+  const { data, collectionName, count } = await fetchBookings(options.queryStr)
+  return { data, collectionName, count }
 })
 const getBooking = getOne(async (options) => {
   const { data, collectionName } = await fetchBooking(options.id || '')

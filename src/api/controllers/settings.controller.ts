@@ -4,8 +4,8 @@ import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.control
 const { fetchSettings, fetchSetting, editSetting, createSetting, removeSetting } = settingsService
 
 const getSettings = getAll(async () => {
-  const { data, collectionName } = await fetchSettings()
-  return { data, collectionName }
+  const { data, collectionName, count } = await fetchSettings()
+  return { data, collectionName, count }
 })
 
 const getSetting = getOne(async (options) => {

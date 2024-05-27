@@ -6,8 +6,8 @@ const { fetchGuests, fetchGuest, editGuest, createGuest, removeGuest } = guestsS
 const { checkEmailExist } = authService
 
 const getGuests = getAll(async () => {
-  const { data, collectionName } = await fetchGuests()
-  return { data, collectionName }
+  const { data, collectionName, count } = await fetchGuests()
+  return { data, collectionName, count }
 })
 
 const getGuest = getOne(async (options) => {

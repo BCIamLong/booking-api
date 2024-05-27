@@ -5,8 +5,8 @@ const { fetchUsers, fetchUser, editUser, createUser, removeUser } = usersService
 const { checkEmailExist } = authService
 
 const getUsers = getAll(async () => {
-  const { data, collectionName } = await fetchUsers()
-  return { data, collectionName }
+  const { data, collectionName, count } = await fetchUsers()
+  return { data, collectionName, count }
 })
 
 const getUser = getOne(async (options) => {

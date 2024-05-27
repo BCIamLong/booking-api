@@ -1,6 +1,7 @@
 jest.mock('dotenv/config')
 jest.mock('bcrypt')
 jest.mock('jsonwebtoken')
+jest.mock('../../utils/index.ts')
 jest.mock('../../database/models/user.model.ts')
 jest.mock('../../database/models/guest.model')
 jest.mock('../../services/auth.service')
@@ -72,6 +73,7 @@ const guestItem = {
   nationality: 'UK',
   password: 'hashedPwd(password123)',
   countryFlag: '🇬🇧',
+  verifyEmail: true,
   createdAt: new Date(),
   updatedAt: new Date()
 }
@@ -80,16 +82,20 @@ describe('unit test for auth controller', () => {
   describe('test login function', () => {
     describe('given a false format email', () => {
       it('should return a 400', async () => {
-        // @ts-ignore
-        User.findOne.mockRejectedValueOnce({
+        jest.spyOn(authService, 'loginService').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
-        // @ts-ignore
-        Guest.findOne.mockRejectedValueOnce({
-          name: 'ValidationError',
-          statusCode: 400
-        })
+        // // @ts-ignore
+        // User.findOne.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
+        // // @ts-ignore
+        // Guest.findOne.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -104,10 +110,14 @@ describe('unit test for auth controller', () => {
 
     describe('given a true format email but email is not exist', () => {
       it('should return a 404', async () => {
-        // @ts-ignore
-        User.findOne.mockImplementationOnce(() => undefined)
-        // @ts-ignore
-        Guest.findOne.mockImplementationOnce(() => undefined)
+        jest.spyOn(authService, 'loginService').mockRejectedValueOnce({
+          name: 'No users found with this email',
+          statusCode: 404
+        })
+        // // @ts-ignore
+        // User.findOne.mockImplementationOnce(() => undefined)
+        // // @ts-ignore
+        // Guest.findOne.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -134,11 +144,17 @@ describe('unit test for auth controller', () => {
         User.findOne.mockImplementationOnce(() => userQuery)
         // @ts-ignore
         Guest.findOne.mockImplementationOnce(() => guestQuery)
-        // @ts-ignore
-        User.schema.checkPwd = jest.fn().mockRejectedValueOnce({
+
+        jest.spyOn(authService, 'loginService').mockRejectedValueOnce({
           type: 'ValidationError',
           statusCode: 400
         })
+
+        // @ts-ignore
+        // User.schema.checkPwd = jest.fn().mockRejectedValueOnce({
+        //   type: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -162,7 +178,8 @@ describe('unit test for auth controller', () => {
         jest.spyOn(authController, 'signToken').mockImplementationOnce(() => accessToken)
 
         // @ts-ignore
-        jest.spyOn(authService, 'loginService').mockImplementationOnce(() => new Guest(guestItem))
+        jest.spyOn(authService, 'loginService').mockImplementationOnce(() => guestItem)
+        // jest.spyOn(authService, 'loginService').mockImplementationOnce(() => new Guest(guestItem))
 
         // @ts-ignore
         await login(req, res)

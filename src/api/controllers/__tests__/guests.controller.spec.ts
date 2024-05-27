@@ -1,10 +1,13 @@
 jest.mock('bcrypt')
 jest.mock('../../database/models/guest.model.ts')
 jest.mock('../../services/auth.service')
+jest.mock('../../utils/index.ts')
+jest.mock('../../services/guests.service')
 // jest.mock('~/api/services')
 // import { authService } from '~/api/services'
 import bcrypt from 'bcrypt'
 import authService from '../../services/auth.service'
+import guestService from '../../services/guests.service'
 import Guest from '../../database/models/guest.model'
 import guestsController from '../guests.controller'
 
@@ -44,7 +47,11 @@ describe('unit test for guests controller', () => {
   describe('test getGuests function', () => {
     it('should return a status of 200 and guests list', async () => {
       // @ts-ignore
-      Guest.find.mockImplementationOnce(() => [guestItem])
+      jest.spyOn(guestService, 'fetchGuests').mockImplementationOnce(() => ({
+        data: [guestItem],
+        collectionName: 'guests',
+        count: 1
+      }))
 
       // @ts-ignore
       await getGuests(req, res)
@@ -52,7 +59,9 @@ describe('unit test for guests controller', () => {
       expect(res.json).toHaveBeenCalledTimes(1)
       expect(res.json).toHaveBeenCalledWith({
         status: 'success',
-        data: expect.any(Object)
+        data: expect.any(Object),
+        count: 1,
+        results: 1
       })
     })
   })
@@ -60,8 +69,11 @@ describe('unit test for guests controller', () => {
   describe('test getGuest function', () => {
     describe('given an invalid guest id ', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(guestService, 'fetchGuest').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        Guest.findById.mockImplementationOnce(() => undefined)
+        // Guest.findById.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -76,7 +88,12 @@ describe('unit test for guests controller', () => {
     describe('given an valid guest id ', () => {
       it('should return a status of 200 and guest', async () => {
         // @ts-ignore
-        Guest.findById.mockImplementationOnce(() => guestItem)
+        jest.spyOn(guestService, 'fetchGuest').mockImplementationOnce(() => ({
+          data: guestItem,
+          collectionName: 'guests'
+        }))
+        // @ts-ignore
+        // Guest.findById.mockImplementationOnce(() => guestItem)
 
         // @ts-ignore
         await getGuest(req, res)
@@ -95,8 +112,11 @@ describe('unit test for guests controller', () => {
   describe('test updateGuest function', () => {
     describe('given the invalid guest id', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(guestService, 'editGuest').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        Guest.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        // Guest.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -110,11 +130,15 @@ describe('unit test for guests controller', () => {
 
     describe('given the invalid input', () => {
       it('should return a status of 400', async () => {
-        // @ts-ignore
-        Guest.findByIdAndUpdate.mockRejectedValueOnce({
+        jest.spyOn(guestService, 'editGuest').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
+        // @ts-ignore
+        // Guest.findByIdAndUpdate.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -129,7 +153,13 @@ describe('unit test for guests controller', () => {
     describe('given the valid input', () => {
       it('should return a status of 200 and new updated guest', async () => {
         // @ts-ignore
-        Guest.findByIdAndUpdate.mockImplementationOnce(() => guestItem)
+        jest.spyOn(guestService, 'editGuest').mockImplementationOnce(() => ({
+          data: guestItem,
+          collectionName: 'guests'
+        }))
+        // @ts-ignore
+        // Guest.findByIdAndUpdate.mockImplementationOnce(() => guestItem)
+
         // @ts-ignore
         await updateGuest(req, res)
 
@@ -153,11 +183,15 @@ describe('unit test for guests controller', () => {
         // @ts-ignore
         bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
 
-        // @ts-ignore
-        Guest.create.mockRejectedValueOnce({
+        jest.spyOn(guestService, 'createGuest').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
+        // @ts-ignore
+        // Guest.create.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -177,11 +211,15 @@ describe('unit test for guests controller', () => {
         // @ts-ignore
         bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
 
-        // @ts-ignore
-        Guest.create.mockRejectedValueOnce({
+        jest.spyOn(guestService, 'createGuest').mockRejectedValueOnce({
           name: 'ConflictError',
           statusCode: 409
         })
+        // @ts-ignore
+        // Guest.create.mockRejectedValueOnce({
+        //   name: 'ConflictError',
+        //   statusCode: 409
+        // })
 
         try {
           // @ts-ignore
@@ -226,7 +264,13 @@ describe('unit test for guests controller', () => {
         bcrypt.hash.mockImplementationOnce(() => 'hashedPwd(password123)')
 
         // @ts-ignore
-        Guest.create.mockImplementationOnce(() => guestItem)
+        jest.spyOn(guestService, 'createGuest').mockImplementationOnce(() => ({
+          data: guestItem,
+          collectionName: 'guests'
+        }))
+        // @ts-ignore
+        // Guest.create.mockImplementationOnce(() => guestItem)
+
         // @ts-ignore
         await postGuest(req, res)
 
@@ -246,8 +290,12 @@ describe('unit test for guests controller', () => {
   describe('test deleteGuest function', () => {
     describe('given an invalid id', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(guestService, 'removeGuest').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        Guest.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        // Guest.findByIdAndDelete.mockImplementationOnce(() => undefined)
+
         try {
           // @ts-ignore
           await deleteGuest(req, res)
@@ -261,7 +309,12 @@ describe('unit test for guests controller', () => {
     describe('given a valid id', () => {
       it('should return a status of 204', async () => {
         // @ts-ignore
-        Guest.findByIdAndDelete.mockImplementationOnce(() => guestItem)
+        jest.spyOn(guestService, 'removeGuest').mockImplementationOnce(() => ({
+          data: guestItem,
+          collectionName: 'guests'
+        }))
+        // @ts-ignore
+        // Guest.findByIdAndDelete.mockImplementationOnce(() => guestItem)
         // @ts-ignore
         await deleteGuest(req, res)
 

@@ -1,12 +1,12 @@
-jest.mock('../../database/models/setting.model.ts')
+jest.mock('../../database/models/review.model.ts')
 jest.mock('../../utils/index.ts')
-jest.mock('../../services/settings.service')
+jest.mock('../../services/reviews.service')
 
-import Setting from '../../database/models/setting.model'
-import settingsController from '../settings.controller'
-import settingsService from '../../services/settings.service'
+import Review from '../../database/models/review.model'
+import reviewsController from '../review.controller'
+import reviewsService from '../../services/reviews.service'
 
-const { getSettings, getSetting, postSetting, deleteSetting, updateSetting } = settingsController
+const { getReviews, getReview, postReview, deleteReview, updateReview } = reviewsController
 
 const req = {
   params: {
@@ -26,31 +26,32 @@ const res = {
 }
 // const res = jest
 
-const settingItem = {
-  _id: 'f10e695b-14df-4fe0-a944-fcf8e473e614',
-  minBookingLength: 1,
-  maxBookingLength: 30,
-  maxGuestsPersonal: 5,
-  breakfastPrice: 10,
+const reviewItem = {
+  _id: 'abc123',
+  user: 'user123',
+  cabin: 'cabin456',
+  review:
+    'This cabin was absolutely amazing! The view was stunning and the amenities were top-notch. Highly recommend!',
+  rating: 5,
   createdAt: new Date(),
   updatedAt: new Date()
 }
 
-describe('unit test for settings controller', () => {
-  describe('test getSettings function', () => {
-    it('should return a status of 200 and settings list', async () => {
+describe('unit test for reviews controller', () => {
+  describe('test getReviews function', () => {
+    it('should return a status of 200 and reviews list', async () => {
       // @ts-ignore
-      // Setting.find.mockResolvedValue([settingItem])
-      // Setting.find.mockImplementationOnce(() => [settingItem])
+      // Review.find.mockResolvedValue([reviewItem])
+      // Review.find.mockImplementationOnce(() => [reviewItem])
 
-      jest.spyOn(settingsService, 'fetchSettings').mockImplementationOnce(() => ({
-        data: [settingItem],
-        collectionName: 'settings',
+      jest.spyOn(reviewsService, 'fetchReviews').mockImplementationOnce(() => ({
+        data: [reviewItem],
+        collectionName: 'reviews',
         count: 1
       }))
 
       // @ts-ignore
-      await getSettings(req, res)
+      await getReviews(req, res)
 
       expect(res.json).toHaveBeenCalledTimes(1)
       expect(res.json).toHaveBeenCalledWith({
@@ -62,18 +63,18 @@ describe('unit test for settings controller', () => {
     })
   })
 
-  describe('test getSetting function', () => {
-    describe('given an invalid setting id ', () => {
+  describe('test getReview function', () => {
+    describe('given an invalid review id ', () => {
       it('should return a status of 404', async () => {
-        jest.spyOn(settingsService, 'fetchSetting').mockRejectedValueOnce({
+        jest.spyOn(reviewsService, 'fetchReview').mockRejectedValueOnce({
           statusCode: 404
         })
         // @ts-ignore
-        // Setting.findById.mockImplementationOnce(() => undefined)
+        // Review.findById.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
-          await getSetting(req, res)
+          await getReview(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(404)
@@ -81,41 +82,41 @@ describe('unit test for settings controller', () => {
       })
     })
 
-    describe('given an valid setting id ', () => {
-      it('should return a status of 200 and setting', async () => {
+    describe('given an valid review id ', () => {
+      it('should return a status of 200 and review', async () => {
         // @ts-ignore
-        // Setting.findById.mockImplementationOnce(() => settingItem)
-        jest.spyOn(settingsService, 'fetchSetting').mockImplementationOnce(() => ({
-          data: settingItem,
-          collectionName: 'settings'
+        // Review.findById.mockImplementationOnce(() => reviewItem)
+        jest.spyOn(reviewsService, 'fetchReview').mockImplementationOnce(() => ({
+          data: reviewItem,
+          collectionName: 'reviews'
         }))
 
         // @ts-ignore
-        await getSetting(req, res)
+        await getReview(req, res)
 
         expect(res.json).toHaveBeenCalledTimes(1)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           data: {
-            setting: settingItem
+            review: reviewItem
           }
         })
       })
     })
   })
 
-  describe('test updateSetting function', () => {
-    describe('given the invalid setting id', () => {
+  describe('test updateReview function', () => {
+    describe('given the invalid review id', () => {
       it('should return a status of 404', async () => {
-        jest.spyOn(settingsService, 'editSetting').mockRejectedValueOnce({
+        jest.spyOn(reviewsService, 'editReview').mockRejectedValueOnce({
           statusCode: 404
         })
         // @ts-ignore
-        // Setting.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        // Review.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
-          await updateSetting(req, res)
+          await updateReview(req, res)
         } catch (err: any) {
           expect(err.statusCode).toBe(404)
           expect(res.json).toHaveBeenCalledTimes(0)
@@ -125,20 +126,20 @@ describe('unit test for settings controller', () => {
 
     describe('given the invalid input', () => {
       it('should return a status of 400', async () => {
-        jest.spyOn(settingsService, 'editSetting').mockRejectedValueOnce({
+        jest.spyOn(reviewsService, 'editReview').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
 
         // @ts-ignore
-        // Setting.findByIdAndUpdate.mockRejectedValueOnce({
+        // Review.findByIdAndUpdate.mockRejectedValueOnce({
         //   name: 'ValidationError',
         //   statusCode: 400
         // })
 
         try {
           // @ts-ignore
-          await updateSetting(req, res)
+          await updateReview(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
@@ -147,46 +148,46 @@ describe('unit test for settings controller', () => {
     })
 
     describe('given the valid input', () => {
-      it('should return a status of 200 and new updated setting', async () => {
+      it('should return a status of 200 and new updated review', async () => {
         // @ts-ignore
-        jest.spyOn(settingsService, 'editSetting').mockImplementationOnce(() => ({
-          data: settingItem,
-          collectionName: 'settings'
+        jest.spyOn(reviewsService, 'editReview').mockImplementationOnce(() => ({
+          data: reviewItem,
+          collectionName: 'reviews'
         }))
 
         // @ts-ignore
-        // Setting.findByIdAndUpdate.mockImplementationOnce(() => settingItem)
+        // Review.findByIdAndUpdate.mockImplementationOnce(() => reviewItem)
 
         // @ts-ignore
-        await updateSetting(req, res)
+        await updateReview(req, res)
 
         expect(res.json).toHaveBeenCalledTimes(1)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           data: {
-            setting: settingItem
+            review: reviewItem
           }
         })
       })
     })
   })
 
-  describe('test postSetting function', () => {
+  describe('test postReview function', () => {
     describe('given an invalid input', () => {
       it('should return a status of 400', async () => {
-        jest.spyOn(settingsService, 'createSetting').mockRejectedValueOnce({
+        jest.spyOn(reviewsService, 'createReview').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
         // @ts-ignore
-        // Setting.create.mockRejectedValueOnce({
+        // Review.create.mockRejectedValueOnce({
         //   name: 'ValidationError',
         //   statusCode: 400
         // })
 
         try {
           // @ts-ignore
-          await postSetting(req, res)
+          await postReview(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(400)
@@ -195,42 +196,42 @@ describe('unit test for settings controller', () => {
     })
 
     describe('given a valid input', () => {
-      it('should return a status of 201 and new setting', async () => {
+      it('should return a status of 201 and new review', async () => {
         // @ts-ignore
-        jest.spyOn(settingsService, 'createSetting').mockImplementationOnce(() => ({
-          data: settingItem,
-          collectionName: 'settings'
+        jest.spyOn(reviewsService, 'createReview').mockImplementationOnce(() => ({
+          data: reviewItem,
+          collectionName: 'reviews'
         }))
         // @ts-ignore
-        // Setting.create.mockImplementationOnce(() => settingItem)
+        // Review.create.mockImplementationOnce(() => reviewItem)
 
         // @ts-ignore
-        await postSetting(req, res)
+        await postReview(req, res)
 
         expect(res.status).toHaveBeenCalledWith(201)
         expect(res.json).toHaveBeenCalledTimes(1)
         expect(res.json).toHaveBeenCalledWith({
           status: 'success',
           data: {
-            // setting: expect.any(Object)
-            setting: settingItem
+            // review: expect.any(Object)
+            review: reviewItem
           }
         })
       })
     })
   })
 
-  describe('test deleteSetting function', () => {
+  describe('test deleteReview function', () => {
     describe('given an invalid id', () => {
       it('should return a status of 404', async () => {
-        jest.spyOn(settingsService, 'removeSetting').mockRejectedValueOnce({
+        jest.spyOn(reviewsService, 'removeReview').mockRejectedValueOnce({
           statusCode: 404
         })
         // @ts-ignore
-        // Setting.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        // Review.findByIdAndDelete.mockImplementationOnce(() => undefined)
         try {
           // @ts-ignore
-          await deleteSetting(req, res)
+          await deleteReview(req, res)
         } catch (err: any) {
           expect(res.json).toHaveBeenCalledTimes(0)
           expect(err.statusCode).toBe(404)
@@ -241,14 +242,14 @@ describe('unit test for settings controller', () => {
     describe('given a valid id', () => {
       it('should return a status of 204', async () => {
         // @ts-ignore
-        jest.spyOn(settingsService, 'removeSetting').mockImplementationOnce(() => ({
-          data: settingItem,
-          collectionName: 'settings'
+        jest.spyOn(reviewsService, 'removeReview').mockImplementationOnce(() => ({
+          data: reviewItem,
+          collectionName: 'reviews'
         }))
-        // Setting.findByIdAndDelete.mockImplementationOnce(() => settingItem)
+        // Review.findByIdAndDelete.mockImplementationOnce(() => reviewItem)
 
         // @ts-ignore
-        await deleteSetting(req, res)
+        await deleteReview(req, res)
 
         expect(res.status).toHaveBeenCalledWith(204)
         expect(res.json).toHaveBeenCalledTimes(1)

@@ -1,6 +1,10 @@
 jest.mock('../../database/models/booking.model.ts')
+jest.mock('../../utils/index.ts')
+jest.mock('../../services/bookings.service')
+
 import Booking from '../../database/models/booking.model'
 import bookingsController from '../bookings.controller'
+import bookingsService from '../../services/bookings.service'
 
 const { getBookings, getBooking, postBooking, deleteBooking, updateBooking } = bookingsController
 
@@ -45,7 +49,14 @@ describe('unit test for bookings controller', () => {
   describe('test getBookings function', () => {
     it('should return a status of 200 and bookings list', async () => {
       // @ts-ignore
-      Booking.find.mockImplementationOnce(() => [bookingItem])
+      // Booking.find.mockResolvedValue([bookingItem])
+      // Booking.find.mockImplementationOnce(() => [bookingItem])
+
+      jest.spyOn(bookingsService, 'fetchBookings').mockImplementationOnce(() => ({
+        data: [bookingItem],
+        collectionName: 'bookings',
+        count: 1
+      }))
 
       // @ts-ignore
       await getBookings(req, res)
@@ -53,7 +64,9 @@ describe('unit test for bookings controller', () => {
       expect(res.json).toHaveBeenCalledTimes(1)
       expect(res.json).toHaveBeenCalledWith({
         status: 'success',
-        data: expect.any(Object)
+        data: expect.any(Object),
+        count: 1,
+        results: 1
       })
     })
   })
@@ -61,8 +74,11 @@ describe('unit test for bookings controller', () => {
   describe('test getBooking function', () => {
     describe('given an invalid booking id ', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(bookingsService, 'fetchBooking').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        Booking.findById.mockImplementationOnce(() => undefined)
+        // Booking.findById.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -77,7 +93,11 @@ describe('unit test for bookings controller', () => {
     describe('given an valid booking id ', () => {
       it('should return a status of 200 and booking', async () => {
         // @ts-ignore
-        Booking.findById.mockImplementationOnce(() => bookingItem)
+        // Booking.findById.mockImplementationOnce(() => bookingItem)
+        jest.spyOn(bookingsService, 'fetchBooking').mockImplementationOnce(() => ({
+          data: bookingItem,
+          collectionName: 'bookings'
+        }))
 
         // @ts-ignore
         await getBooking(req, res)
@@ -96,8 +116,11 @@ describe('unit test for bookings controller', () => {
   describe('test updateBooking function', () => {
     describe('given the invalid booking id', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(bookingsService, 'editBooking').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        Booking.findByIdAndUpdate.mockImplementationOnce(() => undefined)
+        // Booking.findByIdAndUpdate.mockImplementationOnce(() => undefined)
 
         try {
           // @ts-ignore
@@ -111,11 +134,16 @@ describe('unit test for bookings controller', () => {
 
     describe('given the invalid input', () => {
       it('should return a status of 400', async () => {
-        // @ts-ignore
-        Booking.findByIdAndUpdate.mockRejectedValueOnce({
+        jest.spyOn(bookingsService, 'editBooking').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
+
+        // @ts-ignore
+        // Booking.findByIdAndUpdate.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -130,7 +158,14 @@ describe('unit test for bookings controller', () => {
     describe('given the valid input', () => {
       it('should return a status of 200 and new updated booking', async () => {
         // @ts-ignore
-        Booking.findByIdAndUpdate.mockImplementationOnce(() => bookingItem)
+        jest.spyOn(bookingsService, 'editBooking').mockImplementationOnce(() => ({
+          data: bookingItem,
+          collectionName: 'bookings'
+        }))
+
+        // @ts-ignore
+        // Booking.findByIdAndUpdate.mockImplementationOnce(() => bookingItem)
+
         // @ts-ignore
         await updateBooking(req, res)
 
@@ -148,11 +183,15 @@ describe('unit test for bookings controller', () => {
   describe('test postBooking function', () => {
     describe('given an invalid input', () => {
       it('should return a status of 400', async () => {
-        // @ts-ignore
-        Booking.create.mockRejectedValueOnce({
+        jest.spyOn(bookingsService, 'createBooking').mockRejectedValueOnce({
           name: 'ValidationError',
           statusCode: 400
         })
+        // @ts-ignore
+        // Booking.create.mockRejectedValueOnce({
+        //   name: 'ValidationError',
+        //   statusCode: 400
+        // })
 
         try {
           // @ts-ignore
@@ -167,7 +206,13 @@ describe('unit test for bookings controller', () => {
     describe('given a valid input', () => {
       it('should return a status of 201 and new booking', async () => {
         // @ts-ignore
-        Booking.create.mockImplementationOnce(() => bookingItem)
+        jest.spyOn(bookingsService, 'createBooking').mockImplementationOnce(() => ({
+          data: bookingItem,
+          collectionName: 'bookings'
+        }))
+        // @ts-ignore
+        // Booking.create.mockImplementationOnce(() => bookingItem)
+
         // @ts-ignore
         await postBooking(req, res)
 
@@ -187,8 +232,11 @@ describe('unit test for bookings controller', () => {
   describe('test deleteBooking function', () => {
     describe('given an invalid id', () => {
       it('should return a status of 404', async () => {
+        jest.spyOn(bookingsService, 'removeBooking').mockRejectedValueOnce({
+          statusCode: 404
+        })
         // @ts-ignore
-        Booking.findByIdAndDelete.mockImplementationOnce(() => undefined)
+        // Booking.findByIdAndDelete.mockImplementationOnce(() => undefined)
         try {
           // @ts-ignore
           await deleteBooking(req, res)
@@ -202,7 +250,12 @@ describe('unit test for bookings controller', () => {
     describe('given a valid id', () => {
       it('should return a status of 204', async () => {
         // @ts-ignore
-        Booking.findByIdAndDelete.mockImplementationOnce(() => bookingItem)
+        jest.spyOn(bookingsService, 'removeBooking').mockImplementationOnce(() => ({
+          data: bookingItem,
+          collectionName: 'bookings'
+        }))
+        // Booking.findByIdAndDelete.mockImplementationOnce(() => bookingItem)
+
         // @ts-ignore
         await deleteBooking(req, res)
 
