@@ -1,0 +1,52 @@
+[2024-05-27T:16:39:46] ERROR (longhoang): 
+    err: {
+      "type": "AggregateError",
+      "message": "",
+      "stack":
+          AggregateError
+              at internalConnectMultiple (node:net:1114:18)
+              at afterConnectMultiple (node:net:1667:5)
+      "aggregateErrors": [
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED ::1:6379",
+          "stack":
+              Error: connect ECONNREFUSED ::1:6379
+                  at createConnectionError (node:net:1634:14)
+                  at afterConnectMultiple (node:net:1664:40)
+          "errno": -4078,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "::1",
+          "port": 6379
+        },
+        {
+          "type": "Error",
+          "message": "connect ECONNREFUSED 127.0.0.1:6379",
+          "stack":
+              Error: connect ECONNREFUSED 127.0.0.1:6379
+                  at createConnectionError (node:net:1634:14)
+                  at afterConnectMultiple (node:net:1664:40)
+          "errno": -4078,
+          "code": "ECONNREFUSED",
+          "syscall": "connect",
+          "address": "127.0.0.1",
+          "port": 6379
+        }
+      ],
+      "code": "ECONNREFUSED"
+    }
+[2024-05-28T:13:36:08] ERROR (longhoang): Connection timeout
+    err: {
+      "type": "ConnectionTimeoutError",
+      "message": "Connection timeout",
+      "stack":
+          Error: Connection timeout
+              at Socket.<anonymous> (C:\Users\hoanglong\Downloads\SinhVien\reactjs\api\the-wild-oasis-api\node_modules\@redis\client\dist\lib\client\socket.js:177:124)
+              at Object.onceWrapper (node:events:632:28)
+              at Socket.emit (node:events:518:28)
+              at Socket.emit (node:domain:488:12)
+              at Socket._onTimeout (node:net:589:8)
+              at listOnTimeout (node:internal/timers:573:17)
+              at processTimers (node:internal/timers:514:7)
+    }
