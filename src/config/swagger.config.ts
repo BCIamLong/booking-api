@@ -38,8 +38,12 @@ const swaggerDefinition: SwaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3009',
+      url: '/',
       description: 'Development server'
+    },
+    {
+      url: '/',
+      description: 'Production server'
     }
   ]
 }
@@ -54,7 +58,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions)
 const options = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Booking API',
-  customfavIcon: '/logo-light.png'
+  customfavIcon: './logo-light.png'
 }
 
 swagger.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, options))

@@ -53,7 +53,7 @@ const corsOptions = {
   optionSuccessStatus: 200
 }
 
-app.enable('trust proxy')
+if (process.env.NODE_ENV === 'production') app.enable('trust proxy')
 
 // * default level is -1: which is point to 6
 // * https://www.npmjs.com/package/compression?activeTab=readme
