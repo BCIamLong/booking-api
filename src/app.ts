@@ -7,15 +7,17 @@ import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
 import hpp from 'hpp'
+import compression from 'compression'
 
 import { swagger } from './config'
 import router from './api/routes'
 import { errorsHandler as globalErrorsHandler } from './api/middlewares'
 import { AppError } from './api/utils'
-import { loggerConfig } from './config'
+import { loggerConfig, appConfig } from './config'
 // import './config/modules.d'
 
 const { accessLogStream } = loggerConfig
+const { COMPRESSION_LEVEL } = appConfig
 const app = express()
 
 // *https://express-rate-limit.mintlify.app/reference/configuration
@@ -50,6 +52,10 @@ const corsOptions = {
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200
 }
+
+// * default level is -1: which is point to 6
+// * https://www.npmjs.com/package/compression?activeTab=readme
+app.use(compression({ level: COMPRESSION_LEVEL }))
 
 app.use(cors<Request>(corsOptions))
 // app.use(
