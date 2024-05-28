@@ -1,6 +1,4 @@
-import dotenv from 'dotenv'
-dotenv.config()
-
+import 'dotenv/config'
 import './api/database'
 import { appConfig } from './config'
 import app from './app'
