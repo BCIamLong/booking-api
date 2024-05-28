@@ -1,3 +1,5 @@
+// * because sharp cause some problem on deployment and we also use the resizeAndUploadAvatarToLocal so we can just ignore them but of course we can use it in local
+// * for now in development just delete it and if we need we just use this code again
 import sharp from 'sharp'
 import { UploadApiResponse } from 'cloudinary'
 import { Request, Response, NextFunction } from 'express'
@@ -70,4 +72,5 @@ const resizeAndUploadAvatarToCloud = async function (req: Request, res: Response
   }
 }
 
+// export default { resizeAndUploadAvatarToCloud }
 export default { resizeAndUploadAvatarToLocal, resizeAndUploadAvatarToCloud }

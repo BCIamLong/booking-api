@@ -48,7 +48,7 @@
     "pino-pretty": "^10.3.1",
     "qs": "^6.12.0",
     "redis": "^4.6.13",
-    "sharp": "^0.33.3",
+    "sharp": "^0.33.4",
     "stripe": "^14.25.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
