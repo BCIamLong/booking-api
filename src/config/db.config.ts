@@ -89,7 +89,7 @@ if (process.env.NODE_ENV === 'production')
     password: process.env.REDIS_CLOUD_PWD,
     socket: {
       host: process.env.REDIS_CLOUD_HOST,
-      port: +process.env.PORT!
+      port: +process.env.REDIS_CLOUD_PORT!
     }
   })
 
