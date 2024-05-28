@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "start": "nodemon ./src/index.ts",
+    "start": "node ./src/index.ts",
+    "build": "tsc",
     "start:dev": "set NODE_ENV=development& nodemon ./src/index.ts",
     "start:prod": "set NODE_ENV=production& nodemon ./src/index.ts",
     "test": "set NODE_ENV=test& npx jest",
