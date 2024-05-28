@@ -3,6 +3,7 @@ import { RedisClientType, createClient } from 'redis'
 import jwtConfig from './jwt.config'
 
 const { REFRESH_TOKEN_EXPIRES } = jwtConfig
+const DB_CLOUD_URI = process.env.MONGODB_CLOUD?.replace('<password>', process.env.MONGODB_CLOUD_PASSWORD!)
 
 // declare module 'mongoose' {
 //   interface Query<ResultType, DocType, THelpers = {}, RawDocType = DocType> {
@@ -93,7 +94,8 @@ if (process.env.NODE_ENV === 'production')
   })
 
 export default {
-  DB_LOCAL: process.env.MONGODB_LOCAL,
+  // DB_URI: process.env.NODE_ENV === 'production' ? DB_CLOUD_URI : process.env.MONGODB_LOCAL,
+  DB_URI: DB_CLOUD_URI,
   REDIS_URI: process.env.REDIS_LOCAL,
   mongooseConfigWithRedis,
   redisClient
