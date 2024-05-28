@@ -94,8 +94,8 @@ if (process.env.NODE_ENV === 'production')
   })
 
 export default {
-  // DB_URI: process.env.NODE_ENV === 'production' ? DB_CLOUD_URI : process.env.MONGODB_LOCAL,
-  DB_URI: DB_CLOUD_URI,
+  DB_URI: process.env.NODE_ENV === 'production' ? DB_CLOUD_URI : process.env.MONGODB_LOCAL,
+  // DB_URI: DB_CLOUD_URI,
   REDIS_URI: process.env.REDIS_LOCAL,
   mongooseConfigWithRedis,
   redisClient
