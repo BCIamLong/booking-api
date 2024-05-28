@@ -53,6 +53,8 @@ const corsOptions = {
   optionSuccessStatus: 200
 }
 
+app.enable('trust proxy')
+
 // * default level is -1: which is point to 6
 // * https://www.npmjs.com/package/compression?activeTab=readme
 app.use(compression({ level: COMPRESSION_LEVEL }))
