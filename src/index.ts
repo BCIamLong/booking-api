@@ -39,3 +39,11 @@ process.on('unhandledRejection', (err: Error) => {
     process.exit(1)
   })
 })
+
+process.on('SIGTERM', () => {
+  log.info('SIGTERM RECEIVED. Shutting down gracefully')
+  server.close(() => {
+    log.info('💥 Process terminated')
+    // *SIGTERM will automatically to shutdown our application so therefore we don't need to use process.exit() here
+  })
+})

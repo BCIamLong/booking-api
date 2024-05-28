@@ -4,7 +4,10 @@ import { log } from '~/api/utils'
 
 const PAGE_LIMIT = 6
 const COMPRESSION_LEVEL = 6
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN as string
+const CLIENT_ORIGIN =
+  process.env.NODE_ENV === 'production'
+    ? (process.env.CLIENT_ORIGIN_CLOUD as string)
+    : (process.env.CLIENT_ORIGIN as string)
 const SERVER_ORIGIN = process.env.NODE_ENV === 'production' ? 'https://' : `http://localhost:${process.env.PORT}`
 const DELETE_ACCOUNT_TIMEOUT = Number(process.env.DELETE_ACCOUNT_TIMEOUT)
 
