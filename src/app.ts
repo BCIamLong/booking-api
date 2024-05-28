@@ -24,7 +24,7 @@ const app = express()
 // const allowlist = ['192.168.0.56', '192.168.0.21']
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: process.env.NODE_ENV === 'production' ? 10000 : 1000,
   standardHeaders: 'draft-7',
   handler: (req, res, next, options) =>
     res.status(options.statusCode).json({ status: 'fails', message: 'Too much requests' })
