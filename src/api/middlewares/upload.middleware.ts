@@ -1,30 +1,30 @@
 // * because sharp cause some problem on deployment and we also use the resizeAndUploadAvatarToLocal so we can just ignore them but of course we can use it in local
 // * for now in development just delete it and if we need we just use this code again
-import sharp from 'sharp'
+// import sharp from 'sharp'
 import { UploadApiResponse } from 'cloudinary'
 import { Request, Response, NextFunction } from 'express'
 import { uploadConfig } from '~/config'
 
 const { cloudinary } = uploadConfig
 
-const resizeAndUploadAvatarToLocal = async function (req: Request, res: Response, next: NextFunction) {
-  if (!req.file) return next()
-  try {
-    // const fileName = `user-${req.user._id}-${Date.now()}.jpeg`
-    const fileName = `user-${req.user.id}-${Date.now()}.jpeg`
+// const resizeAndUploadAvatarToLocal = async function (req: Request, res: Response, next: NextFunction) {
+//   if (!req.file) return next()
+//   try {
+//     // const fileName = `user-${req.user._id}-${Date.now()}.jpeg`
+//     const fileName = `user-${req.user.id}-${Date.now()}.jpeg`
 
-    await sharp(req.file.buffer)
-      .resize(300, 300)
-      .toFormat('jpeg')
-      .jpeg({ quality: 90 })
-      .toFile(`src/public/imgs/users/${fileName}`)
-    // * because we want store this fileName to DB so we need to pass it like this and then in the update user profile route we will store it to DB
-    req.fileName = fileName
-    next()
-  } catch (err) {
-    next(err)
-  }
-}
+//     await sharp(req.file.buffer)
+//       .resize(300, 300)
+//       .toFormat('jpeg')
+//       .jpeg({ quality: 90 })
+//       .toFile(`src/public/imgs/users/${fileName}`)
+//     // * because we want store this fileName to DB so we need to pass it like this and then in the update user profile route we will store it to DB
+//     req.fileName = fileName
+//     next()
+//   } catch (err) {
+//     next(err)
+//   }
+// }
 
 const resizeAndUploadAvatarToCloud = async function (req: Request, res: Response, next: NextFunction) {
   if (!req.file) return next()
@@ -72,5 +72,5 @@ const resizeAndUploadAvatarToCloud = async function (req: Request, res: Response
   }
 }
 
-// export default { resizeAndUploadAvatarToCloud }
-export default { resizeAndUploadAvatarToLocal, resizeAndUploadAvatarToCloud }
+export default { resizeAndUploadAvatarToCloud }
+// export default { resizeAndUploadAvatarToLocal, resizeAndUploadAvatarToCloud }
