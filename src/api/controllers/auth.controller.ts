@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import sharp from 'sharp'
+// import sharp from 'sharp'
 import { Request, Response } from 'express'
 import { authService, guestsService, usersService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
