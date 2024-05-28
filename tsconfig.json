@@ -11,7 +11,7 @@
     // "noEmit": true, //* when we deploy we should turn off this noEmit option so it will enable the type check for typescript without generate files but in deployment we need to generate JS files from TS files right so we need to turn off it
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*", "dist/*"]
     }
   },
   "ts-node": {
