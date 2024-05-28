@@ -8,7 +8,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "noEmit": true,
+    // "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["src/*"]
