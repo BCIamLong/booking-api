@@ -17,5 +17,6 @@
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   },
+  // "include": ["src/**/*.ts", "src/**/**/*.ts", "src/__tests__/*.ts", "src/api/**/__tests__/*.ts"],
   "exclude": ["./node_modules", "./jest.config.ts"]
 }

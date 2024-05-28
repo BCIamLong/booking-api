@@ -8,7 +8,8 @@ const config: Config = {
 
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testMatch: ['**/__tests__/*.spec.ts', '**/api/**/*.spec.ts'],
+  // testMatch: ['**/__tests__/*.spec.ts', '**/api/**/*.spec.ts'],
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],
   verbose: true,
   forceExit: true,
   clearMocks: true,
