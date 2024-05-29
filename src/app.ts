@@ -14,10 +14,13 @@ import router from './api/routes'
 import { errorsHandler as globalErrorsHandler } from './api/middlewares'
 import { AppError } from './api/utils'
 import { loggerConfig, appConfig } from './config'
+import { bookingsController } from './api/controllers'
 // import './config/modules.d'
 
 const { accessLogStream } = loggerConfig
 const { COMPRESSION_LEVEL } = appConfig
+const { webhookCheckout } = bookingsController
+
 const app = express()
 
 // *https://express-rate-limit.mintlify.app/reference/configuration
@@ -91,6 +94,9 @@ app.use(swagger)
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
 if (process.env.NODE_ENV === 'production') app.use(morgan('combined', { stream: accessLogStream }))
 app.use(cookieParser())
+
+app.post('/webhook/checkout', bodyParser.raw({ type: 'application/json' }), webhookCheckout)
+
 app.use(bodyParser.json({ limit: '90kb' }))
 app.use(bodyParser.urlencoded({ extended: true }))
 

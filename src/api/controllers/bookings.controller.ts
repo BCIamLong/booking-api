@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { Stripe } from 'stripe'
 import { bookingsService, cabinsService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 import { paymentConfig, appConfig } from '~/config'
@@ -99,7 +100,8 @@ const createBookingCheckout = async function (req: Request, res: Response) {
 }
 
 const getCheckOutSession = async function (req: Request, res: Response) {
-  const { cabinId, regularPrice, name, description, image, endDate, startDate, numGuests, numNights } = req.body
+  const { cabinId, cabinName, regularPrice, name, description, image, endDate, startDate, numGuests, numNights } =
+    req.body
   // console.log(req.user)
   const { id: userId, email } = req.user
 
@@ -110,7 +112,11 @@ const getCheckOutSession = async function (req: Request, res: Response) {
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/api/v1/bookings/create-booking-checkout?user=${userId}&cabin=${cabinId}&price=${regularPrice}&startDate=${startDate}&endDate=${endDate}&numGuests=${numGuests}&numNights=${numNights}`,
+    // * the comment bellow use for in development
+    // success_url: `${req.protocol}://${req.get('host')}/api/v1/bookings/create-booking-checkout?user=${userId}&cabin=${cabinId}&price=${regularPrice}&startDate=${startDate}&endDate=${endDate}&numGuests=${numGuests}&numNights=${numNights}`,
+
+    success_url: `${CLIENT_ORIGIN}/bookings/success`, //* for production
+
     cancel_url: `${CLIENT_ORIGIN}/cabins/${cabinId}`,
     customer_email: email,
     client_reference_id: cabinId,
@@ -128,7 +134,20 @@ const getCheckOutSession = async function (req: Request, res: Response) {
         },
         quantity: 1
       }
-    ]
+    ],
+    // * this is the way we can custom the data we want to pass to session
+    // * and we use it when we deploy because now we can use webhook from stripe
+    // * for production
+    metadata: {
+      user: userId,
+      cabinName,
+      startDate,
+      endDate,
+      numGuests,
+      numNights,
+      extrasPrice: 0,
+      observation: 'I will checking later'
+    }
   })
   // res.redirect(303, session.url as string)
   res.status(201).json({
@@ -137,6 +156,96 @@ const getCheckOutSession = async function (req: Request, res: Response) {
     // session
   })
 }
+
+const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Session, userData: IUser & IGuest) {
+  const { client_reference_id, metadata, line_items } = session || {}
+  const { user, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName } = metadata || {}
+  const cabinId = client_reference_id as string
+  // const price = line_items?.[0].price_data.unit_amount
+  const price = line_items?.data[0].price?.unit_amount as number
+
+  const { data: booking } = await createBooking({
+    cabinId,
+    guestId: user as string,
+    startDate: new Date(startDate as string),
+    endDate: new Date(endDate as string),
+    numNights: +numNights,
+    numGuests: +numGuests,
+    cabinPrice: price,
+    extrasPrice: +extrasPrice,
+    totalPrice: price + +extrasPrice,
+    observation,
+    status: 'confirmed'
+  })
+
+  const customBooking = { ...booking, totalPrice: +price, cabinId: { name: cabinName } } as IBooking & {
+    cabinId: string | ICabin
+  }
+  const url = `${CLIENT_ORIGIN}/profile/bookings`
+
+  appEmitter.bookingSuccess(userData as IUser & IGuest, customBooking, url)
+}
+
+const webhookCheckout = async function (req: Request, res: Response) {
+  const signature = req.headers['stripe-signature']
+
+  let event
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, signature!, process.env.STRIPE_WEBHOOK_CHECKOUT_SECRET!)
+  } catch (err: any) {
+    return res.status(400).send(`Webhook error: ${err.message}`)
+  }
+
+  if (event.type === 'checkout.session.completed')
+    createBookingWebhookCheckout(event.data.object, req.user as IUser & IGuest)
+
+  res.status(200).json({ received: true })
+}
+
+// const webhookCheckout = async function (req: Request, res: Response) {
+//   const signature = req.headers['stripe-signature']
+
+//   let event
+
+//   try {
+//     event = stripe.webhooks.constructEvent(req.body, signature!, process.env.STRIPE_WEBHOOK_CHECKOUT_SECRET!)
+//   } catch (err: any) {
+//     return res.status(400).send(`Webhook error: ${err.message}`)
+//   }
+
+//   if (event.type === 'checkout.session.completed') {
+//     const { client_reference_id, metadata, line_items } = event.data.object || {}
+//     const { user, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName } = metadata || {}
+//     const cabinId = client_reference_id as string
+//     // const price = line_items?.[0].price_data.unit_amount
+//     const price = line_items?.data[0].price?.unit_amount as number
+
+//     const { data: booking } = await createBooking({
+//       cabinId,
+//       guestId: user as string,
+//       startDate: new Date(startDate as string),
+//       endDate: new Date(endDate as string),
+//       numNights: +numNights,
+//       numGuests: +numGuests,
+//       cabinPrice: price,
+//       extrasPrice: +extrasPrice,
+//       totalPrice: price + +extrasPrice,
+//       observation,
+//       status: 'confirmed'
+//     })
+
+//     const customBooking = { ...booking, totalPrice: +price, cabinId: { name: cabinName } } as IBooking & {
+//       cabinId: string | ICabin
+//     }
+//     const url = `${CLIENT_ORIGIN}/profile/bookings`
+
+//     appEmitter.bookingSuccess(req.user as IUser & IGuest, customBooking, url)
+//   }
+
+//   res.status(200).json({ received: true })
+// }
+
 // const getCheckOutSession = async function (req: Request, res: Response) {
 //   const { cabinId: id } = req.params || {}
 
@@ -187,5 +296,6 @@ export default {
   createBookingCheckout,
   getUserBookings,
   getUserBooking,
-  deleteUserBooking
+  deleteUserBooking,
+  webhookCheckout
 }
