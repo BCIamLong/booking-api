@@ -42,9 +42,10 @@ const limiter = rateLimit({
 const allowedOrigins = ['http://localhost:5173', 'https://bookings-app-client.vercel.app']
 
 const corsOptions: CorsOptions = {
-  origin: function (origin, callback: (err: Error | null, origin?: string) => void) {
+  origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
     if (allowedOrigins.indexOf(origin!) !== -1 || !origin) {
-      callback(null, origin)
+      callback(null, true)
+      // callback(null, origin)
     } else {
       callback(new Error('Not allowed by CORS'))
     }
