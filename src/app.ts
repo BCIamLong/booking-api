@@ -52,7 +52,19 @@ const corsOptions: CorsOptions = {
     }
   },
   credentials: true,
-  allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
+  methods: ['GET', 'POST', 'OPTIONS', 'PATCH', 'DELETE', 'PUT'],
+  allowedHeaders: [
+    'Authorization',
+    'X-Requested-With',
+    'Content-Type',
+    'X-CSRF-Token',
+    'Accept',
+    'Accept-Version',
+    'Content-Length',
+    'Content-MD5',
+    'Date',
+    'X-Api-Version'
+  ]
 }
 
 // const corsOptions: CorsOptions = {
