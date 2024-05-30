@@ -51,9 +51,9 @@ const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
 const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  domain: SERVER_ORIGIN,
-  path: '/',
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  // domain: SERVER_ORIGIN,
+  // path: '/',
 }
 
 const setCookies = function (res: Response, accessToken: string, refreshToken: string) {
