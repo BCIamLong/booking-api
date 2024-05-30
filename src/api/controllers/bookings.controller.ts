@@ -187,8 +187,9 @@ const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Se
 }
 
 const webhookCheckout = async function (req: Request, res: Response) {
+  console.log('ok')
   const signature = req.headers['stripe-signature']
-
+  console.log(signature)
   let event
 
   try {
