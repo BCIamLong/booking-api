@@ -53,7 +53,7 @@ const corsOptions: CorsOptions = {
   // },
   origin: '*',
   credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS', 'PATCH', 'DELETE', 'PUT'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
   allowedHeaders:
     process.env.NODE_ENV === 'production'
       ? [
@@ -114,7 +114,7 @@ app.use(cors<Request>(corsOptions))
 //   next()
 // })
 
-app.options('*', cors<Request>())
+app.options('*', cors<Request>(corsOptions))
 // app.options('*', cors())
 
 app.use(helmet())
