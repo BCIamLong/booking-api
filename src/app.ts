@@ -42,50 +42,18 @@ const limiter = rateLimit({
 const allowedOrigins = ['http://localhost:5173', 'https://bookings-app-client.vercel.app']
 
 const corsOptions: CorsOptions = {
-  // origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
-  //   if (allowedOrigins.indexOf(origin!) !== -1 || !origin) {
-  //     callback(null, true)
-  //     // *origin can be string or boolean type: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
-  //     // callback(null, origin)
-  //   } else {
-  //     callback(new Error('Not allowed by CORS'))
-  //   }
-  // },
-  origin: '*',
+  origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
+    if (allowedOrigins.indexOf(origin!) !== -1 || !origin) {
+      callback(null, true)
+      // *origin can be string or boolean type: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
+      // callback(null, origin)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
-  allowedHeaders:
-    process.env.NODE_ENV === 'production'
-      ? [
-          'X-Requested-With',
-          'Content-Type',
-          'X-CSRF-Token',
-          'Accept',
-          'Accept-Version',
-          'Content-Length',
-          'Content-MD5',
-          'Date',
-          'X-Api-Version'
-        ]
-      : [
-          'Authorization',
-          'X-Requested-With',
-          'Content-Type',
-          'X-CSRF-Token',
-          'Accept',
-          'Accept-Version',
-          'Content-Length',
-          'Content-MD5',
-          'Date',
-          'X-Api-Version'
-        ]
+  allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
 }
-
-// const corsOptions: CorsOptions = {
-//   origin: 'https://bookings-app-client.vercel.app',
-//   credentials: true,
-//   allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
-// }
 
 // const corsOptions = {
 //   origin: '*',
