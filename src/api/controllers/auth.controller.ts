@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 // import sharp from 'sharp'
-import { Request, Response } from 'express'
+import { Request, Response, CookieOptions } from 'express'
 import { authService, guestsService, usersService } from '../services'
 import { jwtConfig, appConfig } from '~/config'
 import { IGuest, IUser, UserSession } from '../interfaces'
@@ -48,10 +48,12 @@ const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
   })
 }
 
-const cookieOptions = {
+const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production'
 }
+
+if (process.env.NODE_ENV === 'production') cookieOptions.sameSite = 'none'
 
 const setCookies = function (res: Response, accessToken: string, refreshToken: string) {
   res.cookie('access-token', accessToken, {
