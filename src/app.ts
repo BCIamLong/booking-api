@@ -12,7 +12,7 @@ import compression from 'compression'
 import { swagger } from './config'
 import router from './api/routes'
 import { errorsHandler as globalErrorsHandler } from './api/middlewares'
-import { AppError } from './api/utils'
+import { AppError, asyncCatch } from './api/utils'
 import { loggerConfig, appConfig } from './config'
 import { bookingsController } from './api/controllers'
 // import './config/modules.d'
@@ -101,7 +101,7 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
 if (process.env.NODE_ENV === 'production') app.use(morgan('combined', { stream: accessLogStream }))
 app.use(cookieParser())
 
-app.post('/webhook/checkout', bodyParser.raw({ type: 'application/json' }), webhookCheckout)
+app.post('/webhook/checkout', bodyParser.raw({ type: 'application/json' }), asyncCatch(webhookCheckout))
 
 app.use(bodyParser.json({ limit: '90kb' }))
 app.use(bodyParser.urlencoded({ extended: true }))

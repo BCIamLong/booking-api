@@ -158,11 +158,13 @@ const getCheckOutSession = async function (req: Request, res: Response) {
 }
 
 const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Session, userData: IUser & IGuest) {
-  const { client_reference_id, metadata, line_items } = session || {}
+  const { client_reference_id, metadata, amount_total } = session || {}
   const { user, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName } = metadata || {}
   const cabinId = client_reference_id as string
   // const price = line_items?.[0].price_data.unit_amount
-  const price = line_items?.data[0].price?.unit_amount as number
+  // const price = line_items?.data.price?.unit_amount as number
+  const price = amount_total! / 100
+  const totalPrice = price! + +extrasPrice
 
   const { data: booking } = await createBooking({
     cabinId,
@@ -173,7 +175,7 @@ const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Se
     numGuests: +numGuests,
     cabinPrice: price,
     extrasPrice: +extrasPrice,
-    totalPrice: price + +extrasPrice,
+    totalPrice,
     observation,
     status: 'confirmed'
   })
@@ -187,9 +189,7 @@ const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Se
 }
 
 const webhookCheckout = async function (req: Request, res: Response) {
-  console.log('ok')
   const signature = req.headers['stripe-signature']
-  console.log(signature)
   let event
 
   try {
