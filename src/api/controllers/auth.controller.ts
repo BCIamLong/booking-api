@@ -12,7 +12,7 @@ import { JwtPayload } from 'jsonwebtoken'
 
 // const { redisClient } = redis
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES, REFRESH_TOKEN_EXPIRES } = jwtConfig
-const { CLIENT_ORIGIN, appEmitter } = appConfig
+const { CLIENT_ORIGIN, appEmitter, SERVER_ORIGIN } = appConfig
 const {
   loginService,
   signupService,
@@ -50,10 +50,11 @@ const signToken = function (type: 'access' | 'refresh', user: IUser | IGuest) {
 
 const cookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production'
+  secure: process.env.NODE_ENV === 'production',
+  domain: SERVER_ORIGIN,
+  path: '/',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
 }
-
-if (process.env.NODE_ENV === 'production') cookieOptions.sameSite = 'none'
 
 const setCookies = function (res: Response, accessToken: string, refreshToken: string) {
   res.cookie('access-token', accessToken, {
