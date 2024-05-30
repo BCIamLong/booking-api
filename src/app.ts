@@ -114,7 +114,7 @@ app.use(cors<Request>(corsOptions))
 //   next()
 // })
 
-app.options('*', cors<Request>(corsOptions))
+app.options('*', cors<Request>())
 // app.options('*', cors())
 
 app.use(helmet())
