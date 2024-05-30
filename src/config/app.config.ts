@@ -8,7 +8,10 @@ const CLIENT_ORIGIN =
   process.env.NODE_ENV === 'production'
     ? (process.env.CLIENT_ORIGIN_CLOUD as string)
     : (process.env.CLIENT_ORIGIN as string)
-const SERVER_ORIGIN = process.env.NODE_ENV === 'production' ? 'https://' : `http://localhost:${process.env.PORT}`
+const SERVER_ORIGIN =
+  process.env.NODE_ENV === 'production'
+    ? 'https://booking-api-ebe1.onrender.com'
+    : `http://localhost:${process.env.PORT}`
 const DELETE_ACCOUNT_TIMEOUT = Number(process.env.DELETE_ACCOUNT_TIMEOUT)
 
 process.on('uncaughtException', (err: Error) => {

@@ -45,6 +45,7 @@ const corsOptions: CorsOptions = {
   origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
     if (allowedOrigins.indexOf(origin!) !== -1 || !origin) {
       callback(null, true)
+      // *origin can be string or boolean type: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
       // callback(null, origin)
     } else {
       callback(new Error('Not allowed by CORS'))
