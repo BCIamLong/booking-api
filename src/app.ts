@@ -51,7 +51,8 @@ const corsOptions: CorsOptions = {
       callback(new Error('Not allowed by CORS'))
     }
   },
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
 }
 
 // const corsOptions = {
