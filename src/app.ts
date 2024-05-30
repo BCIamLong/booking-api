@@ -39,39 +39,24 @@ const limiter = rateLimit({
   // store: ... , // Redis, Memcached, etc. See below.
 })
 
-// const whitelist = ['http://localhost:5173', 'https://checkout.stripe.com']
-
-// const corsOptions = {
-//   origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
-//     if (whitelist.indexOf(origin) !== -1 || !origin) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   }
-// }
-
 const allowedOrigins = ['http://localhost:5173', 'https://bookings-app-client.vercel.app']
+
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback: (err: Error | null, origin?: string) => void) {
+    if (allowedOrigins.indexOf(origin!) !== -1 || !origin) {
+      callback(null, origin)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}
 
 // const corsOptions = {
 //   origin: '*',
 //   credentials: true, //access-control-allow-credentials:true
 //   optionSuccessStatus: 200
 // }
-
-const corsOptions = (req: Request, callback: (err: Error | null, options: CorsOptions) => void) => {
-  const corsOptions: CorsOptions = {
-    credentials: true
-  }
-
-  if (allowedOrigins.includes(req.header('Origin')!)) {
-    corsOptions.origin = req.header('Origin')
-  } else {
-    corsOptions.origin = false // Disallow if not in allowedOrigins
-  }
-
-  callback(null, corsOptions)
-}
 
 if (process.env.NODE_ENV === 'production') app.enable('trust proxy')
 
