@@ -42,10 +42,24 @@ const limiter = rateLimit({
 const allowedOrigins = ['http://localhost:5173', 'https://bookings-app-client.vercel.app']
 
 const corsOptions: CorsOptions = {
-  origin: 'https://bookings-app-client.vercel.app',
+  origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
+    if (allowedOrigins.indexOf(origin!) !== -1 || !origin) {
+      callback(null, true)
+      // *origin can be string or boolean type: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
+      // callback(null, origin)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
   allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
 }
+
+// const corsOptions: CorsOptions = {
+//   origin: 'https://bookings-app-client.vercel.app',
+//   credentials: true,
+//   allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
+// }
 
 // const corsOptions = {
 //   origin: '*',
