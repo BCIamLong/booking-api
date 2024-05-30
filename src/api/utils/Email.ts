@@ -68,7 +68,7 @@ export default class Email {
   async sendEmail(template: string, subject: string) {
     const emailOptions = {
       from: EMAIL_FROM,
-      to: this.user.email,
+      to: this.user?.email,
       subject,
       text: convert(template, { wordwrap: 120 }),
       html: template

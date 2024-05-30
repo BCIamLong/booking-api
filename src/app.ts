@@ -39,7 +39,12 @@ const limiter = rateLimit({
   // store: ... , // Redis, Memcached, etc. See below.
 })
 
-const allowedOrigins = ['http://localhost:5173', 'https://bookings-app-client.vercel.app']
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://bookings-app-client.vercel.app',
+  'https://stripe.com',
+  'https://m.stripe.com'
+]
 
 const corsOptions: CorsOptions = {
   origin: function (origin, callback: (err: Error | null, allow?: boolean) => void) {
