@@ -1,6 +1,6 @@
 import path from 'path'
 import express, { NextFunction, Request, Response } from 'express'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
@@ -50,10 +50,27 @@ const limiter = rateLimit({
 //     }
 //   }
 // }
-const corsOptions = {
-  origin: '*',
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200
+
+const allowedOrigins = ['http://localhost:5173', 'https://bookings-app-client.vercel.app']
+
+// const corsOptions = {
+//   origin: '*',
+//   credentials: true, //access-control-allow-credentials:true
+//   optionSuccessStatus: 200
+// }
+
+const corsOptions = (req: Request, callback: (err: Error | null, options: CorsOptions) => void) => {
+  const corsOptions: CorsOptions = {
+    credentials: true
+  }
+
+  if (allowedOrigins.includes(req.header('Origin')!)) {
+    corsOptions.origin = req.header('Origin')
+  } else {
+    corsOptions.origin = false // Disallow if not in allowedOrigins
+  }
+
+  callback(null, corsOptions)
 }
 
 if (process.env.NODE_ENV === 'production') app.enable('trust proxy')
