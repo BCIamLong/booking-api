@@ -482,7 +482,12 @@ const verify2FAOtp = async function (req: Request, res: Response) {
 
 const validate2FAOtp = async function (req: Request, res: Response) {
   const { id, role } = req.user
-  await validate2FAOtpService({ id, role, otp: req.body.otp })
+  const user = await validate2FAOtpService({ id, role, otp: req.body.otp })
+
+  const accessToken = signToken('access', user)
+  const refreshToken = signToken('refresh', user)
+
+  setCookies(res, accessToken, refreshToken)
 
   res.json({
     status: 'success',

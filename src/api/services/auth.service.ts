@@ -332,7 +332,15 @@ const verify2FAOtpService = async function ({ id, role, otp }: { id: string; rol
   // setCache('user', '', JSON.stringify(userCache?.data))
 }
 
-const validate2FAOtpService = async function ({ id, role, otp }: { id: string; role: string; otp: string }) {
+const validate2FAOtpService = async function ({
+  id,
+  role,
+  otp
+}: {
+  id: string
+  role: string
+  otp: string
+}): Promise<IGuest | IUser> {
   const user = await isUserExisted({ field: '_id', value: id })
 
   const totp = generateTotp({ secret: user?.otp2FAToken as string })
@@ -347,9 +355,16 @@ const validate2FAOtpService = async function ({ id, role, otp }: { id: string; r
 
   const delta = totp.validate({ token: otp, window: 1 })
   if (delta === null) throw new AppError(401, 'Your otp code is invalid')
-
-  if (role === 'user') await editGuest(id, { verify2FAOtp: true })
-  if (role === 'admin') await editUser(id, { verify2FAOtp: true })
+  let editedUser: IUser | IGuest
+  if (role === 'admin') {
+    const { data } = await editUser(id, { verify2FAOtp: true })
+    editedUser = data
+    return editedUser
+  }
+  // if it's user: if (role === 'user')
+  const { data } = await editGuest(id, { verify2FAOtp: true })
+  editedUser = data
+  return editedUser
 }
 
 const disable2FAService = async function ({ id, role }: { id: string; role: string }) {
