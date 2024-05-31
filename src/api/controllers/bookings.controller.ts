@@ -144,6 +144,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
     // * for production
     metadata: {
       user: userId,
+      email,
       cabinName,
       startDate,
       endDate,
@@ -161,9 +162,9 @@ const getCheckOutSession = async function (req: Request, res: Response) {
   })
 }
 
-const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Session, userData: IUser & IGuest) {
+const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Session) {
   const { client_reference_id, metadata, amount_total } = session || {}
-  const { user, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName } = metadata || {}
+  const { user, email, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName } = metadata || {}
   const cabinId = client_reference_id as string
   // const price = line_items?.[0].price_data.unit_amount
   // const price = line_items?.data.price?.unit_amount as number
@@ -189,7 +190,10 @@ const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Se
   }
   const url = `${CLIENT_ORIGIN}/profile/bookings`
 
-  appEmitter.bookingSuccess(userData as IUser & IGuest, customBooking, url)
+  // ! this webhook here need to be handle at the very top of the app routes and also stripe will make the request here then we can't have req.user right because it's only if we handle in our client or server
+  // * but now it's handled from stripe right therefore a solution that we can pass the user data so the req.user to the metadata then we access it from checkout session
+  // * so that's it
+  appEmitter.bookingSuccess({ id: user, email } as IUser & IGuest, customBooking, url)
 }
 
 const webhookCheckout = async function (req: Request, res: Response) {
@@ -202,8 +206,7 @@ const webhookCheckout = async function (req: Request, res: Response) {
     return res.status(400).send(`Webhook error: ${err.message}`)
   }
 
-  if (event.type === 'checkout.session.completed')
-    createBookingWebhookCheckout(event.data.object, req.user as IUser & IGuest)
+  if (event.type === 'checkout.session.completed') createBookingWebhookCheckout(event.data.object)
 
   res.status(200).json({ received: true })
 }
