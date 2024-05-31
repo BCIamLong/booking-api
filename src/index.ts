@@ -4,13 +4,13 @@ import { appConfig } from './config'
 import app from './app'
 import { Email, log } from './api/utils'
 
-const { appEmitter } = appConfig
+const { appEmitter, SERVER_ORIGIN } = appConfig
 
 const port = process.env.PORT || 3009
 
 const server = app.listen(port, () => {
   log.info(`Server is listening at port ${port}`)
-  log.info(`Documentation available at http://localhost:${port}/docs`)
+  log.info(`Documentation available at ${SERVER_ORIGIN}/docs`)
 })
 
 appEmitter.on('signup', (user, url) => {
