@@ -30,7 +30,7 @@ const settingSchema = new Schema(
   {
     _id: {
       type: String,
-      default: `setting-${uuidv4()}`
+      default: () => `setting-${uuidv4()}`
       // unique: true
       // required: true,
     },

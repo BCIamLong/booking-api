@@ -31,7 +31,7 @@ const reviewSchema = new Schema(
   {
     _id: {
       type: String,
-      default: `review-${uuidv4()}`
+      default: () => `review-${uuidv4()}`
       //* _id will already have this in place, that is we cannot have _id to have non-unique value even if the condition from mongoose is not there and it is always required.
       // * so by default mongoose is always set this _id property to unique, therefore the error here that we overwrite this unique property and maybe this property _id always have this unique like it can be change outside right so it might be private
       // * so therefore if we custom this _id we should not set the unique property of the _id

@@ -61,7 +61,7 @@ const guestSchema = new Schema(
   {
     _id: {
       type: String,
-      default: `guest-${uuidv4()}`
+      default: () => `guest-${uuidv4()}`
       // unique: true
     },
     fullName: {

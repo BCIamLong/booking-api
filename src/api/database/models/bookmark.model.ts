@@ -32,7 +32,7 @@ const bookmarkSchema = new Schema(
   {
     _id: {
       type: String,
-      default: `bookmark-${uuidv4()}`
+      default: () => `bookmark-${uuidv4()}`
     },
     user: {
       type: String,
