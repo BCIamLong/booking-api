@@ -68,7 +68,10 @@ reviewSchema.index({ cabin: 1, user: 1 }, { unique: true })
 reviewSchema.methods.updateCabinWithReview = async function (model: Model<IReview>, cabinId: string) {
   const stats = await model.aggregate([
     {
-      $match: { cabin: cabinId }
+      // ! because the cabinId is reference field so it can be populated right and when it is populated then it's object(data) of the cabin
+      // * so therefore we need to check it whether it's different with string then give it the id in that cabin data
+      // * if we pass it an object to the cabin with its type of value is string then it always return empty string right because there is no cabin match that condition right
+      $match: { cabin: typeof cabinId !== 'string' ? (cabinId as { _id: string })._id : cabinId }
     },
     {
       $group: {
