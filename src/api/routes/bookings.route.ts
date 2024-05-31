@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import cors from 'cors'
 import { asyncCatch } from '../utils'
 import { bookingsController } from '../controllers'
 import { validator, bookingSchema } from '../validators'
@@ -125,7 +126,17 @@ bookingRouter.get('/me', authenticate, auth2FA, authorize('user'), asyncCatch(ge
  *    500:
  *     description: Something went wrong
  */
-bookingRouter.get('/me/latest', authenticate, auth2FA, authorize('user'), asyncCatch(getUserBooking))
+bookingRouter.get(
+  '/me/latest',
+  cors({
+    origin: process.env.NODE_ENV === 'production' ? 'https://bookings-app-client.vercel.app' : '*',
+    credentials: true
+  }),
+  authenticate,
+  auth2FA,
+  authorize('user'),
+  asyncCatch(getUserBooking)
+)
 
 /**
  * @openapi
