@@ -27,13 +27,13 @@ const getCache = async function <T>({ key, hashKey = '', model }: { key: string;
       const dataRaw = await redisClient.hGet(hashKey, key)
       if (!dataRaw) return null
       data = JSON.parse(dataRaw!)
-      if (Array.isArray(data)) return data.map((item) => model?.hydrate(item))
+      if (Array.isArray(data)) return data.map((item) => model?.hydrate?.(item))
       // console.log(model)
-      return model?.hydrate(data)
+      return model?.hydrate?.(data)
     }
 
     data = await redisClient.get(key)
-    return model?.hydrate(JSON.parse(data!))
+    return model?.hydrate?.(JSON.parse(data!))
   } catch (error) {
     console.log(error)
   }
