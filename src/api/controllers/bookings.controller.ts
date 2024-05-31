@@ -115,6 +115,10 @@ const getCheckOutSession = async function (req: Request, res: Response) {
     // * the comment bellow use for in development
     // success_url: `${req.protocol}://${req.get('host')}/api/v1/bookings/create-booking-checkout?user=${userId}&cabin=${cabinId}&price=${regularPrice}&startDate=${startDate}&endDate=${endDate}&numGuests=${numGuests}&numNights=${numNights}`,
 
+    // * if we want to use the information of the checkout session to display on the success page we can customize the success_url with session id
+    // * and the access to checkout session with this session_id then take the data and display
+    // * https://docs.stripe.com/payments/checkout/custom-success-page
+    // success_url: `${CLIENT_ORIGIN}/bookings/success?session_id={CHECKOUT_SESSION_ID}`, //* for production
     success_url: `${CLIENT_ORIGIN}/bookings/success`, //* for production
 
     cancel_url: `${CLIENT_ORIGIN}/cabins/${cabinId}`,

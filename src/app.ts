@@ -57,7 +57,7 @@ const corsOptions: CorsOptions = {
     }
   },
   credentials: true,
-  allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type']
+  allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type', 'Origin', 'Accept']
 }
 
 // const corsOptions = {
