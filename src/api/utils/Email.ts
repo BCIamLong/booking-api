@@ -66,15 +66,19 @@ export default class Email {
   // }
 
   async sendEmail(template: string, subject: string) {
-    const emailOptions = {
-      from: EMAIL_FROM,
-      to: this.user?.email,
-      subject,
-      text: convert(template, { wordwrap: 120 }),
-      html: template
-    }
+    try {
+      const emailOptions = {
+        from: EMAIL_FROM,
+        to: this.user?.email,
+        subject,
+        text: convert(template, { wordwrap: 120 }),
+        html: template
+      }
 
-    await this.newTransporter().sendMail(emailOptions)
+      await this.newTransporter().sendMail(emailOptions)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   newTransporter() {
