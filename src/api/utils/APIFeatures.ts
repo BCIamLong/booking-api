@@ -95,7 +95,7 @@ export default class APIFeatures<T> {
     const dataCached = await getCache({ hashKey: 'page', key: `${pageVal}-${this.queryStr}`, model: this.query.model })
 
     if (dataCached) {
-      console.log('ok')
+      // console.log('ok')
       this.query = Promise.resolve(dataCached) as Query<T[], T>
       return this
     }

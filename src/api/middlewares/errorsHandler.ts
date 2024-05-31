@@ -10,7 +10,7 @@ const devErrorHandler = function (err: AppError, res: Response) {
   })
 }
 const prodErrorHandler = function (err: AppError, res: Response) {
-  console.log(err.isOperation)
+  // console.log(err.isOperation)
   if (err.isOperation)
     return res.status(err.statusCode).json({
       status: err.status,

@@ -79,7 +79,7 @@ reviewSchema.methods.updateCabinWithReview = async function (model: Model<IRevie
     }
   ])
 
-  console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
+  // console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
   const ratingQuantity = stats[0]?.ratingQuantity || 0
   const ratingAverage = stats[0]?.ratingAverage || 5
   // await this.model('Cabin').findByIdAndUpdate(

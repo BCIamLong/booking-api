@@ -181,9 +181,9 @@ guestSchema.pre(/^find/, function (next) {
 guestSchema.post('findOneAndUpdate', async function (doc, next) {
   // *DELETE THE verifyEmailToken after we verify email because we use findAndUpdateGuest to update and cache the user then we need to remove this verifyEmailToken in this post hook of findOneAndUpdate
   // ! PROBLEM SOME HOW THIS POST HOOK DOESN'T WORK
-  console.log('ok1')
+  // console.log('ok1')
   if (doc?.verifyEmail && doc?.verifyEmailToken) {
-    console.log('ok2')
+    // console.log('ok2')
     doc.verifyEmailToken = undefined
     await doc.save({ validateBeforeSave: false })
   }

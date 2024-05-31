@@ -6,7 +6,7 @@ const bookmarksQueryModifier = async function (req: Request, res: Response, next
     if (req.method === 'POST') {
       req.body.cabin = cabinId
       req.body.user = req.user.id
-      console.log('middleware', req.body)
+      // console.log('middleware', req.body)
       return next()
     }
     req.query.cabin = cabinId
