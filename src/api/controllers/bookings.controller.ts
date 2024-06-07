@@ -100,8 +100,19 @@ const createBookingCheckout = async function (req: Request, res: Response) {
 }
 
 const getCheckOutSession = async function (req: Request, res: Response) {
-  const { cabinId, cabinName, regularPrice, name, description, image, endDate, startDate, numGuests, numNights } =
-    req.body
+  const {
+    cabinId,
+    cabinName,
+    regularPrice,
+    name,
+    description,
+    image,
+    endDate,
+    startDate,
+    numGuests,
+    numNights,
+    locale
+  } = req.body
   // console.log(req.user)
   const { id: userId, email } = req.user
 
@@ -139,6 +150,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
         quantity: 1
       }
     ],
+    locale: locale || 'en',
     // * this is the way we can custom the data we want to pass to session
     // * and we use it when we deploy because now we can use webhook from stripe
     // * for production
