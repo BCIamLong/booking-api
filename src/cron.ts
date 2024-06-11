@@ -9,7 +9,8 @@ import { appConfig } from './config'
 
 const { SERVER_ORIGIN } = appConfig
 
-const job = new CronJob('*/1 * * * *', function () {
+// * we want do it after 14 mins because at 15 mins server will auto sleep on render free
+const job = new CronJob('*/14 * * * *', function () {
   log.info('RESTARTING SERVER')
   https
     .get(`${SERVER_ORIGIN}/health-check`, (res) => {
