@@ -3,10 +3,12 @@ import './api/database'
 import { appConfig } from './config'
 import app from './app'
 import { Email, log } from './api/utils'
+import job from './cron'
 
 const { appEmitter, SERVER_ORIGIN } = appConfig
 
 const port = process.env.PORT || 3009
+if (process.env.NODE_ENV === 'production') job.start()
 
 const server = app.listen(port, () => {
   log.info(`Server is listening at port ${port}`)
