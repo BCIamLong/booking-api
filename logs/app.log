@@ -1,0 +1,10 @@
+[2024-06-11T:14:51:21] INFO (longhoang): Server is listening at port 3009
+[2024-06-11T:14:51:21] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-06-11T:14:51:21] INFO (longhoang): Connect Redis successfully
+[2024-06-11T:14:51:21] INFO (longhoang): Connect DB successfully
+[2024-06-11T:14:51:54] INFO (longhoang): Server is listening at port 3009
+[2024-06-11T:14:51:54] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-06-11T:14:51:54] INFO (longhoang): Connect Redis successfully
+[2024-06-11T:14:51:54] INFO (longhoang): Connect DB successfully
+[2024-06-11T:14:52:00] INFO (longhoang): RESTARTING SERVER
+[2024-06-11T:14:52:00] INFO (longhoang): SERVER RESTARTED
