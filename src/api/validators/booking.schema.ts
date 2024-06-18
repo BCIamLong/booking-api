@@ -180,6 +180,9 @@ const updateBookingSchema = Joi.object({
  *      default: 2
  *     regularPrice:
  *      type: number
+ *      default: 2000
+ *     cabinPrice:
+ *      type: number
  *      default: 200
  *     locale:
  *      type: string
@@ -195,6 +198,7 @@ const checkoutBookingSchema = Joi.object({
   numNights: Joi.number().required().strict(true),
   numGuests: Joi.number().required().strict(true),
   regularPrice: Joi.number().required().strict(true),
+  cabinPrice: Joi.number().required().strict(true),
   locale: Joi.string()
 })
 
