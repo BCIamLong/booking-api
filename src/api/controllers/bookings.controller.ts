@@ -104,6 +104,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
     cabinId,
     cabinName,
     regularPrice,
+    cabinPrice,
     name,
     description,
     image,
@@ -156,6 +157,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
     // * for production
     metadata: {
       user: userId,
+      cabinPrice,
       email,
       cabinName,
       startDate,
@@ -176,7 +178,8 @@ const getCheckOutSession = async function (req: Request, res: Response) {
 
 const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Session) {
   const { client_reference_id, metadata, amount_total } = session || {}
-  const { user, email, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName } = metadata || {}
+  const { user, email, startDate, endDate, numGuests, numNights, extrasPrice, observation, cabinName, cabinPrice } =
+    metadata || {}
   const cabinId = client_reference_id as string
   // const price = line_items?.[0].price_data.unit_amount
   // const price = line_items?.data.price?.unit_amount as number
@@ -190,7 +193,7 @@ const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Se
     endDate: new Date(endDate as string),
     numNights: +numNights,
     numGuests: +numGuests,
-    cabinPrice: price,
+    cabinPrice: +cabinPrice,
     extrasPrice: +extrasPrice,
     totalPrice,
     observation,
