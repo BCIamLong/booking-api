@@ -11,6 +11,7 @@
     "otpauth",
     "pino",
     "TOTP",
-    "uuidv"
+    "uuidv",
+    "virtuals"
   ]
 }
