@@ -1,0 +1,332 @@
+[
+  {
+    "name": "Adventure in the Rockies",
+    "slug": "adventure-in-the-rockies",
+    "duration": 7,
+    "maxGroupSize": 15,
+    "difficulty": "medium",
+    "type": "group",
+    "price": 1200,
+    "summary": "A thrilling 7-day adventure in the Rocky Mountains",
+    "description": "Experience an unforgettable journey in the Rockies with breathtaking hikes, scenic vistas, and wildlife sightings.",
+    "imageCover": "https://images.pexels.com/photos/386000/pexels-photo-386000.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/386001/pexels-photo-386001.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/386002/pexels-photo-386002.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/386003/pexels-photo-386003.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-11-01T00:00:00.000Z",
+        "participants": 10,
+        "soldOut": false
+      },
+      {
+        "date": "2025-02-01T00:00:00.000Z",
+        "participants": 5,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [-106.4453, 39.5501],
+      "address": "Denver, CO",
+      "description": "Starting point at Denver International Airport"
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [-105.7821, 39.7392],
+        "address": "Boulder, CO",
+        "description": "Day 1 hiking spot",
+        "day": 1
+      },
+      {
+        "type": "Point",
+        "coordinates": [-106.1587, 40.015],
+        "address": "Aspen, CO",
+        "description": "Day 3 visit to Aspen",
+        "day": 3
+      }
+    ]
+  },
+  {
+    "name": "Safari in the Serengeti",
+    "slug": "safari-in-the-serengeti",
+    "duration": 10,
+    "maxGroupSize": 12,
+    "difficulty": "medium",
+    "type": "group",
+    "price": 3000,
+    "summary": "A wild safari adventure in the Serengeti.",
+    "description": "Discover the wonders of African wildlife on this guided safari tour.",
+    "imageCover": "https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/1285626/pexels-photo-1285626.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1285627/pexels-photo-1285627.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1285628/pexels-photo-1285628.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-12-15T00:00:00.000Z",
+        "participants": 8,
+        "soldOut": false
+      },
+      {
+        "date": "2025-03-10T00:00:00.000Z",
+        "participants": 6,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [34.6856, -2.3332],
+      "address": "Serengeti National Park, Tanzania",
+      "description": "Meeting point at the park entrance."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [34.6856, -2.6234],
+        "address": "Main safari area",
+        "description": "First day of the safari.",
+        "day": 1
+      }
+    ]
+  },
+  {
+    "name": "Cultural Tour of Kyoto",
+    "slug": "cultural-tour-of-kyoto",
+    "duration": 5,
+    "maxGroupSize": 10,
+    "difficulty": "easy",
+    "type": "private",
+    "price": 1500,
+    "summary": "A private tour exploring the temples and culture of Kyoto.",
+    "description": "Immerse yourself in the beauty and traditions of ancient Japan.",
+    "imageCover": "https://images.pexels.com/photos/815880/pexels-photo-815880.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/815881/pexels-photo-815881.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/815882/pexels-photo-815882.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/815883/pexels-photo-815883.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+
+    "startDates": [
+      {
+        "date": "2024-10-20T00:00:00.000Z",
+        "participants": 5,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [135.7681, 35.0116],
+      "address": "Kyoto, Japan",
+      "description": "Starting point at Kyoto Station."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [135.7984, 35.0275],
+        "address": "Fushimi Inari Taisha",
+        "description": "Visit the iconic shrine.",
+        "day": 2
+      }
+    ]
+  },
+  {
+    "name": "Northern Lights in Norway",
+    "slug": "northern-lights-in-norway",
+    "duration": 4,
+    "maxGroupSize": 20,
+    "difficulty": "easy",
+    "type": "group",
+    "price": 800,
+    "summary": "Witness the mesmerizing Northern Lights in Norway.",
+    "description": "A magical 4-day experience of the auroras in the Arctic Circle.",
+    "imageCover": "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/1010658/pexels-photo-1010658.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1010659/pexels-photo-1010659.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1010660/pexels-photo-1010660.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-11-25T00:00:00.000Z",
+        "participants": 15,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [18.9553, 69.6492],
+      "address": "Tromsø, Norway",
+      "description": "Meeting point at Tromsø city center."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [18.9553, 69.6782],
+        "address": "Aurora Borealis viewing site",
+        "description": "Day 2 viewing of Northern Lights.",
+        "day": 2
+      }
+    ]
+  },
+  {
+    "name": "Hiking the Inca Trail",
+    "slug": "hiking-the-inca-trail",
+    "duration": 7,
+    "maxGroupSize": 10,
+    "difficulty": "difficult",
+    "type": "group",
+    "price": 1800,
+    "summary": "Trek through the ancient Inca Trail to Machu Picchu.",
+    "description": "A challenging but rewarding 7-day trek through the Peruvian mountains.",
+    "imageCover": "https://images.pexels.com/photos/1998439/pexels-photo-1998439.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/1998440/pexels-photo-1998440.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1998441/pexels-photo-1998441.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1998442/pexels-photo-1998442.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-09-10T00:00:00.000Z",
+        "participants": 8,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [-72.5069, -13.1631],
+      "address": "Cusco, Peru",
+      "description": "Meeting point at Cusco city."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [-72.4898, -13.1518],
+        "address": "Inca Trail start point",
+        "description": "Start the trek at Km 82.",
+        "day": 1
+      }
+    ]
+  },
+  {
+    "name": "Luxury Yacht Tour of the Maldives",
+    "slug": "luxury-yacht-tour-of-the-maldives",
+    "duration": 5,
+    "maxGroupSize": 8,
+    "difficulty": "easy",
+    "type": "private",
+    "price": 5000,
+    "summary": "A luxurious private yacht tour around the Maldives.",
+    "description": "Sail in style around the stunning islands of the Maldives, with personalized service.",
+    "imageCover": "https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/414613/pexels-photo-414613.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/414614/pexels-photo-414614.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/414615/pexels-photo-414615.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-08-15T00:00:00.000Z",
+        "participants": 4,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [73.5089, 4.1742],
+      "address": "Malé, Maldives",
+      "description": "Yacht boarding point in Malé."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [73.5289, 4.1745],
+        "address": "Vaavu Atoll",
+        "description": "Day 1 snorkeling adventure.",
+        "day": 1
+      }
+    ]
+  },
+  {
+    "name": "Paris Romantic Getaway",
+    "slug": "paris-romantic-getaway",
+    "duration": 4,
+    "maxGroupSize": 2,
+    "difficulty": "easy",
+    "type": "personal",
+    "price": 4000,
+    "summary": "A personal romantic getaway in the heart of Paris.",
+    "description": "Enjoy a dreamy, intimate escape in Paris with a loved one, featuring luxury accommodation and private tours.",
+    "imageCover": "https://images.pexels.com/photos/279574/pexels-photo-279574.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/279575/pexels-photo-279575.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/279576/pexels-photo-279576.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/279577/pexels-photo-279577.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-02-14T00:00:00.000Z",
+        "participants": 2,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [2.3522, 48.8566],
+      "address": "Paris, France",
+      "description": "Pick-up at Paris Charles de Gaulle Airport."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [2.2945, 48.8584],
+        "address": "Eiffel Tower",
+        "description": "Day 2 visit to the Eiffel Tower.",
+        "day": 2
+      }
+    ]
+  },
+  {
+    "name": "Solo Wellness Retreat in Bali",
+    "slug": "solo-wellness-retreat-in-bali",
+    "duration": 7,
+    "maxGroupSize": 1,
+    "difficulty": "easy",
+    "type": "personal",
+    "price": 3500,
+    "summary": "A personal wellness retreat in Bali for solo travelers.",
+    "description": "Rejuvenate your body and mind with yoga, meditation, and spa treatments in a serene Balinese environment.",
+    "imageCover": "https://images.pexels.com/photos/280221/pexels-photo-280221.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "images": [
+      "https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/280223/pexels-photo-280223.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/280224/pexels-photo-280224.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "startDates": [
+      {
+        "date": "2024-05-01T00:00:00.000Z",
+        "participants": 1,
+        "soldOut": false
+      }
+    ],
+    "startLocation": {
+      "type": "Point",
+      "coordinates": [115.1889, -8.4095],
+      "address": "Ubud, Bali",
+      "description": "Pick-up from Ngurah Rai International Airport."
+    },
+    "locations": [
+      {
+        "type": "Point",
+        "coordinates": [115.2625, -8.5146],
+        "address": "Yoga retreat center",
+        "description": "Daily yoga and wellness activities.",
+        "day": 2
+      }
+    ]
+  }
+]

@@ -16,7 +16,7 @@ const tourSchema = new Schema(
       required: [true, 'Tour name is required field'],
       unique: true,
       trim: true,
-      maxLength: [30, 'A name of tour not greater than 30 characters'],
+      maxLength: [50, 'A name of tour not greater than 30 characters'],
       minLength: [9, 'A name of tour not less than 9 characters']
     },
     slug: String,
