@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
+import { ITour } from '~/api/interfaces'
 
 const tourSchema = new Schema(
   {
@@ -75,11 +76,6 @@ const tourSchema = new Schema(
       required: [true, 'A tour must have an image']
     },
     images: [String],
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-      select: false
-    },
     startDates: [
       {
         date: Date,
@@ -143,9 +139,11 @@ const tourSchema = new Schema(
   },
   {
     toJSON: { virtuals: true }, // to consvert to json type
-    toObject: { virtuals: true } // to display based on object type
+    toObject: { virtuals: true }, // to display based on object type
+    timestamps: true
   }
 )
 
-const Tour = model('Tour', tourSchema)
+const Tour = model<ITour>('Tour', tourSchema)
+
 export default Tour

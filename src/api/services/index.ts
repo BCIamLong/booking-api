@@ -6,6 +6,7 @@ import usersService from './users.service'
 import authService from './auth.service'
 import reviewsService from './reviews.service'
 import bookmarksService from './bookmarks.service'
+import toursService from './tours.service'
 
 export {
   cabinsService,
@@ -15,5 +16,6 @@ export {
   usersService,
   authService,
   reviewsService,
-  bookmarksService
+  bookmarksService,
+  toursService
 }

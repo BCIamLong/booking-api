@@ -32,12 +32,13 @@ export interface ITourInput {
   imageCover: string
   images: string[]
   createdAt: Date
+  updatedAt: Date
   startDates: StartDate[]
   vip: boolean
   startLocation: StartLocation
   locations: Location[]
 }
 
-export default interface ISetting extends ITourInput, Document {
+export default interface ITour extends ITourInput, Document {
   _id: string
 }
