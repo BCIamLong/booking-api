@@ -41,11 +41,46 @@ export default class APIFeatures<T> {
     operations.forEach((op) => delete queryOb[op])
     // * then we need to think about the case we have $gte, $gt, $lt, $lte... we have two factor $ and short name of operation: { price: { gte: '2' } } so the query string we get like this, url: price[gte]=2
     // * how we can add the $ to before gte like: $gte
+
+    // if (queryOb.date) queryOb['startDates.soldOut'] = true
+    // console.log(queryOb)
+    const queryDate = new Date(queryOb.date)
+    if (queryOb.date) {
+      queryOb['startDates.date'] = {
+        gte: queryDate, // Start of the day
+        lt: new Date(queryDate.getTime() + 24 * 60 * 60 * 1000) // End of the day
+      }
+
+      delete queryOb['date']
+    }
+    // if (queryOb.date) queryOb.date = { 'startDates.date': { $regex: new RegExp(`${queryOb.date}`, 'i') } }
+    // console.log(queryOb)
+
+    if (queryOb.where) {
+      queryOb['locations.address'] = { $regex: queryOb.where, $options: 'i' }
+
+      console.log(queryOb)
+
+      delete queryOb['where']
+    }
+
+    const difficulty = queryOb.difficulty
+
     let queryObStr = JSON.stringify(queryOb)
     queryObStr = queryObStr.replace(/(gt|lt|gte|gt|ne)/g, (val) => `$${val}`)
 
     // * and put this to the find() method
-    this.query = this.query.find(JSON.parse(queryObStr))
+
+    // console.log(JSON.parse(queryObStr))
+    const queryObStrToOb = JSON.parse(queryObStr)
+    if (difficulty) {
+      queryObStrToOb.difficulty = difficulty
+      delete queryObStrToOb['difficu$lty']
+    }
+
+    // console.log(queryObStrToOb)
+    this.query = this.query.find(queryObStrToOb)
+    // this.query = this.query.find(JSON.parse(queryObStr))
     // * return this.query to chaining object
     return this
   }

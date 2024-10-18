@@ -3,8 +3,8 @@ import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.control
 
 const { fetchTours, fetchTour, editTour, createTour, removeTour } = toursService
 
-const getTours = getAll(async () => {
-  const { data, collectionName, count } = await fetchTours()
+const getTours = getAll(async (options) => {
+  const { data, collectionName, count } = await fetchTours(options.queryStr!)
   return { data, collectionName, count }
 })
 

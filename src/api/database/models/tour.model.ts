@@ -41,7 +41,7 @@ const tourSchema = new Schema(
       required: [true, 'A tour must have a type'],
       enum: {
         values: ['group', 'private', 'personal'],
-        message: 'Difficult either: group, private and personal'
+        message: 'Type either: group, private and personal'
       }
     },
     ratingsAverage: {
