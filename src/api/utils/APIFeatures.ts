@@ -59,9 +59,25 @@ export default class APIFeatures<T> {
     if (queryOb.where) {
       queryOb['locations.address'] = { $regex: queryOb.where, $options: 'i' }
 
-      console.log(queryOb)
+      // console.log(queryOb)
 
       delete queryOb['where']
+    }
+
+    if (queryOb.nameLike) {
+      queryOb['name'] = { $regex: queryOb.nameLike, $options: 'i' }
+
+      // console.log(queryOb)
+
+      delete queryOb['nameLike']
+    }
+
+    if (queryOb.priceRange) {
+      queryOb['price'] = { lt: queryOb.priceRange }
+
+      // console.log(queryOb)
+
+      delete queryOb['priceRange']
     }
 
     const difficulty = queryOb.difficulty
