@@ -86,11 +86,11 @@ router.get('/health-check', (req: Request, res: Response) => res.sendStatus(200)
 router.use('/api/v1/auth', authRouter)
 router.use('/api/v1/users', userRouter)
 router.use('/api/v1/cabins', cabinsRouter)
+router.use('/api/v1/tours', toursRouter)
 router.use('/api/v1/guests', guestRouter)
 router.use('/api/v1/bookings', bookingRouter)
 router.use('/api/v1/reviews', reviewRouter)
 router.use('/api/v1/settings', settingsRouter)
 router.use('/api/v1/bookmarks', bookmarksRouter)
-router.use('/api/v1/tours', toursRouter)
 
 export default router

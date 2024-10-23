@@ -1,6 +1,7 @@
 import { Document } from 'mongoose'
 
 interface StartDate {
+  _id: string
   date: Date
   participants: number
   soldOut: boolean

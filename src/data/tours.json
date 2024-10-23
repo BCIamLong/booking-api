@@ -28,25 +28,39 @@
       }
     ],
     "startLocation": {
+      "description": "Miami, USA",
       "type": "Point",
-      "coordinates": [-106.4453, 39.5501],
-      "address": "Denver, CO",
-      "description": "Starting point at Denver International Airport"
+      "coordinates": [-80.185942, 25.774772],
+      "address": "301 Biscayne Blvd, Miami, FL 33132, USA"
     },
     "locations": [
       {
+        "description": "Lummus Park Beach",
         "type": "Point",
-        "coordinates": [-105.7821, 39.7392],
-        "address": "Boulder, CO",
-        "description": "Day 1 hiking spot",
-        "day": 1
+        "coordinates": [-80.128473, 25.781842],
+        "day": 1,
+        "address": "Lummus Park Beach Area"
       },
       {
+        "description": "Islamorada",
         "type": "Point",
-        "coordinates": [-106.1587, 40.015],
-        "address": "Aspen, CO",
-        "description": "Day 3 visit to Aspen",
-        "day": 3
+        "coordinates": [-80.647885, 24.909047],
+        "day": 2,
+        "address": "Islamorada Area"
+      },
+      {
+        "description": "Sombrero Beach",
+        "type": "Point",
+        "coordinates": [-81.0784, 24.707496],
+        "day": 3,
+        "address": "Sombrero Beach Area"
+      },
+      {
+        "description": "West Key",
+        "type": "Point",
+        "coordinates": [-81.768719, 24.552242],
+        "day": 5,
+        "address": "West Key Area"
       }
     ]
   },

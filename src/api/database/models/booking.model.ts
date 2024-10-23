@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
-import mongoose, { Schema } from 'mongoose'
-import { IBooking } from '~/api/interfaces'
+import mongoose, { Model, Schema } from 'mongoose'
+import { IBooking, ITour } from '~/api/interfaces'
+import Tour from './tour.model'
 
 /**
  * @openapi
@@ -118,6 +119,24 @@ const bookingSchema = new Schema(
 // *https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/
 bookingSchema.index({ cabinId: 1, guestId: -1 })
 
+bookingSchema.methods.updateTourWithBooking = async function (tourId: string, startDate: string) {
+  const tour = await Tour.findById(tourId)
+  const { startDates } = tour as ITour
+
+  const date = startDates.find((d) => new Date(d.date).toDateString() === new Date(startDate).toDateString())
+
+  // * https://stackoverflow.com/questions/15691224/mongoose-update-values-in-array-of-objects
+  // * https://stackoverflow.com/questions/74781500/mongoose-modify-update-objects-inside-and-array
+  await Tour.findOneAndUpdate(
+    { 'startDates._id': date?._id },
+    // doc.cabin.split('$')[1],
+    { $set: { 'startDates.$.participants': (date?.participants || 0) + 1 } },
+    {
+      runValidators: true
+    }
+  )
+}
+
 bookingSchema.pre(/^find/, async function (next) {
   // const data = await mongoose.model('Booking').aggregate([
   //   {
@@ -147,9 +166,13 @@ bookingSchema.pre(/^find/, async function (next) {
   next()
 })
 
-bookingSchema.post('save', function (doc, next) {
-  next()
-})
+bookingSchema.post(
+  'save',
+  function (doc: IBooking & { updateTourWithBooking: (tourId: string, startDate: string) => void }, next) {
+    doc.updateTourWithBooking(doc.cabinId, doc.startDate.toISOString())
+    next()
+  }
+)
 
 const Booking = mongoose.model<IBooking>('Booking', bookingSchema)
 

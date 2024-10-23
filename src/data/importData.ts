@@ -1,13 +1,14 @@
 import * as fs from 'fs'
 import 'dotenv/config'
 import mongoose from 'mongoose'
-import { Booking, Guest } from '~/api/database/models'
+import { Booking, Guest, Tour } from '~/api/database/models'
 import { dbConfig } from '~/config'
 
 const { DB_URI } = dbConfig
 
 const guestsData = JSON.parse(fs.readFileSync('src/data/guests.json', 'utf-8'))
 const bookingsData = JSON.parse(fs.readFileSync('src/data/bookings.json', 'utf-8'))
+const toursData = JSON.parse(fs.readFileSync('src/data/tours.json', 'utf-8'))
 ;(async () => {
   try {
     await mongoose.connect(DB_URI!)
@@ -27,3 +28,4 @@ const importData = async function (Model: any, data: any) {
 
 if (process.argv[2] === '--guests') importData(Guest, guestsData)
 if (process.argv[2] === '--bookings') importData(Booking, bookingsData)
+if (process.argv[2] === '--tours') importData(Tour, toursData)

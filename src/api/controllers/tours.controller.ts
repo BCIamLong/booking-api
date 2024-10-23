@@ -9,6 +9,7 @@ const getTours = getAll(async (options) => {
 })
 
 const getTour = getOne(async (options) => {
+  console.log(options)
   const { data, collectionName } = await fetchTour(options.id || '')
   return { data, collectionName }
 })
