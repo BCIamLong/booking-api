@@ -4,5 +4,14 @@ import uploadMiddleware from './upload.middleware'
 import reviewMiddleware from './review.middleware'
 import bookmarkMiddleware from './bookmark.middleware'
 import bookingMiddleware from './booking.middleware'
+import postMiddleware from './post.middleware'
 
-export { errorsHandler, authMiddleware, uploadMiddleware, reviewMiddleware, bookmarkMiddleware, bookingMiddleware }
+export {
+  errorsHandler,
+  authMiddleware,
+  uploadMiddleware,
+  reviewMiddleware,
+  bookmarkMiddleware,
+  bookingMiddleware,
+  postMiddleware
+}

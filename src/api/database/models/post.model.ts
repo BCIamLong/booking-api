@@ -7,7 +7,7 @@ const postSchema = new Schema(
   {
     _id: {
       type: String,
-      default: () => `tour-${uuidv4()}`
+      default: () => `post-${uuidv4()}`
     },
     userId: {
       type: String,

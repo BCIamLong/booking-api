@@ -4,3 +4,47 @@
 [2024-10-23T:15:08:36] INFO (longhoang): Connect DB successfully
 [2024-10-23T:15:14:00] INFO (longhoang): RESTARTING SERVER
 [2024-10-23T:15:28:00] INFO (longhoang): RESTARTING SERVER
+[2024-10-24T:15:18:44] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:15:18:44] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:15:18:44] INFO (longhoang): Connect Redis successfully
+[2024-10-24T:15:18:44] INFO (longhoang): Connect DB successfully
+[2024-10-24T:15:20:12] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:15:20:12] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:15:20:12] INFO (longhoang): Connect Redis successfully
+[2024-10-24T:15:20:12] INFO (longhoang): Connect DB successfully
+[2024-10-24T:15:23:04] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:15:23:04] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:15:23:04] ERROR (longhoang): Connection timeout
+    err: {
+      "type": "ConnectionTimeoutError",
+      "message": "Connection timeout",
+      "stack":
+          Error: Connection timeout
+              at Socket.<anonymous> (C:\Users\hoanglong\Downloads\SinhVien\reactjs\api\the-wild-oasis-api\node_modules\@redis\client\dist\lib\client\socket.js:177:124)
+              at Object.onceWrapper (node:events:632:28)
+              at Socket.emit (node:events:518:28)
+              at Socket.emit (node:domain:488:12)
+              at Socket._onTimeout (node:net:589:8)
+              at listOnTimeout (node:internal/timers:573:17)
+              at processTimers (node:internal/timers:514:7)
+    }
+[2024-10-24T:15:27:21] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:15:27:21] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:15:27:21] INFO (longhoang): Connect Redis successfully
+[2024-10-24T:15:27:21] INFO (longhoang): Connect DB successfully
+[2024-10-24T:15:28:00] INFO (longhoang): RESTARTING SERVER
+[2024-10-24T:15:42:00] INFO (longhoang): RESTARTING SERVER
+[2024-10-24T:15:56:46] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:15:56:46] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:15:56:46] INFO (longhoang): Connect Redis successfully
+[2024-10-24T:15:56:46] INFO (longhoang): Connect DB successfully
+[2024-10-24T:15:58:46] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:15:58:46] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:15:58:46] INFO (longhoang): Connect Redis successfully
+[2024-10-24T:15:58:46] INFO (longhoang): Connect DB successfully
+[2024-10-24T:16:00:00] INFO (longhoang): RESTARTING SERVER
+[2024-10-24T:16:05:00] INFO (longhoang): Server is listening at port 3009
+[2024-10-24T:16:05:00] INFO (longhoang): Documentation available at http://localhost:3009/docs
+[2024-10-24T:16:05:00] INFO (longhoang): Connect Redis successfully
+[2024-10-24T:16:05:00] INFO (longhoang): Connect DB successfully
+[2024-10-24T:16:14:00] INFO (longhoang): RESTARTING SERVER

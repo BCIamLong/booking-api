@@ -1,0 +1,19 @@
+[
+  {
+    "userId": "guest-58282d75-9521-4f22-8198-f7013eb0c0f6",
+    "tourId": "tour-0842ec16-d656-44a8-9c95-fa079bdc89f4",
+    "title": "Amazing Adventure at the Grand Canyon Post",
+    "description": "This post tells the tour was an unforgettable experience. The views were breathtaking, and the guide was very knowledgeable.",
+    "images": [
+      "https://images.pexels.com/photos/1285626/pexels-photo-1285626.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1285627/pexels-photo-1285627.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "https://images.pexels.com/photos/1285628/pexels-photo-1285628.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ],
+    "likes": 150,
+    "comments": 23,
+    "shares": 45,
+    "bookmarks": 10,
+    "createdAt": "2024-10-24T12:34:56Z",
+    "updatedAt": "2024-10-24T12:34:56Z"
+  }
+]
