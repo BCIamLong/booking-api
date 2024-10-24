@@ -6,6 +6,8 @@ import usersController from './users.controller'
 import authController from './auth.controller'
 import reviewController from './review.controller'
 import bookmarksController from './bookmarks.controller'
+import toursController from './tours.controller'
+import postsController from './posts.controller'
 
 export {
   cabinsController,
@@ -15,5 +17,7 @@ export {
   usersController,
   authController,
   reviewController,
-  bookmarksController
+  bookmarksController,
+  toursController,
+  postsController
 }

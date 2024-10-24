@@ -7,5 +7,18 @@ import { UserSession, UpdateCurrentUserInput } from './IAuth'
 import IReview from './IReview'
 import IBookmark from './IBookmark'
 import ITour from './ITour'
+import IPost from './IPost'
 
-export { ICabin, IGuest, ISetting, IBooking, IUser, UserSession, UpdateCurrentUserInput, IReview, IBookmark, ITour }
+export {
+  ICabin,
+  IGuest,
+  ISetting,
+  IBooking,
+  IUser,
+  UserSession,
+  UpdateCurrentUserInput,
+  IReview,
+  IBookmark,
+  ITour,
+  IPost
+}

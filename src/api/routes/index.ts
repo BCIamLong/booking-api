@@ -8,8 +8,9 @@ import userRouter from './users.route'
 import authRouter from './auth.route'
 import reviewRouter from './review.route'
 import bookmarksRouter from './bookmarks.route'
-import { IGuest, IUser } from '../interfaces'
 import toursRouter from './tours.route'
+import postsRouter from './posts.route'
+import { IGuest, IUser } from '../interfaces'
 
 const router = Router()
 
@@ -87,6 +88,7 @@ router.use('/api/v1/auth', authRouter)
 router.use('/api/v1/users', userRouter)
 router.use('/api/v1/cabins', cabinsRouter)
 router.use('/api/v1/tours', toursRouter)
+router.use('/api/v1/posts', postsRouter)
 router.use('/api/v1/guests', guestRouter)
 router.use('/api/v1/bookings', bookingRouter)
 router.use('/api/v1/reviews', reviewRouter)

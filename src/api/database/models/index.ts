@@ -6,5 +6,6 @@ import User from './user.model'
 import Review from './review.model'
 import Bookmark from './bookmark.model'
 import Tour from './tour.model'
+import Post from './post.model'
 
-export { Cabin, Guest, Setting, Booking, User, Review, Bookmark, Tour }
+export { Cabin, Guest, Setting, Booking, User, Review, Bookmark, Tour, Post }
