@@ -1,5 +1,8 @@
+import { Request, Response } from 'express'
 import { toursService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
+
+const { getToursAvailableToPostService } = toursService
 
 const { fetchTours, fetchTour, editTour, createTour, removeTour } = toursService
 
@@ -33,4 +36,15 @@ const deleteTour = deleteOne(async (options) => {
   return { data, collectionName }
 })
 
-export default { getTours, getTour, postTour, updateTour, deleteTour }
+const getToursAvailableToPost = async function (req: Request, res: Response) {
+  const tours = await getToursAvailableToPostService({ userId: req.user.id })
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tours
+    }
+  })
+}
+
+export default { getTours, getTour, postTour, updateTour, deleteTour, getToursAvailableToPost }

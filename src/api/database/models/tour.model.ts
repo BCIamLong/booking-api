@@ -76,10 +76,10 @@ const tourSchema = new Schema(
       required: [true, 'A tour must have an image']
     },
     images: [String],
-    isPosted: {
-      type: Boolean,
-      default: false
-    },
+    // isPosted: {
+    //   type: Boolean,
+    //   default: false
+    // },
     startDates: [
       {
         date: Date,
