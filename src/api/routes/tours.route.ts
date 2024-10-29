@@ -7,12 +7,12 @@ const { deleteTour, getTour, getTours, updateTour, postTour, getToursAvailableTo
 
 const toursRouter = Router({ mergeParams: true })
 
+toursRouter.get('/tours-to-post', asyncCatch(getToursAvailableToPost))
+
 toursRouter.use('/:tourId/bookings', bookingRouter)
 
 toursRouter.route('/').get(asyncCatch(getTours)).post(asyncCatch(postTour))
 
 toursRouter.route('/:id').get(asyncCatch(getTour)).patch(asyncCatch(updateTour)).delete(asyncCatch(deleteTour))
-
-toursRouter.get('/tours-to-post', asyncCatch(getToursAvailableToPost))
 
 export default toursRouter

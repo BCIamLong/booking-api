@@ -37,7 +37,8 @@ const deleteTour = deleteOne(async (options) => {
 })
 
 const getToursAvailableToPost = async function (req: Request, res: Response) {
-  const tours = await getToursAvailableToPostService({ userId: req.user.id })
+  const tours = await getToursAvailableToPostService({ userId: req.user?.id })
+  // console.log('ok')
 
   res.status(200).json({
     status: 'success',

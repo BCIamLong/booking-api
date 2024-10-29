@@ -1,4 +1,4 @@
-import { required } from 'joi'
+import { number, ref, required } from 'joi'
 import mongoose, { model, Schema } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 import { IPost } from '~/api/interfaces'
@@ -28,27 +28,93 @@ const postSchema = new Schema(
       required: true
     },
     images: [String],
-    likes: {
-      type: Number,
-      default: 0
-    },
-    comments: {
-      type: Number,
-      default: 0
-    },
+    likes: [
+      {
+        userId: {
+          type: String,
+          required: true,
+          ref: 'Guest'
+        },
+        likeAt: {
+          type: Date,
+          default: Date.now()
+        }
+      }
+    ],
+    comments: [
+      {
+        userId: {
+          type: String,
+          required: true,
+          ref: 'Guest'
+        },
+        content: {
+          type: String,
+          required: true
+        },
+        likes: [
+          {
+            userId: {
+              type: String,
+              required: true,
+              ref: 'Guest'
+            },
+            likeAt: {
+              type: Date,
+              default: Date.now()
+            }
+          }
+        ],
+        commentAt: {
+          type: Date,
+          default: Date.now()
+        },
+        updateCommentAt: {
+          type: Date,
+          default: Date.now()
+        }
+      }
+    ],
     shares: {
       type: Number,
       default: 0
     },
-    bookmarks: {
-      type: Number,
-      default: 0
-    }
+    bookmarks: [
+      {
+        userId: {
+          type: String,
+          required: true,
+          ref: 'Guest'
+        },
+        bookmarkAt: {
+          type: Date,
+          default: Date.now()
+        }
+      }
+    ]
   },
   {
     timestamps: true
   }
 )
+
+postSchema.pre('find', function (next) {
+  this.populate({ path: 'tourId', select: 'name' })
+    .populate({ path: 'userId', select: 'fullName avatar' })
+    .populate({ path: 'comments.userId', select: 'fullName avatar' })
+    .populate({ path: 'likes.userId', select: 'fullName avatar' })
+    .populate({ path: 'bookmarks.userId', select: 'fullName avatar' })
+  next()
+})
+
+postSchema.pre('findOne', function (next) {
+  this.populate({ path: 'tourId', select: 'name' })
+    .populate({ path: 'userId', select: 'fullName avatar' })
+    .populate({ path: 'comments.userId', select: 'fullName avatar' })
+    .populate({ path: 'likes.userId', select: 'fullName avatar' })
+    .populate({ path: 'bookmarks.userId', select: 'fullName avatar' })
+  next()
+})
 
 const Post = model<IPost>('Post', postSchema)
 

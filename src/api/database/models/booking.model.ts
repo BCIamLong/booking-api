@@ -57,7 +57,7 @@ const bookingSchema = new Schema(
     },
     cabinId: {
       type: String,
-      ref: 'Cabin',
+      ref: 'Tour',
       required: true
     },
     guestId: {
