@@ -21,6 +21,10 @@ postsRouter
     asyncCatch(postPost)
   )
 
-postsRouter.route('/:id').get(asyncCatch(getPost)).patch(asyncCatch(updatePost)).delete(asyncCatch(deletePost))
+postsRouter
+  .route('/:id')
+  .get(asyncCatch(getPost))
+  .patch(asyncCatch(upload.single('image')), resizeAndUploadPostImageToCloud, asyncCatch(updatePost))
+  .delete(asyncCatch(deletePost))
 
 export default postsRouter
