@@ -37,6 +37,7 @@ const deleteTour = deleteOne(async (options) => {
 })
 
 const getToursAvailableToPost = async function (req: Request, res: Response) {
+  // console.log(req.user)
   const tours = await getToursAvailableToPostService({ userId: req.user?.id })
   // console.log('ok')
 
