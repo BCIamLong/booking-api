@@ -42,6 +42,11 @@ export default class APIFeatures<T> {
     // * then we need to think about the case we have $gte, $gt, $lt, $lte... we have two factor $ and short name of operation: { price: { gte: '2' } } so the query string we get like this, url: price[gte]=2
     // * how we can add the $ to before gte like: $gte
 
+    if (queryOb?.bookmarkFor) {
+      queryOb['bookmarks.userId'] = queryOb.bookmarkFor
+      delete queryOb['bookmarkFor']
+    }
+
     // if (queryOb.date) queryOb['startDates.soldOut'] = true
     // console.log(queryOb)
     const queryDate = new Date(queryOb.date)

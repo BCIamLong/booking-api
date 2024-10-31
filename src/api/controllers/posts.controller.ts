@@ -21,6 +21,7 @@ const postPost = postOne(async (options) => {
 })
 
 const updatePost = updateOne(async (options) => {
+  // console.log(options.body)
   const { data, collectionName } = await editPost(options.id || '', options.body || {})
 
   return { data, collectionName }
