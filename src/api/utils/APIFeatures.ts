@@ -42,6 +42,19 @@ export default class APIFeatures<T> {
     // * then we need to think about the case we have $gte, $gt, $lt, $lte... we have two factor $ and short name of operation: { price: { gte: '2' } } so the query string we get like this, url: price[gte]=2
     // * how we can add the $ to before gte like: $gte
 
+    if (queryOb?.search) {
+      queryOb['$or'] = [
+        {
+          title: { $regex: queryOb.search, $options: 'i' }
+        },
+        {
+          description: { $regex: queryOb.search, $options: 'i' }
+        }
+      ]
+      delete queryOb['search']
+    }
+
+    // console.log(queryOb['$or'][0], queryOb['$or'][1])
     if (queryOb?.bookmarkFor) {
       queryOb['bookmarks.userId'] = queryOb.bookmarkFor
       delete queryOb['bookmarkFor']
@@ -100,6 +113,7 @@ export default class APIFeatures<T> {
     }
 
     // console.log(queryObStrToOb)
+    // console.log(queryObStrToOb)
     this.query = this.query.find(queryObStrToOb)
     // this.query = this.query.find(JSON.parse(queryObStr))
     // * return this.query to chaining object
@@ -114,8 +128,9 @@ export default class APIFeatures<T> {
     }
     // * sort=duration&sort=price => { price: { gte: '2' }, sort: [ 'duration', 'price' ] }
     // * sort=duration => sort: 'price'
-
-    const sortQueryStr = Array.isArray(sortVal) ? sortVal.join(' ') : sortVal
+    let sortQueryStr
+    if (JSON.parse(sortVal).likes) sortQueryStr = JSON.parse(sortVal)
+    else sortQueryStr = Array.isArray(sortVal) ? sortVal.join(' ') : sortVal
 
     this.query = this.query.sort(sortQueryStr)
     return this

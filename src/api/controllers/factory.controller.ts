@@ -11,6 +11,7 @@ type ControllerFn = ({ id, body }: Options) => Promise<{ data: any; count?: numb
 
 const getAll = (fn: ControllerFn) =>
   async function (req: Request, res: Response) {
+    // try {
     const { data, collectionName, count } = await fn({ queryStr: req.query })
     // console.log(count)
     res.json({
@@ -21,6 +22,9 @@ const getAll = (fn: ControllerFn) =>
         [collectionName]: data
       }
     })
+    // } catch (err) {
+    //   console.log(err)
+    // }
   }
 
 const getOne = (fn: ControllerFn) =>
