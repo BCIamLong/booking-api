@@ -129,8 +129,10 @@ export default class APIFeatures<T> {
     // * sort=duration&sort=price => { price: { gte: '2' }, sort: [ 'duration', 'price' ] }
     // * sort=duration => sort: 'price'
     let sortQueryStr
-    if (JSON.parse(sortVal).likes) sortQueryStr = JSON.parse(sortVal)
-    else sortQueryStr = Array.isArray(sortVal) ? sortVal.join(' ') : sortVal
+    if (sortVal.includes('{')) {
+      sortQueryStr = JSON.parse(sortVal)
+      // console.log(sortQueryStr)
+    } else sortQueryStr = Array.isArray(sortVal) ? sortVal.join(' ') : sortVal
 
     this.query = this.query.sort(sortQueryStr)
     return this
