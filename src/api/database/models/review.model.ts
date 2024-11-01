@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import mongoose, { Model, Schema, model } from 'mongoose'
 import { IReview } from '~/api/interfaces'
 import Cabin from './cabin.model'
+import Tour from './tour.model'
 
 /**
  * @openapi
@@ -54,7 +55,8 @@ const reviewSchema = new Schema(
     cabin: {
       type: String,
       required: true,
-      ref: 'Cabin'
+      ref: 'Tour'
+      // ref: 'Cabin'
     }
   },
   {
@@ -76,20 +78,26 @@ reviewSchema.methods.updateCabinWithReview = async function (model: Model<IRevie
     {
       $group: {
         _id: null,
-        ratingQuantity: { $sum: 1 },
-        ratingAverage: { $avg: '$rating' }
+        ratingsQuantity: { $sum: 1 },
+        ratingsAverage: { $avg: '$rating' }
+        // ratingQuantity: { $sum: 1 },
+        // ratingAverage: { $avg: '$rating' }
       }
     }
   ])
 
   // console.log(stats) //* [ { _id: '$cabin4', ratingQuantity: 4, ratingAverage: 4 } ]
-  const ratingQuantity = stats[0]?.ratingQuantity || 0
-  const ratingAverage = stats[0]?.ratingAverage || 5
+  const ratingsQuantity = stats[0]?.ratingsQuantity || 0
+  const ratingsAverage = stats[0]?.ratingsAverage || 5
+  // const ratingQuantity = stats[0]?.ratingQuantity || 0
+  // const ratingAverage = stats[0]?.ratingAverage || 5
   // await this.model('Cabin').findByIdAndUpdate(
-  await Cabin.findByIdAndUpdate(
+  // await Cabin.findByIdAndUpdate(
+  await Tour.findByIdAndUpdate(
     cabinId,
     // doc.cabin.split('$')[1],
-    { ratingQuantity, ratingAverage },
+    { ratingsQuantity, ratingsAverage },
+    // { ratingQuantity, ratingAverage },
     {
       runValidators: true
     }
