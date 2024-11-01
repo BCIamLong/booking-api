@@ -5,8 +5,13 @@ import { v4 as uuidv4 } from 'uuid'
 import { uploadConfig } from '~/config'
 import { Booking, Post } from '../database/models'
 import { AppError } from '../utils'
+import authMiddleware from './auth.middleware'
+import { postsService } from '../services'
+import { IGuest } from '../interfaces'
 
 const { cloudinary } = uploadConfig
+const { authorize } = authMiddleware
+const { fetchPost } = postsService
 
 const checkPostCreateAbility = async function (req: Request, res: Response, next: NextFunction) {
   try {
@@ -72,4 +77,17 @@ const resizeAndUploadPostImageToCloud = async function (req: Request, res: Respo
   }
 }
 
-export default { checkPostCreateAbility, resizeAndUploadPostImageToCloud }
+const postsQueryModifier = async function (req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id: postId } = req.params
+    const { data: post } = await fetchPost(postId)
+
+    if (((post.userId as unknown as IGuest)._id = req.user.id)) return next()
+
+    return authorize('admin')(req, res, next)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export default { checkPostCreateAbility, resizeAndUploadPostImageToCloud, postsQueryModifier }

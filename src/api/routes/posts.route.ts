@@ -7,14 +7,17 @@ import { uploadConfig } from '~/config'
 const { upload } = uploadConfig
 const postsRouter = Router({ mergeParams: true })
 const { getPost, getPosts, postPost, updatePost, deletePost } = postsController
-const { checkPostCreateAbility, resizeAndUploadPostImageToCloud } = postMiddleware
-const { authenticate } = authMiddleware
+const { checkPostCreateAbility, resizeAndUploadPostImageToCloud, postsQueryModifier } = postMiddleware
+const { authenticate, auth2FA, authorize } = authMiddleware
 
 postsRouter
   .route('/')
   .get(asyncCatch(getPosts))
   .post(
     // authenticate,
+    authenticate,
+    auth2FA,
+    // postsQueryModifier,
     checkPostCreateAbility,
     asyncCatch(upload.single('image')),
     resizeAndUploadPostImageToCloud,
@@ -24,7 +27,14 @@ postsRouter
 postsRouter
   .route('/:id')
   .get(asyncCatch(getPost))
-  .patch(asyncCatch(upload.single('image')), resizeAndUploadPostImageToCloud, asyncCatch(updatePost))
-  .delete(asyncCatch(deletePost))
+  .patch(
+    authenticate,
+    auth2FA,
+    postsQueryModifier,
+    asyncCatch(upload.single('image')),
+    resizeAndUploadPostImageToCloud,
+    asyncCatch(updatePost)
+  )
+  .delete(authenticate, auth2FA, postsQueryModifier, asyncCatch(deletePost))
 
 export default postsRouter
