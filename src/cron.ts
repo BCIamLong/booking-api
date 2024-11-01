@@ -14,6 +14,7 @@ const job = schedule('*/14 * * * *', function () {
   log.info('RESTARTING SERVER')
   https
     .get(`${SERVER_ORIGIN}/health-check`, (res) => {
+      log.info(res)
       if (res.statusCode === 200) log.info('SERVER RESTARTED')
       else log.error(`FAILED TO RESTART SERVER WITH STATUS CODE: ${res.statusCode}`)
     })
