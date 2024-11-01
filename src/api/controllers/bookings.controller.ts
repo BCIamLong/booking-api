@@ -4,7 +4,7 @@ import { bookingsService, cabinsService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 import { paymentConfig, appConfig } from '~/config'
 import { AppError } from '../utils'
-import { IBooking, ICabin, IGuest, IUser } from '../interfaces'
+import { IBooking, ICabin, IGuest, ITour, IUser } from '../interfaces'
 
 const { stripe } = paymentConfig
 const { CLIENT_ORIGIN, appEmitter } = appConfig
@@ -91,7 +91,8 @@ const createBookingCheckout = async function (req: Request, res: Response) {
   })
   const url = `${CLIENT_ORIGIN}/profile/bookings`
   const customBooking = { ...booking, totalPrice: +price, cabinId: { name: cabinData.name } } as IBooking & {
-    cabinId: string | ICabin
+    cabinId: string | ITour
+    // cabinId: string | ICabin
   }
 
   appEmitter.bookingSuccess(req.user as IUser & IGuest, customBooking, url)
@@ -201,7 +202,8 @@ const createBookingWebhookCheckout = async function (session: Stripe.Checkout.Se
   })
 
   const customBooking = { ...booking, totalPrice: +price, cabinId: { name: cabinName } } as IBooking & {
-    cabinId: string | ICabin
+    cabinId: string | ITour
+    // cabinId: string | ICabin
   }
   const url = `${CLIENT_ORIGIN}/profile/bookings`
 
