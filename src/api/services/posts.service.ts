@@ -9,4 +9,18 @@ const createPost = createOne<IPost, IPostInput>(Post)
 const editPost = editOne<IPost>(Post)
 const removePost = removeOne<IPost>(Post)
 
-export default { fetchPost, fetchPosts, createPost, editPost, removePost }
+const updatePostCommentsService = async function (commentId: string, data: any) {
+  const newPost = await Post.findOneAndUpdate(
+    { 'comments._id': commentId },
+    {
+      'comments.$.likes': data
+    },
+    {
+      runValidators: true
+    }
+  )
+
+  return newPost
+}
+
+export default { fetchPost, fetchPosts, createPost, editPost, removePost, updatePostCommentsService }

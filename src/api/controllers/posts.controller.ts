@@ -1,7 +1,8 @@
+import { Request, Response } from 'express'
 import { postsService } from '../services'
 import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
 
-const { fetchPosts, fetchPost, editPost, createPost, removePost } = postsService
+const { fetchPosts, fetchPost, editPost, createPost, removePost, updatePostCommentsService } = postsService
 
 const getPosts = getAll(async (options) => {
   const { data, collectionName, count } = await fetchPosts(options.queryStr!)
@@ -34,4 +35,16 @@ const deletePost = deleteOne(async (options) => {
   return { data, collectionName }
 })
 
-export default { getPosts, getPost, postPost, updatePost, deletePost }
+const updatePostComments = async function (req: Request, res: Response) {
+  const { commentId } = req.params
+  const newPost = await updatePostCommentsService(commentId, req.body.likes)
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      post: newPost
+    }
+  })
+}
+
+export default { getPosts, getPost, postPost, updatePost, deletePost, updatePostComments }

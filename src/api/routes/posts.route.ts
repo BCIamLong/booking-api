@@ -6,9 +6,11 @@ import { uploadConfig } from '~/config'
 
 const { upload } = uploadConfig
 const postsRouter = Router({ mergeParams: true })
-const { getPost, getPosts, postPost, updatePost, deletePost } = postsController
+const { getPost, getPosts, postPost, updatePost, deletePost, updatePostComments } = postsController
 const { checkPostCreateAbility, resizeAndUploadPostImageToCloud, postsQueryModifier } = postMiddleware
 const { authenticate, auth2FA, authorize } = authMiddleware
+
+postsRouter.patch('/:id/comments/:commentId', authenticate, auth2FA, postsQueryModifier, asyncCatch(updatePostComments))
 
 postsRouter
   .route('/')
@@ -17,7 +19,7 @@ postsRouter
     // authenticate,
     authenticate,
     auth2FA,
-    // postsQueryModifier,
+    // postsQueryModifier
     checkPostCreateAbility,
     asyncCatch(upload.single('image')),
     resizeAndUploadPostImageToCloud,
