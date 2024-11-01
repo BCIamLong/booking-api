@@ -80,7 +80,7 @@ const mongooseConfigWithRedis = async function (redisClient: ReturnType<typeof c
 
 let redisClient = createClient({
   socket: {
-    connectTimeout: 10000
+    connectTimeout: 20000
   }
 })
 
