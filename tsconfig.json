@@ -19,4 +19,5 @@
   },
   // "include": ["src/**/*.ts", "src/**/**/*.ts", "src/__tests__/*.ts", "src/api/**/__tests__/*.ts"],
   "exclude": ["./node_modules", "./jest.config.ts"]
+  // "exclude": ["./node_modules", "./jest.config.ts", "src/**", "src/api/**"]
 }
