@@ -41,7 +41,7 @@ const bookmarkSchema = new Schema(
     },
     cabin: {
       type: String,
-      ref: 'Cabin',
+      ref: 'Tour',
       required: true
     },
     link: {
