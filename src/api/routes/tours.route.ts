@@ -3,13 +3,17 @@ import toursController from '../controllers/tours.controller'
 import { asyncCatch } from '../utils'
 import bookingRouter from './bookings.route'
 import { authMiddleware } from '../middlewares'
+import reviewRouter from './review.route'
+import bookmarksRouter from './bookmarks.route'
 
 const { deleteTour, getTour, getTours, updateTour, postTour, getToursAvailableToPost } = toursController
 const { authenticate, auth2FA, authorize } = authMiddleware
 
 const toursRouter = Router({ mergeParams: true })
-
-toursRouter.use('/:tourId/bookings', bookingRouter)
+// * it should tour id but in this case let assume cabin Id is like item Id of bookings, reviews and bookmarks
+toursRouter.use('/:cabinId/bookings', bookingRouter)
+toursRouter.use('/:cabinId/reviews', reviewRouter)
+toursRouter.use('/:cabinId/bookmarks', bookmarksRouter)
 
 toursRouter.get('/tours-to-post', authenticate, auth2FA, asyncCatch(getToursAvailableToPost))
 
