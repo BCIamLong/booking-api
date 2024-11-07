@@ -3,6 +3,7 @@
 // import sharp from 'sharp'
 import { UploadApiResponse } from 'cloudinary'
 import { Request, Response, NextFunction } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 import { uploadConfig } from '~/config'
 
 const { cloudinary } = uploadConfig
@@ -72,5 +73,73 @@ const resizeAndUploadAvatarToCloud = async function (req: Request, res: Response
   }
 }
 
-export default { resizeAndUploadAvatarToCloud }
+const resizeImage = async function ({ fileBuffer, imageName }: { fileBuffer: any; imageName: any }) {
+  const data: UploadApiResponse = await new Promise((resolve) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          resource_type: 'image',
+          quality: 'auto:best',
+          width: 300,
+          height: 300,
+          crop: 'fill',
+          // * because we use format to jpg so we don't need specify the extension
+          // * if we don't use format then we should specify the extension
+          filename_override: imageName,
+          public_id: `booking-app/images/tours/${imageName}`,
+          format: 'jpg'
+        },
+        async (err, result) => {
+          if (err) throw err
+
+          return resolve(result!)
+          // req.fileName = result?.secure_url as string
+          // console.log(result?.url) //* doesn't have SSL so just http
+          // console.log(result?.secure_url) //* have SSL so it's https
+        }
+      )
+      .end(fileBuffer)
+  })
+
+  // console.log(data)
+  // * store the secure url from data to req.fileName which is what we will store to DB later
+  return data.secure_url
+}
+
+const resizeAndUploadTourImagesToCloud = async function (req: Request, res: Response, next: NextFunction) {
+  // console.log(req.files)
+  const imageCoverFile = (req.files as any)?.imageCover[0]
+  const imagesFiles = (req.files as any)?.images
+  // console.log(imageCoverFile, imagesFiles)
+  if (!imageCoverFile || !imagesFiles) return next()
+
+  try {
+    // const fileName = `user-${req.user._id}-${Date.now()}`
+    const imageCoverName = `tour-cover-${uuidv4()}}`
+
+    const imageCoverUrl = await resizeImage({
+      fileBuffer: imageCoverFile?.buffer,
+      imageName: imageCoverName
+    })
+
+    req.body['imageCover'] = imageCoverUrl
+
+    const imagesQueryObArr = imagesFiles.map((image: any) => {
+      const imageName = `tour-${uuidv4()}}`
+      return resizeImage({
+        fileBuffer: image?.buffer,
+        imageName: imageName
+      })
+    })
+    const imagesUrlArr = await Promise.all(imagesQueryObArr)
+
+    req.body['images'] = imagesUrlArr
+
+    next()
+  } catch (err) {
+    next(err)
+  }
+}
+
+export default { resizeAndUploadAvatarToCloud, resizeAndUploadTourImagesToCloud }
 // export default { resizeAndUploadAvatarToLocal, resizeAndUploadAvatarToCloud }

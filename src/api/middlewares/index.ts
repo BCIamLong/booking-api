@@ -5,6 +5,7 @@ import reviewMiddleware from './review.middleware'
 import bookmarkMiddleware from './bookmark.middleware'
 import bookingMiddleware from './booking.middleware'
 import postMiddleware from './post.middleware'
+import tourMiddleware from './tour.middleware'
 
 export {
   errorsHandler,
@@ -13,5 +14,6 @@ export {
   reviewMiddleware,
   bookmarkMiddleware,
   bookingMiddleware,
-  postMiddleware
+  postMiddleware,
+  tourMiddleware
 }

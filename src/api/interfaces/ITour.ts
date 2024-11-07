@@ -1,20 +1,20 @@
 import { Document } from 'mongoose'
 
-interface StartDate {
-  _id: string
+export interface StartDate {
+  _id?: string
   date: Date
-  participants: number
-  soldOut: boolean
+  participants?: number
+  soldOut?: boolean
 }
 
-interface StartLocation {
-  type: string
+export interface StartLocation {
+  type?: string
   coordinates: number[]
   address: string
   description: string
 }
 
-interface Location extends StartLocation {
+export interface Location extends StartLocation {
   day: number
 }
 

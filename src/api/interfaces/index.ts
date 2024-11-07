@@ -6,7 +6,7 @@ import IUser from './IUser'
 import { UserSession, UpdateCurrentUserInput } from './IAuth'
 import IReview from './IReview'
 import IBookmark from './IBookmark'
-import ITour from './ITour'
+import ITour, { ITourInput, Location, StartDate, StartLocation } from './ITour'
 import IPost from './IPost'
 
 export {
@@ -20,5 +20,9 @@ export {
   IReview,
   IBookmark,
   ITour,
+  ITourInput,
+  Location,
+  StartDate,
+  StartLocation,
   IPost
 }
