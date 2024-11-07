@@ -40,7 +40,26 @@ toursRouter
 toursRouter
   .route('/:id')
   .get(asyncCatch(getTour))
-  .patch(authenticate, auth2FA, authorize('admin'), asyncCatch(updateTour))
-  .delete(authenticate, auth2FA, authorize('admin'), asyncCatch(deleteTour))
+  .patch(
+    authenticate,
+    auth2FA,
+    //  authorize('admin'),
+    // ! WHEN WE USE multipart/form-data TO SEND THE FORM DATA WE NEED TO SET UP A LIBRARY LIKE MULTER TO TAKE THE DATA TO THE req.body
+    // * so basically it's not depend on we use file data or not it's because we use multipart/form-data so we need something to resolve our data and pass it to req.body or req.file and req.files...
+    // upload.none(),
+    upload.fields([
+      { name: 'imageCover', maxCount: 1 },
+      { name: 'images', maxCount: 3 }
+    ]),
+    resizeAndUploadTourImagesToCloud,
+    covertJSONStringifyDataToOb,
+    asyncCatch(updateTour)
+  )
+  .delete(
+    authenticate,
+    auth2FA,
+    // authorize('admin'),
+    asyncCatch(deleteTour)
+  )
 
 export default toursRouter

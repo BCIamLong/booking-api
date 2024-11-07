@@ -24,6 +24,7 @@ const postTour = postOne(async (options) => {
 })
 
 const updateTour = updateOne(async (options) => {
+  console.log(options.body)
   const { data, collectionName } = await editTour(options.id || '', options.body || {})
 
   return { data, collectionName }

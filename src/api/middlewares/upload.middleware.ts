@@ -107,34 +107,37 @@ const resizeImage = async function ({ fileBuffer, imageName }: { fileBuffer: any
 }
 
 const resizeAndUploadTourImagesToCloud = async function (req: Request, res: Response, next: NextFunction) {
-  // console.log(req.files)
-  const imageCoverFile = (req.files as any)?.imageCover[0]
-  const imagesFiles = (req.files as any)?.images
-  // console.log(imageCoverFile, imagesFiles)
-  if (!imageCoverFile || !imagesFiles) return next()
-
   try {
-    // const fileName = `user-${req.user._id}-${Date.now()}`
-    const imageCoverName = `tour-cover-${uuidv4()}}`
+    // console.log(req.files)
+    // console.log(req.files)
+    const imageCoverFile = (req.files as any)?.imageCover?.[0]
+    const imagesFiles = (req.files as any)?.images
+    // console.log(imageCoverFile, imagesFiles)
+    if (!imageCoverFile && !imagesFiles) return next()
+    if (imageCoverFile) {
+      const imageCoverName = `tour-cover-${uuidv4()}}`
 
-    const imageCoverUrl = await resizeImage({
-      fileBuffer: imageCoverFile?.buffer,
-      imageName: imageCoverName
-    })
-
-    req.body['imageCover'] = imageCoverUrl
-
-    const imagesQueryObArr = imagesFiles.map((image: any) => {
-      const imageName = `tour-${uuidv4()}}`
-      return resizeImage({
-        fileBuffer: image?.buffer,
-        imageName: imageName
+      const imageCoverUrl = await resizeImage({
+        fileBuffer: imageCoverFile?.buffer,
+        imageName: imageCoverName
       })
-    })
-    const imagesUrlArr = await Promise.all(imagesQueryObArr)
 
-    req.body['images'] = imagesUrlArr
+      req.body['imageCover'] = imageCoverUrl
+    }
 
+    // const fileName = `user-${req.user._id}-${Date.now()}`
+    if (imagesFiles) {
+      const imagesQueryObArr = imagesFiles.map((image: any) => {
+        const imageName = `tour-${uuidv4()}}`
+        return resizeImage({
+          fileBuffer: image?.buffer,
+          imageName: imageName
+        })
+      })
+      const imagesUrlArr = await Promise.all(imagesQueryObArr)
+
+      req.body['images'] = imagesUrlArr
+    }
     next()
   } catch (err) {
     next(err)
