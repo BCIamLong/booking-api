@@ -58,6 +58,10 @@ const userSchema = new Schema(
       default: 'user',
       enum: ['user', 'admin']
     },
+    avatar: {
+      type: String,
+      default: 'default-user.jpg'
+    },
     password: {
       type: String,
       required: true

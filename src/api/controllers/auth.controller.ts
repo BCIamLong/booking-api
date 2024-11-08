@@ -513,6 +513,7 @@ const disable2FA = async function (req: Request, res: Response) {
 const getUserSession = async function (req: Request, res: Response) {
   const user = await getUserSessionService({ role: req.user.role })
   // const user = req.user
+  // console.log(user)
 
   res.json({
     status: 'success',

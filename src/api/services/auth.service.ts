@@ -245,6 +245,7 @@ const updatePasswordService = async function ({ token, password }: { token: stri
   user.passwordConfirm = password
   await user.save()
 
+  setCache('user', '', JSON.stringify(user))
   return user
 }
 
