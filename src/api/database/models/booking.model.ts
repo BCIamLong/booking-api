@@ -138,6 +138,8 @@ bookingSchema.methods.updateTourWithBooking = async function (tourId: string, st
 }
 
 bookingSchema.pre(/^find/, async function (next) {
+  // @ts-ignore
+  this.populate({ path: 'guestId', select: 'fullName email' })
   // const data = await mongoose.model('Booking').aggregate([
   //   {
   //     $match: {
