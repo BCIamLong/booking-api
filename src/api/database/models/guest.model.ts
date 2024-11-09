@@ -202,8 +202,8 @@ guestSchema.post('save', async function (doc, next) {
   // const newDoc = this.getFilter()
   // console.log(doc)
   // console.log(newDoc)
-  if (!doc) return
-  if (doc?.verifyEmail) return
+  if (!doc) return next()
+  if (doc?.verifyEmail) return next()
   const url = `${SERVER_ORIGIN}/api/v1/auth/verify-email/${doc.verifyEmailToken}`
 
   appEmitter.signup(doc as IGuest, url)

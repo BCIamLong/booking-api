@@ -13,7 +13,7 @@ import bookmarkSchema from './bookmark.schema'
 
 export const validator = (schema: ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
   // console.log(req.file, req.body)
-  if (req.file) {
+  if (req.file && !req.body.avatar) {
     const { originalname, size, mimetype } = req.file
     req.body.avatar = { originalname, size, mimetype }
   }

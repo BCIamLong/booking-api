@@ -2,12 +2,16 @@ import { Router } from 'express'
 import { guestsController } from '../controllers'
 import { asyncCatch } from '../utils'
 import { guestSchema, validator } from '../validators'
-import { authMiddleware } from '../middlewares'
+import { authMiddleware, guestMiddleware, uploadMiddleware } from '../middlewares'
 import reviewRouter from './review.route'
+import { uploadConfig } from '~/config'
 
 const { createGuestSchema, updateGuestSchema } = guestSchema
 const { getGuests, postGuest, getGuest, updateGuest, deleteGuest } = guestsController
 const { authenticate, authorize, auth2FA } = authMiddleware
+const { setUpVerifyEmail } = guestMiddleware
+const { resizeAndUploadGuestAvatarToCloud } = uploadMiddleware
+const { upload } = uploadConfig
 
 const guestRouter = Router()
 
@@ -91,7 +95,7 @@ guestRouter
    *
    *
    */
-  .post(validator(createGuestSchema), asyncCatch(postGuest))
+  .post(setUpVerifyEmail, validator(createGuestSchema), asyncCatch(postGuest))
 
 guestRouter
   .route('/:id')
@@ -167,7 +171,12 @@ guestRouter
    *    500:
    *     description: Something went wrong
    */
-  .patch(validator(updateGuestSchema), asyncCatch(updateGuest))
+  .patch(
+    upload.single('avatar'),
+    resizeAndUploadGuestAvatarToCloud,
+    validator(updateGuestSchema),
+    asyncCatch(updateGuest)
+  )
   /**
    * @openapi
    * '/api/v1/guests/{id}':

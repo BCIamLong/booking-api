@@ -5,8 +5,8 @@ import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.control
 const { fetchGuests, fetchGuest, editGuest, createGuest, removeGuest } = guestsService
 const { checkEmailExist } = authService
 
-const getGuests = getAll(async () => {
-  const { data, collectionName, count } = await fetchGuests()
+const getGuests = getAll(async (options) => {
+  const { data, collectionName, count } = await fetchGuests(options.queryStr!)
   return { data, collectionName, count }
 })
 
