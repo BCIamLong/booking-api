@@ -3,7 +3,7 @@ import './api/database'
 import { appConfig } from './config'
 import app from './app'
 import { Email, log } from './api/utils'
-// import job from './cron'
+import job from './cron'
 
 const { appEmitter, SERVER_ORIGIN } = appConfig
 
