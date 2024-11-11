@@ -100,6 +100,21 @@ export default class APIFeatures<T> {
 
     const difficulty = queryOb.difficulty
 
+    if (queryOb?.startDate?.lt) queryOb['startDate'] = { lt: new Date(queryOb.startDate.lt) }
+    if (queryOb?.startDate?.gt) queryOb['startDate'] = { gt: new Date(queryOb.startDate.gt) }
+    if (queryOb?.startDate?.lte) queryOb['startDate'] = { lte: new Date(queryOb.startDate.lte) }
+    if (queryOb?.startDate?.gte) queryOb['startDate'] = { gte: new Date(queryOb.startDate.gte) }
+    if (queryOb?.endDate?.lt) queryOb['endDate'] = { lt: new Date(queryOb.endDate.lt) }
+    if (queryOb?.endDate?.gt) queryOb['endDate'] = { gt: new Date(queryOb.endDate.gt) }
+    if (queryOb?.endDate?.lte) queryOb['endDate'] = { lte: new Date(queryOb.endDate.lte) }
+    if (queryOb?.endDate?.gte) queryOb['endDate'] = { gte: new Date(queryOb.endDate.gte) }
+    if (queryOb?.createdAt?.lt) queryOb['createdAt'] = { lt: new Date(queryOb.createdAt.lt) }
+    if (queryOb?.createdAt?.gt) queryOb['createdAt'] = { gt: new Date(queryOb.createdAt.gt) }
+    if (queryOb?.createdAt?.lte) queryOb['createdAt'] = { lte: new Date(queryOb.createdAt.lte) }
+    if (queryOb?.createdAt?.gte) queryOb['createdAt'] = { gte: new Date(queryOb.createdAt.gte) }
+    // console.log(queryOb)
+    if (queryOb?.status?.eq) queryOb['status'] = { $eq: queryOb.status.eq }
+
     let queryObStr = JSON.stringify(queryOb)
     queryObStr = queryObStr.replace(/(gt|lt|gte|gt|ne)/g, (val) => `$${val}`)
 
