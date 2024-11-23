@@ -119,7 +119,8 @@ const getCheckOutSession = async function (req: Request, res: Response) {
   const { id: userId, email } = req.user
 
   // const imageCustom = image?.startsWith('cabin-') ? `${CLIENT_ORIGIN}/imgs/cabins/${image}` : image
-  const imageCustom = image?.startsWith('cabin-') ? `${req.protocol}://${req.get('host')}/imgs/cabins/${image}` : image
+  const imageCustom = image?.startsWith('cabin-') ? `${req.protocol}://${req.get('host')}/imgs/tours/${image}` : image
+  // const imageCustom = image?.startsWith('cabin-') ? `${req.protocol}://${req.get('host')}/imgs/cabins/${image}` : image
   // console.log(`${req.protocol}://${req.get('host')}/imgs/cabins/${image}`)
 
   const session = await stripe.checkout.sessions.create({
