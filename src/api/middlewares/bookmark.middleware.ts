@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 
 const bookmarksQueryModifier = async function (req: Request, res: Response, next: NextFunction) {
   const { cabinId } = req.params
+  const { for: forUser } = req.query
   if (cabinId) {
     if (req.method === 'POST') {
       req.body.cabin = cabinId
@@ -10,6 +11,8 @@ const bookmarksQueryModifier = async function (req: Request, res: Response, next
       return next()
     }
     req.query.cabin = cabinId
+    if (forUser === 'user') req.query.user = req.user.id
+
     return next()
   }
 
