@@ -7,7 +7,7 @@ import { AppError } from '../utils'
 import { IBooking, ICabin, IGuest, ITour, IUser } from '../interfaces'
 
 const { stripe } = paymentConfig
-const { CLIENT_ORIGIN, appEmitter } = appConfig
+const { CLIENT_ORIGIN, appEmitter, SERVER_ORIGIN } = appConfig
 const { fetchCabin } = cabinsService
 const { fetchBookings, fetchBooking, editBooking, createBooking, removeBooking, removeUserBooking } = bookingsService
 
@@ -119,8 +119,9 @@ const getCheckOutSession = async function (req: Request, res: Response) {
   const { id: userId, email } = req.user
 
   // const imageCustom = image?.startsWith('cabin-') ? `${CLIENT_ORIGIN}/imgs/cabins/${image}` : image
-  const imageCustom = image?.startsWith('tour-') ? `${req.protocol}://${req.get('host')}/imgs/tours/${image}` : image
-  console.log(imageCustom)
+  const imageCustom = image?.startsWith('tour-') ? `${SERVER_ORIGIN}/imgs/tours/${image}` : image
+  // const imageCustom = image?.startsWith('tour-') ? `${req.protocol}://${req.get('host')}/imgs/tours/${image}` : image
+  // console.log(imageCustom)
   // const imageCustom = image?.startsWith('cabin-') ? `${req.protocol}://${req.get('host')}/imgs/cabins/${image}` : image
   // console.log(`${req.protocol}://${req.get('host')}/imgs/cabins/${image}`)
 

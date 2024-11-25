@@ -10,7 +10,8 @@ const CLIENT_ORIGIN =
     : (process.env.CLIENT_ORIGIN as string)
 const SERVER_ORIGIN =
   process.env.NODE_ENV === 'production'
-    ? 'https://booking-api-ebe1.onrender.com'
+    ? // ? 'https://booking-api-ebe1.onrender.com'
+      'https://tours-booking-api.onrender.com'
     : `http://localhost:${process.env.PORT}`
 const DELETE_ACCOUNT_TIMEOUT = Number(process.env.DELETE_ACCOUNT_TIMEOUT)
 
