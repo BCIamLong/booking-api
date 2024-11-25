@@ -11,7 +11,10 @@ const bookmarksQueryModifier = async function (req: Request, res: Response, next
       return next()
     }
     req.query.cabin = cabinId
-    if (forUser === 'user') req.query.user = req.user.id
+    if (forUser === 'user') {
+      delete req.query['for']
+      req.query.user = req.user.id
+    }
 
     return next()
   }
