@@ -5,6 +5,7 @@ import Cabin from './cabin.model'
 import Guest from './guest.model'
 import { IBookmark } from '~/api/interfaces'
 import { AppError } from '~/api/utils'
+import Tour from './tour.model'
 
 /**
  * @openapi
@@ -55,12 +56,14 @@ const bookmarkSchema = new Schema(
 )
 
 bookmarkSchema.pre('save', async function (next) {
-  const { cabin } = this
+  const { cabin: tourId } = this
   // * we have authenticate to check the current user therefore we don't need do this
   // const isUserExist = await Guest.findById(user)
   // if(isUserExist) throw new AppError(400, )
-  const isCabinExist = await Cabin.findById(cabin)
-  if (!isCabinExist) throw new AppError(400, "We have no way to bookmark the cabin doesn't exist")
+  const isTourExist = await Tour.findById(tourId)
+  if (!isTourExist) throw new AppError(400, "We have no way to bookmark the tour doesn't exist")
+  // const isCabinExist = await Cabin.findById(cabin)
+  // if (!isCabinExist) throw new AppError(400, "We have no way to bookmark the cabin doesn't exist")
 
   next()
 })
