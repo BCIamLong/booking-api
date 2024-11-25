@@ -92,7 +92,8 @@ app.options('*', cors<Request>(corsOptions))
 // app.options('*', cors())
 
 app.use(helmet())
-app.use(express.static(path.join(__dirname, 'public')))
+// app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.resolve(__dirname, 'public')))
 app.use(limiter)
 app.use(
   hpp({

@@ -120,6 +120,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
 
   // const imageCustom = image?.startsWith('cabin-') ? `${CLIENT_ORIGIN}/imgs/cabins/${image}` : image
   const imageCustom = image?.startsWith('tour-') ? `${req.protocol}://${req.get('host')}/imgs/tours/${image}` : image
+  console.log(imageCustom)
   // const imageCustom = image?.startsWith('cabin-') ? `${req.protocol}://${req.get('host')}/imgs/cabins/${image}` : image
   // console.log(`${req.protocol}://${req.get('host')}/imgs/cabins/${image}`)
 
@@ -145,7 +146,7 @@ const getCheckOutSession = async function (req: Request, res: Response) {
           unit_amount: regularPrice * 100, //* 1 $ = 100 cents
           currency: 'usd',
           product_data: {
-            name: `${name} Cabin`,
+            name: `${name} Tour`,
             description,
             images: [imageCustom]
           }
