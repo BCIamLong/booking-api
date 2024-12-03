@@ -17,7 +17,11 @@ const server = app.listen(port, () => {
 })
 
 appEmitter.on('train-recommends', async () => {
-  await axios.get(`${RECOMMEND_ORIGIN}/train`)
+  try {
+    await axios.get(`${RECOMMEND_ORIGIN}/train`)
+  } catch (err) {
+    log.error(err)
+  }
 })
 
 appEmitter.on('signup', (user, url) => {
