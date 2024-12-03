@@ -3,6 +3,9 @@ import mongoose, { Model, Schema, model } from 'mongoose'
 import { IReview } from '~/api/interfaces'
 import Cabin from './cabin.model'
 import Tour from './tour.model'
+import { appConfig } from '~/config'
+
+const { appEmitter } = appConfig
 
 /**
  * @openapi
@@ -134,6 +137,8 @@ reviewSchema.post(
   'save',
   async function (doc: IReview & { updateCabinWithReview: (model: Model<IReview>, cabinId: string) => void }, next) {
     doc.updateCabinWithReview(mongoose.model<IReview>('Review'), doc.cabin)
+
+    appEmitter.emit('train-recommends')
     // doc.updateCabinWithReview(this.model('Review'), doc.cabin)
 
     // const stats = await this.model('Review').aggregate([

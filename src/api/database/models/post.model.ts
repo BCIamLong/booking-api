@@ -2,6 +2,9 @@ import { number, ref, required } from 'joi'
 import mongoose, { model, Schema } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 import { IPost } from '~/api/interfaces'
+import { appConfig } from '~/config'
+
+const { appEmitter } = appConfig
 
 const postSchema = new Schema(
   {
@@ -115,6 +118,58 @@ postSchema.pre('findOne', function (next) {
     .populate({ path: 'bookmarks.userId', select: 'fullName avatar' })
   next()
 })
+
+postSchema.post('save', async function (doc, next) {
+  appEmitter.emit('train-recommends')
+  next()
+})
+
+// postSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({
+//     $lookup: {
+//       from: 'guests',
+//       localField: 'userId',
+//       foreignField: '_id',
+//       as: 'users'
+//     }
+//   })
+//   this.pipeline().unshift({
+//     $lookup: {
+//       from: 'guests',
+//       // ! For the field like this comments.userId it will not work
+//       localField: 'comments.userId',
+//       foreignField: '_id',
+//       as: 'users'
+//     }
+//   })
+//   this.pipeline().unshift({
+//     $lookup: {
+//       from: 'guests',
+//       localField: 'likes.userId',
+//       foreignField: '_id',
+//       as: 'users'
+//     }
+//   })
+//   this.pipeline().unshift({
+//     $lookup: {
+//       from: 'guests',
+//       localField: 'bookmarks.userId',
+//       foreignField: '_id',
+//       as: 'users'
+//     }
+//   })
+
+//   this.pipeline().unshift({
+//     $lookup: {
+//       from: 'tours',
+//       localField: 'tourId',
+//       foreignField: '_id',
+//       as: 'tours'
+//     }
+//   })
+
+//   next()
+// })
 
 const Post = model<IPost>('Post', postSchema)
 
