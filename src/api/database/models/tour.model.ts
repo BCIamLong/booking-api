@@ -1,6 +1,9 @@
 import { model, Schema } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 import { ITour } from '~/api/interfaces'
+import { appConfig } from '~/config'
+
+const { appEmitter } = appConfig
 
 const tourSchema = new Schema(
   {
@@ -149,5 +152,15 @@ const tourSchema = new Schema(
 )
 
 const Tour = model<ITour>('Tour', tourSchema)
+
+tourSchema.post(/^findOneAnd/, async function (doc, next) {
+  appEmitter.emit('train-recommends')
+  next()
+})
+
+tourSchema.post('save', async function (doc, next) {
+  appEmitter.emit('train-recommends')
+  next()
+})
 
 export default Tour
