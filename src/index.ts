@@ -4,8 +4,9 @@ import { appConfig } from './config'
 import app from './app'
 import { Email, log } from './api/utils'
 import job from './cron'
+import axios from 'axios'
 
-const { appEmitter, SERVER_ORIGIN } = appConfig
+const { appEmitter, SERVER_ORIGIN, RECOMMEND_ORIGIN } = appConfig
 
 const port = process.env.PORT || 3009
 // if (process.env.NODE_ENV === 'production') job.start()
@@ -13,6 +14,10 @@ const port = process.env.PORT || 3009
 const server = app.listen(port, () => {
   log.info(`Server is listening at port ${port}`)
   log.info(`Documentation available at ${SERVER_ORIGIN}/docs`)
+})
+
+appEmitter.on('train-recommends', async () => {
+  await axios.get(`${RECOMMEND_ORIGIN}/train`)
 })
 
 appEmitter.on('signup', (user, url) => {

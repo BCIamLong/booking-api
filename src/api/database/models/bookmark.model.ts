@@ -6,6 +6,9 @@ import Guest from './guest.model'
 import { IBookmark } from '~/api/interfaces'
 import { AppError } from '~/api/utils'
 import Tour from './tour.model'
+import { appConfig } from '~/config'
+
+const { appEmitter } = appConfig
 
 /**
  * @openapi
@@ -66,6 +69,10 @@ bookmarkSchema.pre('save', async function (next) {
   // if (!isCabinExist) throw new AppError(400, "We have no way to bookmark the cabin doesn't exist")
 
   next()
+})
+
+bookmarkSchema.post('save', async function (next) {
+  appEmitter.emit('train-recommends')
 })
 
 bookmarkSchema.pre(/^find/, function (next) {
