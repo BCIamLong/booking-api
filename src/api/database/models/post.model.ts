@@ -119,6 +119,11 @@ postSchema.pre('findOne', function (next) {
   next()
 })
 
+postSchema.post(/^findOneAnd/, async function (doc, next) {
+  appEmitter.emit('train-recommends')
+  next()
+})
+
 postSchema.post('save', async function (doc, next) {
   appEmitter.emit('train-recommends')
   next()

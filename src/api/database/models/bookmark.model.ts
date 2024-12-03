@@ -71,8 +71,14 @@ bookmarkSchema.pre('save', async function (next) {
   next()
 })
 
-bookmarkSchema.post('save', async function (next) {
+bookmarkSchema.post(/^findOneAnd/, async function (doc, next) {
   appEmitter.emit('train-recommends')
+  next()
+})
+
+bookmarkSchema.post('save', async function (doc, next) {
+  appEmitter.emit('train-recommends')
+  next()
 })
 
 bookmarkSchema.pre(/^find/, function (next) {

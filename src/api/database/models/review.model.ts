@@ -121,6 +121,7 @@ reviewSchema.post(
   'findOneAndDelete',
   async function (doc: IReview & { updateCabinWithReview: (model: Model<IReview>, cabinId: string) => void }, next) {
     doc.updateCabinWithReview(mongoose.model<IReview>('Review'), doc.cabin)
+    appEmitter.emit('train-recommends')
     next()
   }
 )
@@ -129,6 +130,7 @@ reviewSchema.post(
   'findOneAndUpdate',
   async function (doc: IReview & { updateCabinWithReview: (model: Model<IReview>, cabinId: string) => void }, next) {
     doc.updateCabinWithReview(mongoose.model<IReview>('Review'), doc.cabin)
+    appEmitter.emit('train-recommends')
     next()
   }
 )
