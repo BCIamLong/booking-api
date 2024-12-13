@@ -40,7 +40,7 @@ const limiter = rateLimit({
 })
 
 const allowedOrigins = [
-  // 'http://localhost:5173',
+  'http://localhost:5173',
   'https://bookings-app-client.vercel.app',
   'https://stripe.com',
   'https://m.stripe.com',
