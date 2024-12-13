@@ -18,7 +18,7 @@ import { bookingsController } from './api/controllers'
 // import './config/modules.d'
 
 const { accessLogStream } = loggerConfig
-const { COMPRESSION_LEVEL } = appConfig
+const { COMPRESSION_LEVEL, CLIENT_ORIGIN, DASHBOARD_ORIGIN } = appConfig
 const { webhookCheckout } = bookingsController
 
 const app = express()
@@ -40,12 +40,13 @@ const limiter = rateLimit({
 })
 
 const allowedOrigins = [
-  'http://localhost:5173',
+  // 'http://localhost:5173',
   'https://bookings-app-client.vercel.app',
-  'https://tours-booking-dashboard-qruy.vercel.app',
   'https://stripe.com',
   'https://m.stripe.com',
-  'https://checkout.stripe.com'
+  'https://checkout.stripe.com',
+  CLIENT_ORIGIN,
+  DASHBOARD_ORIGIN
 ]
 
 const corsOptions: CorsOptions = {

@@ -5,6 +5,7 @@ import { log } from '~/api/utils'
 const PAGE_LIMIT = 6
 const COMPRESSION_LEVEL = 6
 const RECOMMEND_ORIGIN = process.env.RECOMMEND_ORIGIN
+const DASHBOARD_ORIGIN = process.env.DASHBOARD_ORIGIN
 const CLIENT_ORIGIN =
   process.env.NODE_ENV === 'production'
     ? (process.env.CLIENT_ORIGIN_CLOUD as string)
@@ -59,5 +60,6 @@ export default {
   appEmitter,
   PAGE_LIMIT,
   COMPRESSION_LEVEL,
-  RECOMMEND_ORIGIN
+  RECOMMEND_ORIGIN,
+  DASHBOARD_ORIGIN
 }
