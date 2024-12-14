@@ -29,12 +29,12 @@ const getCache = async function <T>({ key, hashKey = '', model }: { key: string;
       data = JSON.parse(dataRaw!)
       if (Array.isArray(data)) return data.map((item) => model?.hydrate?.(item))
       // console.log(model)
-      if (model !== null && typeof model.hydrate === 'function') return model?.hydrate?.(data)
+      if (model !== null && typeof model?.hydrate === 'function') return model?.hydrate?.(data)
       else throw new Error('Model is null or undefined')
     }
 
     data = await redisClient.get(key)
-    if (model !== null && typeof model.hydrate === 'function') return model?.hydrate?.(JSON.parse(data!))
+    if (model !== null && typeof model?.hydrate === 'function') return model?.hydrate?.(JSON.parse(data!))
     else throw new Error('Model is null or undefined')
   } catch (error) {
     console.log(error)
