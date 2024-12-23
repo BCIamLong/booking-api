@@ -62,7 +62,17 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
     //   if (!user.verify2FAOtp)
     //     return next(new AppError(403, 'Please verify your 2FA authentication to continue using our app'))
 
-    const { _id: id, name, fullName, email, role = '', enable2FA = false, verify2FAOtp, avatar } = user
+    const {
+      _id: id,
+      name,
+      fullName,
+      email,
+      role = '',
+      enable2FA = false,
+      verify2FAOtp,
+      avatar,
+      updatePasswordToken
+    } = user
 
     req.user = {
       id,
@@ -70,7 +80,8 @@ const authenticate = async function (req: Request, res: Response, next: NextFunc
       email,
       role,
       enable2FA,
-      avatar: avatar as string
+      avatar: avatar as string,
+      updatePasswordToken
     }
     if (enable2FA) req.user.verify2FAOtp = verify2FAOtp
 

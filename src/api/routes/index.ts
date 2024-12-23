@@ -27,6 +27,7 @@ declare module 'express-serve-static-core' {
       enable2FA: boolean
       verify2FAOtp?: boolean
       avatar: string
+      updatePasswordToken?: string
     }
     token: string
     fileName: string
