@@ -238,7 +238,7 @@ const checkCurrentPasswordService = async function ({
   user.updatePasswordToken = token
   await user.save({ validateBeforeSave: false })
 
-  setCache('user', '', JSON.stringify(user))
+  if (user.role === 'user') setCache('user', '', JSON.stringify(user))
 
   return token
 }
