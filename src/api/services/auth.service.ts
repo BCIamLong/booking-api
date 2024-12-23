@@ -25,7 +25,10 @@ const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET }
 const loginService = async function (email: string, password: string) {
   let user: IUser | IGuest = (await Guest.findOne({ email }).cache({ type: 'session', key: 'user' })) as IGuest
 
-  if (!user) user = (await User.findOne({ email }).cache({ type: 'session', key: 'user' })) as IUser
+  if (!user) user = (await User.findOne({ email })) as IUser
+  // * to avoid conflict cache between user and admin now we will not cache admin, remember admins data is not large right, maybe it's not problem if we don't cache admin data
+  // * but we can also resolve the conflict if we provide another cache key for admin, cache({ type: 'session', key: 'admin' }) so like this
+  // if (!user) user = (await User.findOne({ email }).cache({ type: 'session', key: 'user' })) as IUser
 
   if (!user) throw new AppError(404, 'User is not exist')
 
@@ -213,16 +216,19 @@ const updateCurrentUserService = async function ({
 const checkCurrentPasswordService = async function ({
   // user,
   role,
-  password
+  password,
+  adminId
 }: {
   // user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
   role: string
   password: string
+  adminId?: string
 }) {
   const user =
     role === 'admin'
-      ? ((await getCache<IUser>({ key: 'user', model: User })) as IUser)
-      : ((await getCache<IGuest>({ key: 'user', model: Guest })) as IGuest)
+      ? ((await User.findById(adminId)) as IUser)
+      : // ((await getCache<IUser>({ key: 'user', model: User })) as IUser)
+        ((await getCache<IGuest>({ key: 'user', model: Guest })) as IGuest)
   // console.log(user)
   const check = await user.checkPwd(password, user.password!)
   if (!check) throw new AppError(400, 'Password is not correct')

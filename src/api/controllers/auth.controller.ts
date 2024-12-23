@@ -390,7 +390,7 @@ const checkCurrentPassword = async function (req: Request, res: Response) {
   // const { user } = req
 
   // const token = await checkCurrentPasswordService({ user, password })
-  const token = await checkCurrentPasswordService({ password, role: req.user.role })
+  const token = await checkCurrentPasswordService({ password, role: req.user.role, adminId: req.user.id })
 
   res.json({
     status: 'success',
@@ -511,7 +511,11 @@ const disable2FA = async function (req: Request, res: Response) {
 }
 
 const getUserSession = async function (req: Request, res: Response) {
-  const user = await getUserSessionService({ role: req.user.role })
+  const { role } = req.user
+  let user
+
+  if (role === 'admin') user = req.user
+  else user = await getUserSessionService({ role })
   // const user = req.user
   // console.log(user)
 
