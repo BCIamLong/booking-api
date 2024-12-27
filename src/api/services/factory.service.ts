@@ -2,6 +2,9 @@ import { Model } from 'mongoose'
 import { AppError } from '../utils'
 import { APIFeatures } from '../utils'
 import { QueryStr } from '../utils/APIFeatures'
+import redis from '../database/redis'
+
+const { setCache } = redis
 
 const fetchAll =
   <T>(Model: Model<T>) =>
@@ -54,7 +57,7 @@ interface UpdateOperations {
 const editOne =
   <T>(Model: Model<T>) =>
   async (id: string, editData: Partial<T> & UpdateOperations, validate: boolean = true, cache: boolean = false) => {
-    let query = Model.findByIdAndUpdate(id, editData, {
+    const query = Model.findByIdAndUpdate(id, editData, {
       new: true,
       runValidators: validate
     })
@@ -63,10 +66,15 @@ const editOne =
     // console.log(formatCollectionName)
     if (formatCollectionName === 'user' || formatCollectionName === 'guest') formatCollectionName = 'user'
 
-    if (cache) query = query.cache({ key: formatCollectionName, type: 'session' })
+    // if (cache) query = query.cache({ key: formatCollectionName, type: 'session' })
 
     const data = await query
+
     if (!data) throw new AppError(404, `No ${collectionName} found with this id`)
+
+    if (cache) {
+      setCache(`${formatCollectionName}-${id}`, '', JSON.stringify(data))
+    }
 
     return { data, collectionName: Model.collection.collectionName }
   }
@@ -84,4 +92,19 @@ const removeOne =
     return { data, collectionName: Model.collection.collectionName }
   }
 
-export { fetchAll, fetchOne, createOne, editOne, removeOne }
+const fetchRandom =
+  <T>(Model: Model<T>) =>
+  async (num: number) => {
+    const data = await Model.aggregate([
+      {
+        $sample: {
+          size: num
+        }
+      }
+    ])
+    if (!data) throw new AppError(404, `No ${Model.collection.collectionName} found `)
+
+    return { data, collectionName: Model.collection.collectionName }
+  }
+
+export { fetchAll, fetchOne, createOne, editOne, removeOne, fetchRandom }

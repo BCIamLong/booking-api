@@ -23,7 +23,9 @@ const { editUser } = usersService
 const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET } = oauthConfig
 
 const loginService = async function (email: string, password: string) {
-  let user: IUser | IGuest = (await Guest.findOne({ email }).cache({ type: 'session', key: 'user' })) as IGuest
+  let user: IUser | IGuest = (await Guest.findOne({ email })) as IGuest
+  setCache(`user-${user._id}`, '', JSON.stringify(user))
+  // let user: IUser | IGuest = (await Guest.findOne({ email }).cache({ type: 'session', key: 'user' })) as IGuest
 
   if (!user) user = (await User.findOne({ email })) as IUser
   // * to avoid conflict cache between user and admin now we will not cache admin, remember admins data is not large right, maybe it's not problem if we don't cache admin data
@@ -187,12 +189,12 @@ const resetPwdService = async function ({ token, password }: { password: string;
 
 const logoutService = async function ({ id, role, enable2FA }: { id: string; role: string; enable2FA: boolean }) {
   // await redisClient.del('user')
-  if (!enable2FA) return await deleteCache('user')
+  if (!enable2FA) return await deleteCache(`user-${id}`)
 
   if (role === 'admin') await editUser(id, { verify2FAOtp: false })
   if (role === 'user') await editGuest(id, { verify2FAOtp: false })
 
-  await deleteCache('user')
+  await deleteCache(`user-${id}`)
   await deleteCache('page')
 }
 
@@ -217,18 +219,20 @@ const checkCurrentPasswordService = async function ({
   // user,
   role,
   password,
-  adminId
+  adminId,
+  userId
 }: {
   // user: Omit<IUser, 'passwordConfirm'> | Omit<IGuest, 'passwordConfirm'>
   role: string
   password: string
+  userId?: string
   adminId?: string
 }) {
   const user =
     role === 'admin'
       ? ((await User.findById(adminId)) as IUser)
       : // ((await getCache<IUser>({ key: 'user', model: User })) as IUser)
-        ((await getCache<IGuest>({ key: 'user', model: Guest })) as IGuest)
+        ((await getCache<IGuest>({ key: `user-${userId}`, model: Guest })) as IGuest)
   // console.log(user)
   const check = await user.checkPwd(password, user.password!)
   if (!check) throw new AppError(400, 'Password is not correct')
@@ -237,8 +241,8 @@ const checkCurrentPasswordService = async function ({
 
   user.updatePasswordToken = token
   await user.save({ validateBeforeSave: false })
-
-  if (user.role === 'user') setCache('user', '', JSON.stringify(user))
+  // console.log(`---------user-${user._id}`)
+  if (user.role === 'user') setCache(`user-${user._id}`, '', JSON.stringify(user))
 
   return token
 }
@@ -251,12 +255,20 @@ const updatePasswordService = async function ({ token, password }: { token: stri
   user.passwordConfirm = password
   await user.save()
 
-  if (user.role === 'user') setCache('user', '', JSON.stringify(user))
+  if (user.role === 'user') setCache(`user-${user._id}`, '', JSON.stringify(user))
   return user
 }
 
-const deleteCurrentUserService = async function ({ reason, password }: { reason: string; password: string }) {
-  const user = (await getCache<IGuest>({ key: 'user', model: Guest })) as IGuest
+const deleteCurrentUserService = async function ({
+  reason,
+  password,
+  userId
+}: {
+  reason: string
+  password: string
+  userId?: string
+}) {
+  const user = (await getCache<IGuest>({ key: `user-${userId}`, model: Guest })) as IGuest
   // * maybe if the user does something to get access to delete account but doesn't have cache that means it might a invalid task, like user doesn't verify email but somehow the user can ignore that and access to our system
   // * then the cache doesn't have and we can throw the error like this
   if (!user) throw new AppError(401, 'Delete your account process is failed')
@@ -271,9 +283,9 @@ const deleteCurrentUserService = async function ({ reason, password }: { reason:
 
   await user.save({ validateBeforeSave: false })
   // Guest.collection.createIndex({ deleteAt: 1 }, { expireAfterSeconds: DELETE_ACCOUNT_TIMEOUT })
-  setCache('user', '', JSON.stringify(user))
+  setCache(`user-${user._id}`, '', JSON.stringify(user))
 
-  await deleteCache('user')
+  await deleteCache(`user-${userId}`)
 }
 
 const restoreUserService = async function ({ email }: { email: string }) {}
@@ -405,10 +417,11 @@ const getCurrentUserService = async function (id: string) {
   return user
 }
 
-const getUserSessionService = async function ({ role }: { role: string }) {
+const getUserSessionService = async function ({ role, userId }: { role: string; userId?: string }) {
   let user
   if (role === 'admin') user = await getCache({ key: 'user', model: User })
-  if (role === 'user') user = await getCache({ key: 'user', model: Guest })
+  // console.log(`user-${userId}`)
+  if (role === 'user') user = await getCache({ key: `user-${userId}`, model: Guest })
 
   return user
 }

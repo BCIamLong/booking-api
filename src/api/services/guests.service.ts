@@ -3,6 +3,8 @@ import { createOne, editOne, fetchAll, fetchOne, removeOne } from './factory.ser
 import { IGuest } from '../interfaces'
 import { FilterQuery, QueryOptions, UpdateQuery } from 'mongoose'
 import { IGuestInput } from '../interfaces/IGuest'
+import redis from '../database/redis'
+const { setCache } = redis
 // import { AppError } from '../utils'
 
 const fetchGuests = fetchAll<IGuest>(Guest)
@@ -18,7 +20,11 @@ const findAndUpdateGuest = async function (
   update: UpdateQuery<IGuest>,
   options: QueryOptions = {}
 ) {
-  return Guest.findOneAndUpdate(query, update, options).cache({ key: 'user', type: 'session' })
+  const guest = await Guest.findOneAndUpdate(query, update, options)
+  const { _id } = guest || {}
+  setCache(`user-${_id}`, '', JSON.stringify(guest))
+  return guest
+  // return Guest.findOneAndUpdate(query, update, options).cache({ key: 'user', type: 'session' })
   // return Guest.findOneAndUpdate(query, update, options)
 }
 

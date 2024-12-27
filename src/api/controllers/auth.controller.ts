@@ -390,7 +390,12 @@ const checkCurrentPassword = async function (req: Request, res: Response) {
   // const { user } = req
 
   // const token = await checkCurrentPasswordService({ user, password })
-  const token = await checkCurrentPasswordService({ password, role: req.user.role, adminId: req.user.id })
+  const token = await checkCurrentPasswordService({
+    password,
+    role: req.user.role,
+    userId: req.user.id,
+    adminId: req.user.id
+  })
 
   res.json({
     status: 'success',
@@ -446,7 +451,7 @@ const deleteCurrentUser = async function (req: Request, res: Response) {
   if (req.user.role === 'admin') throw new AppError(403, 'Admins cannot delete their own accounts')
   const { reason, password } = req.body
 
-  await deleteCurrentUserService({ reason, password })
+  await deleteCurrentUserService({ reason, password, userId: req.user.id })
 
   deleteCookies(res)
 
@@ -511,11 +516,11 @@ const disable2FA = async function (req: Request, res: Response) {
 }
 
 const getUserSession = async function (req: Request, res: Response) {
-  const { role } = req.user
+  const { role, id } = req.user
   let user
 
   if (role === 'admin') user = req.user
-  else user = await getUserSessionService({ role })
+  else user = await getUserSessionService({ role, userId: id })
   // const user = req.user
   // console.log(user)
 
