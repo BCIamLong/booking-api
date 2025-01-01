@@ -11,6 +11,8 @@ const { auth2FA, authorize, authenticate } = authMiddleware
 const { getReviews, getReview, postReview, updateReview, deleteReview } = reviewController
 const { createReviewSchema, updateReviewSchema } = reviewSchema
 
+reviewRouter.use(authenticate, auth2FA)
+
 reviewRouter
   .route('/')
   /**
@@ -150,8 +152,6 @@ reviewRouter
    *     description: Something went wrong
    */
   .get(reviewsQueryModifier, asyncCatch(getReviews))
-
-reviewRouter.use(authenticate, auth2FA)
 
 /**
  * @openapi

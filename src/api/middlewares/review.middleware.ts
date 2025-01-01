@@ -8,7 +8,7 @@ const reviewsQueryModifier = async function (req: Request, res: Response, next: 
     const { cabinId, userId, userSlug } = req.params
 
     if (req.baseUrl.split('/').includes('me')) {
-      req.query.user = req.user.id
+      req.query.user = req.user?.id
       return next()
     }
 
