@@ -24,7 +24,7 @@ const { OAUTH_GOOGLE_CLIENT_ID, OAUTH_GOOGLE_REDIRECT_URL, OAUTH_GOOGLE_SECRET }
 
 const loginService = async function (email: string, password: string) {
   let user: IUser | IGuest = (await Guest.findOne({ email })) as IGuest
-  setCache(`user-${user._id}`, '', JSON.stringify(user))
+  if (user) setCache(`user-${user._id}`, '', JSON.stringify(user))
   // let user: IUser | IGuest = (await Guest.findOne({ email }).cache({ type: 'session', key: 'user' })) as IGuest
 
   if (!user) user = (await User.findOne({ email })) as IUser
