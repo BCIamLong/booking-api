@@ -11,8 +11,6 @@ const { auth2FA, authorize, authenticate } = authMiddleware
 const { getReviews, getReview, postReview, updateReview, deleteReview } = reviewController
 const { createReviewSchema, updateReviewSchema } = reviewSchema
 
-reviewRouter.use(authenticate, auth2FA)
-
 reviewRouter
   .route('/')
   /**
@@ -152,86 +150,89 @@ reviewRouter
    *     description: Something went wrong
    */
   .get(reviewsQueryModifier, asyncCatch(getReviews))
-  /**
-   * @openapi
-   * '/api/v1/reviews':
-   *  post:
-   *   tags:
-   *   - Review
-   *   security:
-   *    - bearerAuth: []
-   *    - cookieAuth: []
-   *    - refreshCookieAuth: []
-   *   summary: create review for the specific cabin
-   *   requestBody:
-   *    required: true
-   *    content:
-   *     application/json:
-   *      schema:
-   *       $ref: '#components/schemas/CreateReviewInput'
-   *   responses:
-   *    201:
-   *     description: Success create new data
-   *     content:
-   *      application/json:
-   *       schema:
-   *        type: object
-   *        properties:
-   *         status:
-   *          type: string
-   *         data:
-   *          type: object
-   *          properties:
-   *           setting:
-   *            $ref: '#/components/schemas/ReviewResponse'
-   *
-   *    400:
-   *     description: Bad request
-   *    500:
-   *     description: Something went wrong
-   * @openapi
-   * '/api/v1/cabins/${cabinId}/reviews':
-   *  post:
-   *   tags:
-   *   - Review
-   *   security:
-   *    - bearerAuth: []
-   *    - cookieAuth: []
-   *    - refreshCookieAuth: []
-   *   summary: create review for the specific cabin
-   *   parameters:
-   *    - name: cabinId
-   *      in: path
-   *      description: the id of the cabin
-   *      required: true
-   *   requestBody:
-   *    required: true
-   *    content:
-   *     application/json:
-   *      schema:
-   *       $ref: '#components/schemas/CreateReviewInput'
-   *   responses:
-   *    201:
-   *     description: Success create new data
-   *     content:
-   *      application/json:
-   *       schema:
-   *        type: object
-   *        properties:
-   *         status:
-   *          type: string
-   *         data:
-   *          type: object
-   *          properties:
-   *           setting:
-   *            $ref: '#/components/schemas/ReviewResponse'
-   *
-   *    400:
-   *     description: Bad request
-   *    500:
-   *     description: Something went wrong
-   */
-  .post(authorize('user'), reviewsQueryModifier, validator(createReviewSchema), asyncCatch(postReview))
+
+reviewRouter.use(authenticate, auth2FA)
+
+/**
+ * @openapi
+ * '/api/v1/reviews':
+ *  post:
+ *   tags:
+ *   - Review
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: create review for the specific cabin
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/CreateReviewInput'
+ *   responses:
+ *    201:
+ *     description: Success create new data
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         data:
+ *          type: object
+ *          properties:
+ *           setting:
+ *            $ref: '#/components/schemas/ReviewResponse'
+ *
+ *    400:
+ *     description: Bad request
+ *    500:
+ *     description: Something went wrong
+ * @openapi
+ * '/api/v1/cabins/${cabinId}/reviews':
+ *  post:
+ *   tags:
+ *   - Review
+ *   security:
+ *    - bearerAuth: []
+ *    - cookieAuth: []
+ *    - refreshCookieAuth: []
+ *   summary: create review for the specific cabin
+ *   parameters:
+ *    - name: cabinId
+ *      in: path
+ *      description: the id of the cabin
+ *      required: true
+ *   requestBody:
+ *    required: true
+ *    content:
+ *     application/json:
+ *      schema:
+ *       $ref: '#components/schemas/CreateReviewInput'
+ *   responses:
+ *    201:
+ *     description: Success create new data
+ *     content:
+ *      application/json:
+ *       schema:
+ *        type: object
+ *        properties:
+ *         status:
+ *          type: string
+ *         data:
+ *          type: object
+ *          properties:
+ *           setting:
+ *            $ref: '#/components/schemas/ReviewResponse'
+ *
+ *    400:
+ *     description: Bad request
+ *    500:
+ *     description: Something went wrong
+ */
+reviewRouter.post('/', authorize('user'), reviewsQueryModifier, validator(createReviewSchema), asyncCatch(postReview))
 
 reviewRouter
   .route('/:id')
