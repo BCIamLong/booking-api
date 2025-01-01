@@ -16,7 +16,7 @@ const reviewsQueryModifier = async function (req: Request, res: Response, next: 
       if (req.method === 'POST') {
         // console.log('run ok')
         req.body.cabin = cabinId
-        req.body.user = req.user.id
+        req.body.user = req.user?.id
       } else {
         req.query.cabin = cabinId
       }
@@ -25,7 +25,7 @@ const reviewsQueryModifier = async function (req: Request, res: Response, next: 
     }
     // console.log('ok2')
     if (userSlug === 'me') {
-      req.query = { user: req.user.id }
+      req.query = { user: req.user?.id }
       return next()
     }
 
