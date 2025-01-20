@@ -22,8 +22,80 @@ toursRouter.use('/:cabinId/bookmarks', bookmarksRouter)
 toursRouter.get('/tours-to-post', authenticate, auth2FA, asyncCatch(getToursAvailableToPost))
 
 toursRouter
+  /**
+   * @openapi
+   * '/api/v1/tours':
+   *  get:
+   *   tags:
+   *   - Tour
+   *   summary: get all tours
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         count:
+   *          type: number
+   *         results:
+   *          type: number
+   *         data:
+   *          type: object
+   *          properties:
+   *           tours:
+   *            type: array
+   *            items:
+   *             $ref: '#/components/schemas/TourResponse'
+   *    404:
+   *     description: Not found
+   *    500:
+   *     description: Something went wrong
+   */
   .route('/')
   .get(asyncCatch(getTours))
+  /**
+   * @openapi
+   * '/api/v1/tours':
+   *  post:
+   *   tags:
+   *   - Tour
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: create tour
+   *   requestBody:
+   *    required: true
+   *    content:
+   *     application/json:
+   *      schema:
+   *       $ref: '#components/schemas/CreateTourInput'
+   *   responses:
+   *    201:
+   *     description: Success create new data
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           cabin:
+   *            $ref: '#/components/schemas/TourResponse'
+   *
+   *    400:
+   *     description: Bad request
+   *    500:
+   *     description: Something went wrong
+   *
+   */
   .post(
     authenticate,
     auth2FA,
@@ -38,8 +110,80 @@ toursRouter
   )
 
 toursRouter
+  /**
+   * @openapi
+   * '/api/v1/tours/{id}':
+   *  get:
+   *   tags:
+   *   - Tour
+   *   summary: get a tour with tour id
+   *   parameters:
+   *    - name: id
+   *      in: path
+   *      description: the id of the tour
+   *      required: true
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           tour:
+   *            $ref: '#/components/schemas/TourResponse'
+   *    404:
+   *     description: No user found
+   *    500:
+   *     description: Something went wrong
+   */
   .route('/:id')
   .get(asyncCatch(getTour))
+  /**
+   * @openapi
+   * '/api/v1/tours':
+   *  patch:
+   *   tags:
+   *   - Tour
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: Update tour
+   *   requestBody:
+   *    required: true
+   *    content:
+   *     application/json:
+   *      schema:
+   *       $ref: '#components/schemas/UpdateTourInput'
+   *   responses:
+   *    200:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: object
+   *          properties:
+   *           cabin:
+   *            $ref: '#/components/schemas/TourResponse'
+   *
+   *    400:
+   *     description: Bad request
+   *    404:
+   *     description: No cabin found
+   *    500:
+   *     description: Something went wrong
+   */
   .patch(
     authenticate,
     auth2FA,
@@ -55,6 +199,39 @@ toursRouter
     covertJSONStringifyDataToOb,
     asyncCatch(updateTour)
   )
+  /**
+   * @openapi
+   * '/api/v1/tours/{id}':
+   *  delete:
+   *   tags:
+   *   - Tour
+   *   security:
+   *    - bearerAuth: []
+   *    - cookieAuth: []
+   *    - refreshCookieAuth: []
+   *   summary: delete a tour with the tour id
+   *   parameters:
+   *   - name: id
+   *     in: path
+   *     description: the id of the tour
+   *     required: true
+   *   responses:
+   *    204:
+   *     description: Success
+   *     content:
+   *      application/json:
+   *       schema:
+   *        type: object
+   *        properties:
+   *         status:
+   *          type: string
+   *         data:
+   *          type: null
+   *    404:
+   *     description: No tour found
+   *    500:
+   *     description: Something went wrong
+   */
   .delete(
     authenticate,
     auth2FA,

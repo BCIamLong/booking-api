@@ -5,6 +5,95 @@ import { appConfig } from '~/config'
 
 const { appEmitter } = appConfig
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   TourResponse:
+ *    type: object
+ *    properties:
+ *     _id:
+ *      type: string
+ *     name:
+ *      type: string
+ *     slug:
+ *      type: string
+ *     duration:
+ *      type: number
+ *     maxGroupSize:
+ *      type: number
+ *     difficulty:
+ *      type: string
+ *     ratingsAverage:
+ *      type: number
+ *      format: double
+ *     ratingsQuantity:
+ *      type: number
+ *      format: double
+ *     summary:
+ *      type: string
+ *     description:
+ *      type: string
+ *     price:
+ *      type: number
+ *      format: double
+ *     imageCover:
+ *      type: string
+ *     images:
+ *      type: array
+ *      items:
+ *       type: string
+ *     createdAt:
+ *      type: string
+ *      format: date
+ *     updatedAt:
+ *      type: string
+ *      format: date
+ *     startDates:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        _id:
+ *         type: string
+ *        date:
+ *         type: string
+ *         format: date
+ *        participants:
+ *         type: number
+ *        soldOut:
+ *         type: boolean
+ *     vip:
+ *      type: boolean
+ *     startLocation:
+ *      type: object
+ *      properties:
+ *       _id:
+ *        type: string
+ *       date:
+ *        type: string
+ *        format: date
+ *       participants:
+ *        type: number
+ *       soldOut:
+ *        type: boolean
+ *     locations:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        _id:
+ *         type: string
+ *        date:
+ *         type: string
+ *         format: date
+ *        day:
+ *         type: number
+ *        participants:
+ *         type: number
+ *        soldOut:
+ *         type: boolean
+ */
 const tourSchema = new Schema(
   {
     _id: {
