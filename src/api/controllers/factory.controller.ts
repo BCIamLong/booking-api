@@ -5,6 +5,7 @@ interface Options {
   id?: string
   body?: any
   queryStr?: QueryStr
+  num?: number
 }
 
 type ControllerFn = ({ id, body }: Options) => Promise<{ data: any; count?: number; collectionName: string }>
@@ -81,4 +82,17 @@ const deleteOne = (fn: ControllerFn) =>
     })
   }
 
-export { getAll, getOne, postOne, updateOne, deleteOne }
+const getRandom = (fn: ControllerFn) =>
+  async function (req: Request, res: Response) {
+    const numVal = req.query?.num ? +req.query?.num : 10
+    const { data, collectionName } = await fn({ num: numVal as number })
+
+    res.json({
+      status: 'success',
+      data: {
+        [collectionName]: data
+      }
+    })
+  }
+
+export { getAll, getOne, postOne, updateOne, deleteOne, getRandom }

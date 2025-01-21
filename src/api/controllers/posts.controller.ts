@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
 import { postsService } from '../services'
-import { deleteOne, getAll, getOne, postOne, updateOne } from './factory.controller'
+import { deleteOne, getAll, getOne, getRandom, postOne, updateOne } from './factory.controller'
 
-const { fetchPosts, fetchPost, editPost, createPost, removePost, updatePostCommentsService } = postsService
+const { fetchPosts, fetchPost, editPost, createPost, removePost, fetchRandomPosts, updatePostCommentsService } =
+  postsService
 
 const getPosts = getAll(async (options) => {
   const { data, collectionName, count } = await fetchPosts(options.queryStr!)
@@ -47,4 +48,9 @@ const updatePostComments = async function (req: Request, res: Response) {
   })
 }
 
-export default { getPosts, getPost, postPost, updatePost, deletePost, updatePostComments }
+const getRandomPosts = getRandom(async (options) => {
+  const { data, collectionName } = await fetchRandomPosts(options.num || 10)
+  return { data, collectionName }
+})
+
+export default { getPosts, getPost, postPost, updatePost, deletePost, updatePostComments, getRandomPosts }

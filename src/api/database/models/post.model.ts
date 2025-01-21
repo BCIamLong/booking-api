@@ -6,6 +6,89 @@ import { appConfig } from '~/config'
 
 const { appEmitter } = appConfig
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *   PostResponse:
+ *    type: object
+ *    properties:
+ *     _id:
+ *      type: string
+ *     tourId:
+ *      type: string
+ *     userId:
+ *      type: string
+ *     title:
+ *      type: string
+ *     description:
+ *      type: string
+ *     likes:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        _id:
+ *         type: string
+ *        userId:
+ *         type: string
+ *        likeAt:
+ *         type: string
+ *         format: date
+ *     comments:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        _id:
+ *         type: string
+ *        userId:
+ *         type: string
+ *        likes:
+ *         type: array
+ *         items:
+ *          type: object
+ *          properties:
+ *           _id:
+ *            type: string
+ *           userId:
+ *            type: string
+ *           likeAt:
+ *            type: string
+ *            format: date
+ *        content:
+ *         type: string
+ *        commentAt:
+ *         type: string
+ *         format: date
+ *        updateCommentAt:
+ *         type: string
+ *         format: date
+ *     shares:
+ *      type: number
+ *     bookmarks:
+ *      type: array
+ *      items:
+ *       type: object
+ *       properties:
+ *        _id:
+ *         type: string
+ *        userId:
+ *         type: string
+ *        bookmarkAt:
+ *         type: string
+ *         format: date
+ *     images:
+ *      type: array
+ *      items:
+ *       type: string
+ *     createdAt:
+ *      type: string
+ *      format: date
+ *     updatedAt:
+ *      type: string
+ *      format: date
+ */
 const postSchema = new Schema(
   {
     _id: {

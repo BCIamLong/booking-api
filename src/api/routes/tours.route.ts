@@ -87,7 +87,7 @@ toursRouter
    *         data:
    *          type: object
    *          properties:
-   *           cabin:
+   *           tour:
    *            $ref: '#/components/schemas/TourResponse'
    *
    *    400:
@@ -138,7 +138,7 @@ toursRouter
    *           tour:
    *            $ref: '#/components/schemas/TourResponse'
    *    404:
-   *     description: No user found
+   *     description: No tour found
    *    500:
    *     description: Something went wrong
    */
@@ -174,13 +174,13 @@ toursRouter
    *         data:
    *          type: object
    *          properties:
-   *           cabin:
+   *           tour:
    *            $ref: '#/components/schemas/TourResponse'
    *
    *    400:
    *     description: Bad request
    *    404:
-   *     description: No cabin found
+   *     description: No tour found
    *    500:
    *     description: Something went wrong
    */
