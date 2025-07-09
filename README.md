@@ -1,6 +1,6 @@
 # Booking API
 
-[Booking API](https://booking-api-ebe1.onrender.com/docs) is a RESTful API for managing bookings with comprehensive features including user authentication, profile management, payment processing, and more.
+[Booking API](https://tours-booking-api.onrender.com/docs) is a RESTful API for managing bookings with comprehensive features including user authentication, profile management, payment processing, and more.
 
 ### Table of contents
 - [Features](#feature)
